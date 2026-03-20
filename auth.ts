@@ -1,0 +1,93 @@
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { authConfig } from "./auth.config";
+import dbConnect from "@/lib/mongodb";
+import User from "@/models/User";
+import Role from "@/models/Role";
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+    ...authConfig,
+    providers: [
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    throw new Error("Please provide email and password");
+                }
+
+                try {
+                    await dbConnect();
+
+                    // Ensure Role model is registered
+                    void Role;
+
+                    // Find user and include password field & role
+                    const user: any = await User.findOne({
+                        email: credentials.email
+                    }).select('+password').populate('role');
+
+                    if (!user) {
+                        throw new Error("Invalid email or password");
+                    }
+
+                    // Check password
+                    const isPasswordValid = await user.comparePassword(
+                        credentials.password as string
+                    );
+
+                    if (!isPasswordValid) {
+                        throw new Error("Invalid email or password");
+                    }
+
+                    // Return user object
+                    return {
+                        id: user._id.toString(),
+                        email: user.email,
+                        name: user.name,
+                        role: user.role
+                    };
+                } catch (error) {
+                    console.error("Authentication error:", error);
+                    throw error;
+                }
+            },
+        }),
+    ],
+    // Keep specialized callbacks that need DB here if they can't be in config
+    callbacks: {
+        ...authConfig.callbacks,
+        async jwt({ token, user, trigger, session }) {
+            // Initial sign in
+            if (user) {
+                token.id = user.id;
+                if (user.role) {
+                    token.role = user.role.name;
+                    token.permissions = user.role.permissions;
+                    token.roleId = user.role._id?.toString() || user.role.id;
+                }
+            }
+
+            // On subsequent calls, refresh permissions if roleId exists
+            // This part uses DB so it must stay in the Node-runtime auth.ts
+            if (token.roleId && typeof token.roleId === 'string') {
+                try {
+                    await dbConnect();
+                    const { Role } = await import("@/lib/initModels");
+                    const role = await Role.findById(token.roleId);
+                    if (role) {
+                        token.role = role.name;
+                        token.permissions = role.permissions;
+                    }
+                } catch (error) {
+                    console.error("Error refreshing permissions in JWT callback:", error);
+                }
+            }
+
+            return token;
+        },
+    }
+});
