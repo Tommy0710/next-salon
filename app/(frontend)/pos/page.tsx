@@ -39,7 +39,31 @@ interface StaffAssignment {
     staffId: string;
     percentage: number;
 }
+// Add these to your existing interfaces
+interface Bill {
+    id: string;
+    name: string;
+    cart: CartItem[];
+    selectedCustomer: string;
+    serviceStaffAssignments: Record<string, StaffAssignment[]>;
+    discount: number;
+    paymentMethod: string;
+    amountPaid: number | string;
+}
 
+const createEmptyBill = (): Bill => {
+    const id = Date.now().toString();
+    return {
+        id,
+        name: `Bill #${id.slice(-4)}`,
+        cart: [],
+        selectedCustomer: "",
+        serviceStaffAssignments: {},
+        discount: 0,
+        paymentMethod: "Cash",
+        amountPaid: ""
+    };
+};
 export default function POSPage() {
     const router = useRouter();
     const { settings } = useSettings();
@@ -51,14 +75,80 @@ export default function POSPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
-    // Cart State
-    const [cart, setCart] = useState<CartItem[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState("");
-    const [serviceStaffAssignments, setServiceStaffAssignments] = useState<Record<string, StaffAssignment[]>>({});
-    const [discount, setDiscount] = useState(0);
-    const [paymentMethod, setPaymentMethod] = useState("Cash");
-    const [amountPaid, setAmountPaid] = useState<number | string>("");
+    // --- NEW MULTI-BILL STATE ---
+    const [isMounted, setIsMounted] = useState(false);
+    const [bills, setBills] = useState<Bill[]>([]);
+    const [activeBillId, setActiveBillId] = useState<string>("");
     const [submitting, setSubmitting] = useState(false);
+
+    // Load bills from localStorage on mount
+    useEffect(() => {
+        setIsMounted(true);
+        const savedBills = localStorage.getItem("pos_waiting_bills");
+        const savedActiveId = localStorage.getItem("pos_active_bill_id");
+
+        if (savedBills) {
+            const parsedBills = JSON.parse(savedBills);
+            if (parsedBills.length > 0) {
+                setBills(parsedBills);
+                setActiveBillId(savedActiveId || parsedBills[0].id);
+                return;
+            }
+        }
+
+        // Default: Create 1 empty bill
+        const initialBill = createEmptyBill();
+        setBills([initialBill]);
+        setActiveBillId(initialBill.id);
+    }, []);
+
+    // Save bills to localStorage whenever they change
+    useEffect(() => {
+        if (isMounted && bills.length > 0) {
+            localStorage.setItem("pos_waiting_bills", JSON.stringify(bills));
+            localStorage.setItem("pos_active_bill_id", activeBillId);
+        }
+    }, [bills, activeBillId, isMounted]);
+
+    // Derived active bill for easy access
+    const activeBill = bills.find(b => b.id === activeBillId) || bills[0];
+
+    // Helper to safely update ONLY the active bill
+    const updateActiveBill = (updates: Partial<Bill> | ((prev: Bill) => Partial<Bill>)) => {
+        setBills(prevBills => prevBills.map(bill => {
+            if (bill.id === activeBillId) {
+                const newValues = typeof updates === "function" ? updates(bill) : updates;
+                return { ...bill, ...newValues };
+            }
+            return bill;
+        }));
+    }
+    // --- BILL MANAGEMENT ACTIONS ---
+    const addNewBill = () => {
+        const newBill = createEmptyBill();
+        setBills(prev => [...prev, newBill]);
+        setActiveBillId(newBill.id);
+    };
+
+    const switchBill = (id: string) => setActiveBillId(id);
+
+    const removeBill = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent triggering switchBill
+        setBills(prev => {
+            const filtered = prev.filter(b => b.id !== id);
+            // If we deleted the active bill, switch to the last available one
+            if (id === activeBillId) {
+                setActiveBillId(filtered.length > 0 ? filtered[filtered.length - 1].id : "");
+            }
+            // If no bills left, create a fresh one
+            if (filtered.length === 0) {
+                const fresh = createEmptyBill();
+                setActiveBillId(fresh.id);
+                return [fresh];
+            }
+            return filtered;
+        });
+    };
 
     useEffect(() => {
         fetchResources();
@@ -106,98 +196,122 @@ export default function POSPage() {
 
     const getCartItemKey = (itemId: string, type: string) => `${type}:${itemId}`;
 
+    // --- CART ACTIONS (Refactored) ---
     const addToCart = (item: Item) => {
-        setCart(prev => {
-            const existing = prev.find(i => i._id === item._id && i.type === item.type);
-            if (existing) {
-                return prev.map(i => i._id === item._id && i.type === item.type ? { ...i, quantity: i.quantity + 1 } : i);
+        if (!activeBill) return;
+        updateActiveBill((bill) => {
+            const existing = bill.cart.find(i => i._id === item._id && i.type === item.type);
+            const newCart = existing
+                ? bill.cart.map(i => i._id === item._id && i.type === item.type ? { ...i, quantity: i.quantity + 1 } : i)
+                : [...bill.cart, { ...item, quantity: 1 }];
+
+            const newAssignments = { ...bill.serviceStaffAssignments };
+            if (item.type === 'Service') {
+                const key = getCartItemKey(item._id, item.type);
+                if (!newAssignments[key]) newAssignments[key] = [];
             }
-            return [...prev, { ...item, quantity: 1 }];
+            return { cart: newCart, serviceStaffAssignments: newAssignments };
         });
-        if (item.type === 'Service') {
-            const key = getCartItemKey(item._id, item.type);
-            setServiceStaffAssignments(prev => prev[key] ? prev : { ...prev, [key]: [] });
-        }
     };
 
     const removeFromCart = (itemId: string, type: string) => {
-        setCart(prev => prev.filter(i => !(i._id === itemId && i.type === type)));
-        if (type === 'Service') {
-            const key = getCartItemKey(itemId, type);
-            setServiceStaffAssignments(prev => {
-                const { [key]: _ignored, ...rest } = prev;
-                return rest;
-            });
-        }
+        updateActiveBill(bill => {
+            const newCart = bill.cart.filter(i => !(i._id === itemId && i.type === type));
+            const newAssignments = { ...bill.serviceStaffAssignments };
+            if (type === 'Service') {
+                delete newAssignments[getCartItemKey(itemId, type)];
+            }
+            return { cart: newCart, serviceStaffAssignments: newAssignments };
+        });
     };
 
     const updateQuantity = (itemId: string, type: string, delta: number) => {
-        setCart(prev => prev.map(i => {
-            if (i._id === itemId && i.type === type) {
-                const newQty = Math.max(1, i.quantity + delta);
-                return { ...i, quantity: newQty };
-            }
-            return i;
+        updateActiveBill(bill => ({
+            cart: bill.cart.map(i => i._id === itemId && i.type === type
+                ? { ...i, quantity: Math.max(1, i.quantity + delta) }
+                : i)
         }));
     };
 
+    // Note: Apply similar `updateActiveBill` logic to `addServiceStaffAssignment`, `removeServiceStaffAssignment`, and `updateServiceStaffPercentage`.
+
     const addServiceStaffAssignment = (itemId: string, type: string, staffId: string) => {
+        if (!activeBill) return;
+
         const key = getCartItemKey(itemId, type);
-        const current = serviceStaffAssignments[key] || [];
+        const current = activeBill.serviceStaffAssignments[key] || [];
         if (current.find(a => a.staffId === staffId)) return;
+
         const staff = staffList.find(s => s._id === staffId);
-        setServiceStaffAssignments(prev => ({
-            ...prev,
-            [key]: [
-                ...(prev[key] || []),
-                {
-                    staffId,
-                    percentage: staff?.commissionRate || 0
-                }
-            ]
-        }));
+        const newAssignments = [
+            ...(activeBill.serviceStaffAssignments[key] || []),
+            {
+                staffId,
+                percentage: staff?.commissionRate || 0
+            }
+        ];
+
+        updateActiveBill({
+            serviceStaffAssignments: {
+                ...activeBill.serviceStaffAssignments,
+                [key]: newAssignments
+            }
+        });
     };
 
     const removeServiceStaffAssignment = (itemId: string, type: string, staffId: string) => {
+        if (!activeBill) return;
+
         const key = getCartItemKey(itemId, type);
-        setServiceStaffAssignments(prev => ({
-            ...prev,
-            [key]: (prev[key] || []).filter(a => a.staffId !== staffId)
-        }));
+        const newAssignments = (activeBill.serviceStaffAssignments[key] || []).filter(a => a.staffId !== staffId);
+
+        updateActiveBill({
+            serviceStaffAssignments: {
+                ...activeBill.serviceStaffAssignments,
+                [key]: newAssignments
+            }
+        });
     };
 
     const updateServiceStaffPercentage = (itemId: string, type: string, staffId: string, percentage: number) => {
+        if (!activeBill) return;
+
         const key = getCartItemKey(itemId, type);
-        setServiceStaffAssignments(prev => ({
-            ...prev,
-            [key]: (prev[key] || []).map(a =>
-                a.staffId === staffId ? { ...a, percentage } : a
-            )
-        }));
+        const newAssignments = (activeBill.serviceStaffAssignments[key] || []).map(a =>
+            a.staffId === staffId ? { ...a, percentage } : a
+        );
+
+        updateActiveBill({
+            serviceStaffAssignments: {
+                ...activeBill.serviceStaffAssignments,
+                [key]: newAssignments
+            }
+        });
     };
 
     const calculateTotal = () => {
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        if (!activeBill) return { subtotal: 0, tax: 0, total: 0, commission: 0, assignments: [] };
+        const subtotal = activeBill.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const tax = subtotal * (settings.taxRate / 100);
-        const total = subtotal + tax - discount;
+        const total = subtotal + tax - activeBill.discount;
 
         // Commission calculation aggregated per staff from per-service assignments
         let totalCommission = 0;
         const perStaff: Record<string, { staffId: string; commission: number }> = {};
 
-        const serviceNetBase = cart.reduce((sum, item) => {
+        const serviceNetBase = activeBill.cart.reduce((sum, item) => {
             if (item.type !== 'Service') return sum;
             const itemTotal = item.price * item.quantity;
             const serviceNet = subtotal > 0 ? (total * (itemTotal / subtotal)) : 0;
             return sum + serviceNet;
         }, 0);
 
-        cart.forEach(item => {
+        activeBill.cart.forEach(item => {
             if (item.type !== 'Service') return;
             const key = getCartItemKey(item._id, item.type);
             const itemTotal = item.price * item.quantity;
             const serviceNet = subtotal > 0 ? (total * (itemTotal / subtotal)) : 0;
-            const serviceAssignments = serviceStaffAssignments[key] || [];
+            const serviceAssignments = activeBill.serviceStaffAssignments[key] || [];
 
             serviceAssignments.forEach(assignment => {
                 const percentage = Number(assignment.percentage) || 0;
@@ -222,18 +336,19 @@ export default function POSPage() {
     };
 
     const handleCheckout = async () => {
-        if (!selectedCustomer) {
+        if (!activeBill) return;
+        if (!activeBill.selectedCustomer) {
             alert("Please select a customer");
             return;
         }
-        if (cart.length === 0) {
+        if (activeBill.cart.length === 0) {
             alert("Cart is empty");
             return;
         }
-        const serviceItems = cart.filter(item => item.type === 'Service');
+        const serviceItems = activeBill.cart.filter(item => item.type === 'Service');
         for (const item of serviceItems) {
             const key = getCartItemKey(item._id, item.type);
-            const itemAssignments = serviceStaffAssignments[key] || [];
+            const itemAssignments = activeBill.serviceStaffAssignments[key] || [];
             const percentTotal = itemAssignments.reduce((sum, a) => sum + (Number(a.percentage) || 0), 0);
             if (percentTotal > 100) {
                 alert(`Staff percentage for service "${item.name}" cannot exceed 100%`);
@@ -245,15 +360,15 @@ export default function POSPage() {
         try {
             const { subtotal, tax, total, commission, assignments } = calculateTotal();
 
-            const paid = amountPaid === "" ? total : parseFloat(amountPaid.toString());
+            const paid = activeBill.amountPaid === "" ? total : parseFloat(activeBill.amountPaid.toString());
             const status = paid >= total ? "paid" : "partially_paid";
 
             // Handle walking customer by setting customer to undefined
-            const customerId = selectedCustomer === 'walking-customer' ? undefined : selectedCustomer;
+            const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
 
             const payload = {
                 customer: customerId,
-                items: cart.map(item => ({
+                items: activeBill.cart.map(item => ({
                     item: item._id,
                     itemModel: item.type,
                     name: item.name,
@@ -263,7 +378,7 @@ export default function POSPage() {
                 })),
                 subtotal,
                 tax,
-                discount,
+                discount: activeBill.discount,
                 totalAmount: total,
                 commission,
                 staffAssignments: assignments.map(a => ({
@@ -273,7 +388,7 @@ export default function POSPage() {
                 })),
                 staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
                 amountPaid: 0,
-                paymentMethod,
+                paymentMethod: activeBill.paymentMethod,
                 status: status
             };
 
@@ -284,6 +399,17 @@ export default function POSPage() {
             });
             const data = await res.json();
             if (data.success) {
+                // IMPORTANT: Remove this bill after successful checkout
+                setBills(prev => {
+                    const remaining = prev.filter(b => b.id !== activeBillId);
+                    if (remaining.length === 0) {
+                        const fresh = createEmptyBill();
+                        setActiveBillId(fresh.id);
+                        return [fresh];
+                    }
+                    setActiveBillId(remaining[0].id);
+                    return remaining;
+                });
                 // If there's a payment, create a deposit record
                 if (paid > 0) {
                     await fetch("/api/deposits", {
@@ -293,17 +419,11 @@ export default function POSPage() {
                             invoice: data.data._id,
                             customer: customerId,
                             amount: paid,
-                            paymentMethod,
+                            paymentMethod: activeBill.paymentMethod,
                             notes: "Initial payment from POS"
                         }),
                     });
                 }
-
-                setCart([]);
-                setDiscount(0);
-                setSelectedCustomer("");
-                setServiceStaffAssignments({});
-                setAmountPaid("");
                 router.push(`/invoices/print/${data.data._id}`);
             } else {
                 alert(data.error || "Failed to create invoice");
@@ -399,181 +519,218 @@ export default function POSPage() {
 
             {/* Right Side: Cart */}
             <div className={`w-full md:w-80 lg:w-96 flex-1 md:flex-none flex flex-col bg-white border-l border-gray-200 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
-                <div className="bg-white flex flex-col h-full overflow-hidden">
-                    <div className="p-3 md:p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 space-y-3">
-                        <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
-                            <SearchableSelect
-                                placeholder="Select Customer"
-                                value={selectedCustomer}
-                                onChange={(val) => setSelectedCustomer(val)}
-                                options={[{ value: 'walking-customer', label: 'Walking Customer' }, ...customers.map(c => ({ value: c._id, label: `${c.name} ${c.phone ? `(${c.phone})` : ''}` }))]}
-                                className="flex-1"
-                            />
+                
+                {/* 1. BILL TABS UI */}
+                <div className="flex overflow-x-auto bg-gray-100 border-b border-gray-200 hide-scrollbar p-1 flex-shrink-0">
+                    {bills.map((bill) => (
+                        <div
+                            key={bill.id}
+                            onClick={() => switchBill(bill.id)}
+                            className={`flex items-center gap-2 px-3 py-1.5 min-w-[100px] cursor-pointer rounded-t-md text-xs font-semibold border-b-2 transition-colors ${
+                                activeBillId === bill.id 
+                                    ? "bg-white text-blue-900 border-blue-900 shadow-sm" 
+                                    : "text-gray-500 border-transparent hover:bg-gray-200"
+                            }`}
+                        >
+                            <span className="truncate flex-1">{bill.name}</span>
+                            {bills.length > 1 && (
+                                <button 
+                                    onClick={(e) => removeBill(bill.id, e)} 
+                                    className="text-gray-400 hover:text-red-500 p-0.5"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                </button>
+                            )}
                         </div>
-                    </div>
+                    ))}
+                    <button 
+                        onClick={addNewBill}
+                        className="flex items-center justify-center px-3 py-1.5 text-blue-900 hover:bg-blue-50 rounded text-xs font-bold shrink-0 ml-1"
+                    >
+                        <Plus className="w-3 h-3 mr-1" /> New Bill
+                    </button>
+                </div>
 
-                    {/* Cart Items */}
-                    <div className="flex-grow overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
-                        {cart.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-gray-400 py-10">
-                                <ShoppingCart className="w-8 h-8 md:w-10 md:h-10 mb-2 opacity-30" />
-                                <p className="text-xs md:text-sm">Cart is empty</p>
+                {/* 2. ACTIVE BILL CONTENT */}
+                {isMounted && activeBill && (
+                    <div className="bg-white flex flex-col h-full overflow-hidden">
+                        
+                        {/* Customer Selection */}
+                        <div className="p-3 md:p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <User className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
+                                <SearchableSelect
+                                    placeholder="Select Customer"
+                                    value={activeBill.selectedCustomer}
+                                    onChange={(val) => updateActiveBill({ selectedCustomer: val })}
+                                    options={[{ value: 'walking-customer', label: 'Walking Customer' }, ...customers.map(c => ({ value: c._id, label: `${c.name} ${c.phone ? `(${c.phone})` : ''}` }))]}
+                                    className="flex-1"
+                                />
                             </div>
-                        ) : (
-                            cart.map(item => (
-                                <div key={item._id} className="p-2 border border-gray-100 rounded-lg bg-white shadow-sm space-y-2">
-                                    <div className="flex items-center justify-between gap-1">
-                                        <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                            <div className="flex-shrink-0">
-                                                {item.type === 'Service' ? (
-                                                    <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
-                                                        <ScissorsIcon className="w-3 h-3 text-purple-600" />
-                                                    </div>
-                                                ) : (
-                                                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                        <Package className="w-3 h-3 text-green-600" />
+                        </div>
+
+                        {/* Cart Items */}
+                        <div className="flex-grow overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
+                            {activeBill.cart.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-gray-400 py-10">
+                                    <ShoppingCart className="w-8 h-8 md:w-10 md:h-10 mb-2 opacity-30" />
+                                    <p className="text-xs md:text-sm">Cart is empty</p>
+                                </div>
+                            ) : (
+                                activeBill.cart.map(item => (
+                                    <div key={item._id} className="p-2 border border-gray-100 rounded-lg bg-white shadow-sm space-y-2">
+                                        <div className="flex items-center justify-between gap-1">
+                                            <div className="flex items-center gap-2 overflow-hidden flex-1">
+                                                <div className="flex-shrink-0">
+                                                    {item.type === 'Service' ? (
+                                                        <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
+                                                            <ScissorsIcon className="w-3 h-3 text-purple-600" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                                                            <Package className="w-3 h-3 text-green-600" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">{item.name}</p>
+                                                    <p className="text-[9px] md:text-[10px] text-gray-500">{settings.symbol}{item.price}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                                <button onClick={() => updateQuantity(item._id, item.type, -1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Minus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                                <span className="text-[10px] md:text-xs font-bold w-4 text-center">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item._id, item.type, 1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Plus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                                <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                            </div>
+                                        </div>
+                                        {item.type === 'Service' && (
+                                            <div className="pl-8 space-y-1.5">
+                                                <SearchableSelect
+                                                    placeholder="Assign staff"
+                                                    value=""
+                                                    onChange={(val) => addServiceStaffAssignment(item._id, item.type, val)}
+                                                    options={staffList.map(s => ({ value: s._id, label: s.name }))}
+                                                    className="w-full h-8"
+                                                />
+                                                {(activeBill.serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).length > 0 && (
+                                                    <div className="space-y-1">
+                                                        {(activeBill.serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).map(assignment => {
+                                                            const staff = staffList.find(s => s._id === assignment.staffId);
+                                                            return (
+                                                                <div key={assignment.staffId} className="flex items-center gap-1.5 bg-blue-50 p-1 rounded border border-blue-100">
+                                                                    <p className="text-[9px] font-bold text-gray-800 flex-1 truncate">{staff?.name}</p>
+                                                                    <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-blue-200">
+                                                                        <input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            max="100"
+                                                                            value={assignment.percentage}
+                                                                            onChange={(e) => updateServiceStaffPercentage(item._id, item.type, assignment.staffId, parseFloat(e.target.value) || 0)}
+                                                                            className="w-6 text-right text-[9px] font-black focus:outline-none"
+                                                                        />
+                                                                        <span className="text-[9px] font-bold text-blue-900">%</span>
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => removeServiceStaffAssignment(item._id, item.type, assignment.staffId)}
+                                                                        className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded transition-colors"
+                                                                    >
+                                                                        <Trash2 className="w-2.5 h-2.5" />
+                                                                    </button>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="min-w-0">
-                                                <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">{item.name}</p>
-                                                <p className="text-[9px] md:text-[10px] text-gray-500">{settings.symbol}{item.price}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                            <button onClick={() => updateQuantity(item._id, item.type, -1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Minus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
-                                            <span className="text-[10px] md:text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item._id, item.type, 1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Plus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
-                                            <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
-                                        </div>
+                                        )}
                                     </div>
-                                    {item.type === 'Service' && (
-                                        <div className="pl-8 space-y-1.5">
-                                            <SearchableSelect
-                                                placeholder="Assign staff"
-                                                value=""
-                                                onChange={(val) => addServiceStaffAssignment(item._id, item.type, val)}
-                                                options={staffList.map(s => ({ value: s._id, label: s.name }))}
-                                                className="w-full h-8"
-                                            />
-                                            {(serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).length > 0 && (
-                                                <div className="space-y-1">
-                                                    {(serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).map(assignment => {
-                                                        const staff = staffList.find(s => s._id === assignment.staffId);
-                                                        return (
-                                                            <div key={assignment.staffId} className="flex items-center gap-1.5 bg-blue-50 p-1 rounded border border-blue-100">
-                                                                <p className="text-[9px] font-bold text-gray-800 flex-1 truncate">{staff?.name}</p>
-                                                                <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-blue-200">
-                                                                    <input
-                                                                        type="number"
-                                                                        min="0"
-                                                                        max="100"
-                                                                        value={assignment.percentage}
-                                                                        onChange={(e) => updateServiceStaffPercentage(item._id, item.type, assignment.staffId, parseFloat(e.target.value) || 0)}
-                                                                        className="w-6 text-right text-[9px] font-black focus:outline-none"
-                                                                    />
-                                                                    <span className="text-[9px] font-bold text-blue-900">%</span>
-                                                                </div>
-                                                                <button
-                                                                    onClick={() => removeServiceStaffAssignment(item._id, item.type, assignment.staffId)}
-                                                                    className="p-1 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-2.5 h-2.5" />
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    {/* Summary - Sticky at bottom */}
-                    <div className="flex-shrink-0 p-3 bg-gray-50 border-t border-gray-200 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                        <div className="space-y-1 mb-3 text-[10px] md:text-xs">
-                            <div className="flex justify-between text-gray-600">
-                                <span>Subtotal</span>
-                                <span>{settings.symbol}{subtotal.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Tax ({settings.taxRate}%)</span>
-                                <span>{settings.symbol}{tax.toFixed(2)}</span>
-                            </div>
-                            {commission > 0 && (
-                                <div className="space-y-1 bg-indigo-50 px-2 py-1.5 rounded border border-indigo-100/50">
-                                    <div className="flex justify-between text-indigo-600 font-bold mb-1 border-b border-indigo-200/50 pb-0.5">
-                                        <span>Total Commission</span>
-                                        <span>{settings.symbol}{commission.toFixed(2)}</span>
-                                    </div>
-                                    {assignments.map((assignment, idx) => {
-                                        const staff = staffList.find(s => s._id === assignment.staffId);
-                                        return (
-                                            <div key={idx} className="flex justify-between text-[9px] text-indigo-500 font-medium pl-1">
-                                                <span className="truncate pr-2">{staff?.name}</span>
-                                                <span className="flex-shrink-0">{settings.symbol}{(assignment.commission || 0).toFixed(2)}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                ))
                             )}
-                            <div className="flex justify-between text-gray-600 items-center">
-                                <span>Discount</span>
-                                <input
-                                    type="number"
-                                    value={discount}
-                                    onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                                    className="w-16 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-blue-900 outline-none"
-                                    min="0"
-                                />
-                            </div>
-                            <div className="flex justify-between items-center text-blue-900 border-t border-gray-200 pt-1.5 mt-1">
-                                <span className="text-[10px] font-bold">Paid</span>
-                                <input
-                                    type="number"
-                                    placeholder={total.toFixed(2)}
-                                    value={amountPaid}
-                                    onChange={(e) => setAmountPaid(e.target.value)}
-                                    className="w-20 text-right text-[10px] md:text-xs border-2 border-blue-900/20 rounded px-1 py-0.5 focus:border-blue-900 outline-none font-bold"
-                                />
-                            </div>
-                            <div className="flex justify-between text-sm md:text-base font-black text-gray-900 pt-1 border-t border-gray-200">
-                                <span> {parseFloat(amountPaid.toString()) < total ? 'Due' : 'Total'}</span>
-                                <span className={parseFloat(amountPaid.toString()) < total ? 'text-red-600' : 'text-blue-900'}>
-                                    {settings.symbol}{(parseFloat(amountPaid.toString()) < total ? (total - (parseFloat(amountPaid.toString()) || 0)) : total).toFixed(2)}
-                                </span>
-                            </div>
                         </div>
 
-                        <div className="mb-3">
-                            <div className="grid grid-cols-3 gap-1 md:gap-1.5">
-                                {['Cash', 'Card', 'Wallet'].map(method => (
-                                    <button
-                                        key={method}
-                                        onClick={() => setPaymentMethod(method)}
-                                        className={`py-1.5 text-[9px] md:text-[10px] uppercase tracking-wider font-bold rounded border transition-all ${paymentMethod === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
-                                    >
-                                        {method}
-                                    </button>
-                                ))}
+                        {/* Summary Section */}
+                        <div className="flex-shrink-0 p-3 bg-gray-50 border-t border-gray-200 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                            <div className="space-y-1 mb-3 text-[10px] md:text-xs">
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Subtotal</span>
+                                    <span>{settings.symbol}{subtotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Tax ({settings.taxRate}%)</span>
+                                    <span>{settings.symbol}{tax.toFixed(2)}</span>
+                                </div>
+                                {commission > 0 && (
+                                    <div className="space-y-1 bg-indigo-50 px-2 py-1.5 rounded border border-indigo-100/50">
+                                        <div className="flex justify-between text-indigo-600 font-bold mb-1 border-b border-indigo-200/50 pb-0.5">
+                                            <span>Total Commission</span>
+                                            <span>{settings.symbol}{commission.toFixed(2)}</span>
+                                        </div>
+                                        {assignments.map((assignment, idx) => {
+                                            const staff = staffList.find(s => s._id === assignment.staffId);
+                                            return (
+                                                <div key={idx} className="flex justify-between text-[9px] text-indigo-500 font-medium pl-1">
+                                                    <span className="truncate pr-2">{staff?.name}</span>
+                                                    <span className="flex-shrink-0">{settings.symbol}{(assignment.commission || 0).toFixed(2)}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                                <div className="flex justify-between text-gray-600 items-center">
+                                    <span>Discount</span>
+                                    <input
+                                        type="number"
+                                        value={activeBill.discount}
+                                        onChange={(e) => updateActiveBill({ discount: parseFloat(e.target.value) || 0 })}
+                                        className="w-16 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-blue-900 outline-none"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center text-blue-900 border-t border-gray-200 pt-1.5 mt-1">
+                                    <span className="text-[10px] font-bold">Paid</span>
+                                    <input
+                                        type="number"
+                                        placeholder={total.toFixed(2)}
+                                        value={activeBill.amountPaid}
+                                        onChange={(e) => updateActiveBill({ amountPaid: e.target.value })}
+                                        className="w-20 text-right text-[10px] md:text-xs border-2 border-blue-900/20 rounded px-1 py-0.5 focus:border-blue-900 outline-none font-bold"
+                                    />
+                                </div>
+                                <div className="flex justify-between text-sm md:text-base font-black text-gray-900 pt-1 border-t border-gray-200">
+                                    <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Due' : 'Total'}</span>
+                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600' : 'text-blue-900'}>
+                                        {settings.symbol}{((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total).toFixed(2)}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                        <FormButton
-                            onClick={handleCheckout}
-                            loading={submitting}
-                            variant="success"
-                            className="w-full py-4 md:py-4 text-xs md:text-sm uppercase tracking-widest font-black shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all mb-4"
-                            icon={<CreditCard className="w-4 h-4" />}
-                        >
-                            Complete Order
-                        </FormButton>
+                            <div className="mb-3">
+                                <div className="grid grid-cols-3 gap-1 md:gap-1.5">
+                                    {['Cash', 'Card', 'Wallet'].map(method => (
+                                        <button
+                                            key={method}
+                                            onClick={() => updateActiveBill({ paymentMethod: method })}
+                                            className={`py-1.5 text-[9px] md:text-[10px] uppercase tracking-wider font-bold rounded border transition-all ${activeBill.paymentMethod === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        >
+                                            {method}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <FormButton
+                                onClick={handleCheckout}
+                                loading={submitting}
+                                variant="success"
+                                className="w-full py-4 md:py-4 text-xs md:text-sm uppercase tracking-widest font-black shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all mb-4"
+                                icon={<CreditCard className="w-4 h-4" />}
+                            >
+                                Complete Order
+                            </FormButton>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Mobile Navigation Bar */}
@@ -593,9 +750,9 @@ export default function POSPage() {
                 >
                     <div className="relative">
                         <ShoppingCart className="w-5 h-5 mb-1" />
-                        {cart.length > 0 && (
+                        {activeBill && activeBill.cart.length > 0 && (
                             <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
-                                {cart.reduce((a, b) => a + b.quantity, 0)}
+                                {activeBill.cart.reduce((a, b) => a + b.quantity, 0)}
                             </span>
                         )}
                     </div>
