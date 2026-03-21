@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -29,6 +32,9 @@ body {
 button {
   cursor: pointer;
 }
+.nowrap {
+  white-space: nowrap;
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -47,4 +53,11 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* 3. Custom Utilities (Các class tiện ích nhỏ) */
+@layer utilities {
+  .nowrap {
+  white-space: nowrap;
+}
 }

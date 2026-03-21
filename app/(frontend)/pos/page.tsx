@@ -80,6 +80,8 @@ export default function POSPage() {
     const [bills, setBills] = useState<Bill[]>([]);
     const [activeBillId, setActiveBillId] = useState<string>("");
     const [submitting, setSubmitting] = useState(false);
+    // THÊM DÒNG NÀY: State để lưu ID của bill đang chuẩn bị xóa (mở modal)
+    const [billToDelete, setBillToDelete] = useState<string | null>(null);
 
     // Load bills from localStorage on mount
     useEffect(() => {
@@ -131,16 +133,23 @@ export default function POSPage() {
     };
 
     const switchBill = (id: string) => setActiveBillId(id);
+    // 1. Hàm này chỉ mở popup xác nhận lên
+    const handleRemoveClick = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation(); // Ngăn chặn việc click vào tab làm đổi tab
+        setBillToDelete(id); // Gọi popup lên
+    };
 
-    const removeBill = (id: string, e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent triggering switchBill
+    // 2. Hàm này mới thực sự xóa bill khi bấm "Đồng ý"
+    const confirmRemoveBill = () => {
+        if (!billToDelete) return;
+
         setBills(prev => {
-            const filtered = prev.filter(b => b.id !== id);
-            // If we deleted the active bill, switch to the last available one
-            if (id === activeBillId) {
+            const filtered = prev.filter(b => b.id !== billToDelete);
+            // Nếu xóa trúng bill đang mở, tự động lùi về bill cuối cùng
+            if (billToDelete === activeBillId) {
                 setActiveBillId(filtered.length > 0 ? filtered[filtered.length - 1].id : "");
             }
-            // If no bills left, create a fresh one
+            // Nếu xóa sạch không còn bill nào, tạo 1 bill mới tinh
             if (filtered.length === 0) {
                 const fresh = createEmptyBill();
                 setActiveBillId(fresh.id);
@@ -148,6 +157,9 @@ export default function POSPage() {
             }
             return filtered;
         });
+        
+        // Đóng popup sau khi xóa xong
+        setBillToDelete(null); 
     };
 
     useEffect(() => {
@@ -387,7 +399,7 @@ export default function POSPage() {
                     commission: a.commission
                 })),
                 staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
-                amountPaid: 0,
+                amountPaid: paid,
                 paymentMethod: activeBill.paymentMethod,
                 status: status
             };
@@ -532,10 +544,10 @@ export default function POSPage() {
                                     : "text-gray-500 border-transparent hover:bg-gray-200"
                             }`}
                         >
-                            <span className="truncate flex-1">{bill.name}</span>
+                            <span className="nowrap flex-1">{bill.name}</span>
                             {bills.length > 1 && (
                                 <button 
-                                    onClick={(e) => removeBill(bill.id, e)} 
+                                    onClick={(e) => handleRemoveClick(bill.id, e)} 
                                     className="text-gray-400 hover:text-red-500 p-0.5"
                                 >
                                     <Trash2 className="w-3 h-3" />
@@ -578,7 +590,7 @@ export default function POSPage() {
                                 </div>
                             ) : (
                                 activeBill.cart.map(item => (
-                                    <div key={item._id} className="p-2 border border-gray-100 rounded-lg bg-white shadow-sm space-y-2">
+                                    <div key={`${item.type}-${item._id}`} className="p-2 border border-gray-100 rounded-lg bg-white shadow-sm space-y-2">
                                         <div className="flex items-center justify-between gap-1">
                                             <div className="flex items-center gap-2 overflow-hidden flex-1">
                                                 <div className="flex-shrink-0">
@@ -760,6 +772,37 @@ export default function POSPage() {
                     {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-blue-900 rounded-b-full"></div>}
                 </button>
             </div>
+            {/* THÊM VÀO ĐÂY: Modal Xác nhận xóa Bill */}
+            {billToDelete && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                                <Trash2 className="w-6 h-6 text-red-600" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận xóa hóa đơn</h3>
+                            <p className="text-sm text-gray-500 mb-6">
+                                Bạn có chắc chắn muốn xóa hóa đơn này không? Các sản phẩm đã chọn trong bill sẽ bị mất.
+                            </p>
+                        </div>
+                        <div className="flex justify-end gap-3 w-full">
+                            <button
+                                onClick={() => setBillToDelete(null)}
+                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-bold transition-colors"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={confirmRemoveBill}
+                                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-bold transition-colors shadow-sm"
+                            >
+                                Đồng ý xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
+        
     );
 }
