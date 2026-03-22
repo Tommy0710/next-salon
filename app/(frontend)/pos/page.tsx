@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard } from "lucide-react";
+import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { useSettings } from "@/components/providers/SettingsProvider";
@@ -48,6 +48,7 @@ interface Bill {
     serviceStaffAssignments: Record<string, StaffAssignment[]>;
     discount: number;
     paymentMethod: string;
+    selectedQrIndex: number;
     amountPaid: number | string;
 }
 
@@ -60,7 +61,8 @@ const createEmptyBill = (): Bill => {
         selectedCustomer: "",
         serviceStaffAssignments: {},
         discount: 0,
-        paymentMethod: "Cash",
+        paymentMethod: "Tiền mặt",
+        selectedQrIndex: 0,
         amountPaid: ""
     };
 };
@@ -82,7 +84,7 @@ export default function POSPage() {
     const [submitting, setSubmitting] = useState(false);
     // THÊM DÒNG NÀY: State để lưu ID của bill đang chuẩn bị xóa (mở modal)
     const [billToDelete, setBillToDelete] = useState<string | null>(null);
-
+    const [billSearchQuery, setBillSearchQuery] = useState("");
     // Load bills from localStorage on mount
     useEffect(() => {
         setIsMounted(true);
@@ -368,6 +370,14 @@ export default function POSPage() {
             }
         }
 
+        let qrCodeImage = "";
+            let bankDetails = "";
+            if (activeBill.paymentMethod === "Mã QR" && settings?.qrCodes?.[activeBill.selectedQrIndex]) {
+                const qr = settings.qrCodes[activeBill.selectedQrIndex];
+                qrCodeImage = qr.image;
+                bankDetails = `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`;
+            }
+
         setSubmitting(true);
         try {
             const { subtotal, tax, total, commission, assignments } = calculateTotal();
@@ -401,7 +411,9 @@ export default function POSPage() {
                 staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
                 amountPaid: paid,
                 paymentMethod: activeBill.paymentMethod,
-                status: status
+                status: status,
+                qrCodeImage: qrCodeImage,
+                bankDetails: bankDetails
             };
 
             const res = await fetch("/api/invoices", {
@@ -451,6 +463,7 @@ export default function POSPage() {
     const { subtotal, tax, total, commission, assignments } = calculateTotal();
     const [mobileTab, setMobileTab] = useState<'catalog' | 'cart'>('catalog');
 
+    const filteredBills = bills.filter(b => b.name.toLowerCase().includes(billSearchQuery.toLowerCase()));
     return (
         <div className="flex h-[100dvh] w-full bg-gray-50 overflow-hidden flex-col md:flex-row">
             {/* Left Side: Items Catalog */}
@@ -532,9 +545,30 @@ export default function POSPage() {
             {/* Right Side: Cart */}
             <div className={`w-full md:w-80 lg:w-96 flex-1 md:flex-none flex flex-col bg-white border-l border-gray-200 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
                 
+                {/* --- MỚI: THANH TÌM KIẾM BILL & TẠO BILL MỚI --- */}
+                <div className="p-2 border-b border-gray-200 bg-gray-50 flex items-center gap-2 flex-shrink-0">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                        <input
+                            type="text"
+                            placeholder="Tìm tên bill..."
+                            value={billSearchQuery}
+                            onChange={(e) => setBillSearchQuery(e.target.value)}
+                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-900"
+                        />
+                    </div>
+                    <button 
+                        onClick={addNewBill}
+                        className="flex items-center justify-center p-1.5 bg-blue-900 text-white hover:bg-blue-800 rounded-md shadow-sm transition-colors"
+                        title="Tạo Bill Mới"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </button>
+                </div>
+
                 {/* 1. BILL TABS UI */}
                 <div className="flex overflow-x-auto bg-gray-100 border-b border-gray-200 hide-scrollbar p-1 flex-shrink-0">
-                    {bills.map((bill) => (
+                    {filteredBills.map((bill) => (
                         <div
                             key={bill.id}
                             onClick={() => switchBill(bill.id)}
@@ -555,20 +589,27 @@ export default function POSPage() {
                             )}
                         </div>
                     ))}
-                    <button 
-                        onClick={addNewBill}
-                        className="flex items-center justify-center px-3 py-1.5 text-blue-900 hover:bg-blue-50 rounded text-xs font-bold shrink-0 ml-1"
-                    >
-                        <Plus className="w-3 h-3 mr-1" /> New Bill
-                    </button>
                 </div>
 
                 {/* 2. ACTIVE BILL CONTENT */}
                 {isMounted && activeBill && (
                     <div className="bg-white flex flex-col h-full overflow-hidden">
                         
-                        {/* Customer Selection */}
+                        {/* Customer Selection & Bill Renaming */}
                         <div className="p-3 md:p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 space-y-3">
+                            
+                            {/* --- MỚI: Ô ĐỔI TÊN BILL --- */}
+                            <div className="flex items-center gap-2">
+                                <Edit className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
+                                <input
+                                    type="text"
+                                    placeholder="Đặt tên Bill (VD: Bàn 1, Chị Hà VIP...)"
+                                    value={activeBill.name}
+                                    onChange={(e) => updateActiveBill({ name: e.target.value })}
+                                    className="flex-1 px-3 py-1.5 text-sm font-bold text-blue-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition-all shadow-sm"
+                                />
+                            </div>
+
                             <div className="flex items-center gap-2">
                                 <User className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                                 <SearchableSelect
@@ -718,17 +759,35 @@ export default function POSPage() {
                             </div>
 
                             <div className="mb-3">
-                                <div className="grid grid-cols-3 gap-1 md:gap-1.5">
-                                    {['Cash', 'Card', 'Wallet'].map(method => (
+                                <div className="mb-3 space-y-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['Tiền mặt', 'Mã QR'].map(method => (
                                         <button
                                             key={method}
                                             onClick={() => updateActiveBill({ paymentMethod: method })}
-                                            className={`py-1.5 text-[9px] md:text-[10px] uppercase tracking-wider font-bold rounded border transition-all ${activeBill.paymentMethod === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                            className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
                                         >
                                             {method}
                                         </button>
                                     ))}
                                 </div>
+                                
+                                {/* Hiển thị danh sách QR nếu chọn Mã QR */}
+                                {activeBill.paymentMethod === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
+                                    <div className="animate-in fade-in slide-in-from-top-1">
+                                        <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
+                                        <select 
+                                            value={activeBill.selectedQrIndex}
+                                            onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
+                                            className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium"
+                                        >
+                                            {settings.qrCodes.map((qr: any, idx: number) => (
+                                                <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
                             </div>
 
                             <FormButton
