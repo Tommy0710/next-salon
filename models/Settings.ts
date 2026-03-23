@@ -123,7 +123,13 @@ const SettingsSchema = new mongoose.Schema({
     openaiModel: {
         type: String,
         default: 'gpt-4o'
-    }
+    },
+    qrCodes: [{
+        name: String,
+        bankName: String,
+        accountNumber: String,
+        image: String
+    }]
 }, {
     timestamps: true
 });

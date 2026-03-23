@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles } from "lucide-react";
+import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2 } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { getAllCurrencies } from "@/lib/currency";
@@ -44,6 +44,7 @@ interface Settings {
     aiEnabled: boolean;
     openaiApiKey: string;
     openaiModel: string;
+    qrCodes: { name: string; bankName: string; accountNumber: string; image: string }[];
 }
 
 export default function SettingsPage() {
@@ -81,11 +82,13 @@ export default function SettingsPage() {
         // AI Settings
         aiEnabled: false,
         openaiApiKey: "",
-        openaiModel: "gpt-4o"
+        openaiModel: "gpt-4o",
+        qrCodes: []
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
+    const [newQr, setNewQr] = useState({ name: "", bankName: "", accountNumber: "", image: "" });
 
 
     const currencies = getAllCurrencies();
@@ -97,7 +100,7 @@ export default function SettingsPage() {
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch("/api/settings");
+            const res = await fetch("/api/settings", { credentials: 'include' });
             const data = await res.json();
             if (data.success) {
                 // Merge fetched data with defaults to ensure all fields exist
@@ -135,7 +138,8 @@ export default function SettingsPage() {
                     // AI Settings
                     aiEnabled: data.data.aiEnabled || false,
                     openaiApiKey: data.data.openaiApiKey || "",
-                    openaiModel: data.data.openaiModel || "gpt-4o"
+                    openaiModel: data.data.openaiModel || "gpt-4o",
+                    qrCodes: data.data.qrCodes || []
                 });
             }
         } catch (error) {
@@ -156,17 +160,20 @@ export default function SettingsPage() {
         try {
             const res = await fetch("/api/settings", {
                 method: "PUT",
+                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(settings),
             });
             const data = await res.json();
-            if (data.success) {
-                setSettings(data.data);
-                await refreshSettings();
-                setMessage({ type: "success", text: "Settings saved successfully!" });
-            } else {
+
+            if (!res.ok || !data.success) {
                 setMessage({ type: "error", text: data.error || "Failed to save settings" });
+                return;
             }
+
+            setSettings(data.data);
+            await refreshSettings();
+            setMessage({ type: "success", text: "Settings saved successfully!" });
         } catch (error) {
             console.error("Error saving settings:", error);
             setMessage({ type: "error", text: "Failed to save settings" });
@@ -371,7 +378,78 @@ export default function SettingsPage() {
                         </div>
                     </div>
                 </div>
+                {/* --- MỚI: QUẢN LÝ MÃ QR THANH TOÁN --- */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <QrCode className="w-5 h-5 text-blue-900" />
+                        Quản lý Mã QR Thanh Toán
+                    </h2>
+                    
+                    {/* Danh sách QR đã thêm */}
+                    {settings.qrCodes && settings.qrCodes.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {settings.qrCodes.map((qr, index) => (
+                                <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50 relative">
+                                    {qr.image ? (
+                                        <img src={qr.image} alt="QR" className="w-20 h-20 object-contain bg-white border rounded" />
+                                    ) : (
+                                        <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-xs text-gray-500 rounded">No Image</div>
+                                    )}
+                                    <div>
+                                        <p className="font-bold text-gray-900">{qr.name}</p>
+                                        <p className="text-sm text-gray-600">{qr.bankName}</p>
+                                        <p className="text-sm font-mono text-gray-800">{qr.accountNumber}</p>
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setSettings({ ...settings, qrCodes: settings.qrCodes.filter((_, i) => i !== index) })}
+                                        className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
+                    {/* Form thêm QR mới */}
+                    <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg bg-white">
+                        <h3 className="text-sm font-bold text-gray-700 mb-3">Thêm mã QR mới</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <FormInput label="Tên gợi nhớ (VD: Momo, VCB...)" value={newQr.name} onChange={(e) => setNewQr({...newQr, name: e.target.value})} />
+                            <FormInput label="Tên Ngân Hàng / Ví" value={newQr.bankName} onChange={(e) => setNewQr({...newQr, bankName: e.target.value})} />
+                            <FormInput label="Số Tài Khoản" value={newQr.accountNumber} onChange={(e) => setNewQr({...newQr, accountNumber: e.target.value})} />
+                        </div>
+                        <div className="flex items-end gap-4">
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Hình ảnh Mã QR</label>
+                                <input
+                                    type="file" accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => setNewQr({ ...newQr, image: reader.result as string });
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                    className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if(!newQr.name || !newQr.image) return alert("Vui lòng nhập tên và chọn ảnh QR");
+                                    setSettings({ ...settings, qrCodes: [...(settings.qrCodes || []), newQr] });
+                                    setNewQr({ name: "", bankName: "", accountNumber: "", image: "" }); // Reset form
+                                }}
+                                className="px-4 py-2 bg-blue-900 text-white rounded-lg text-sm font-bold hover:bg-blue-800 h-10"
+                            >
+                                Thêm Mã QR
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 {/* SMS Settings (Twilio) */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -616,7 +694,7 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end sticky bottom-0">
                     <PermissionGate resource="settings" action="edit">
                         <FormButton
                             type="submit"

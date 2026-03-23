@@ -68,7 +68,7 @@ export default function PrintInvoicePage() {
             </div>
 
             {/* Thermal Receipt Content */}
-            <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full font-mono text-sm border-t-8 border-blue-900 print:border-t-0">
+            <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-blue-900 print:border-t-0">
                 {/* Store Header */}
                 <div className="text-center mb-6">
                     <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1>
@@ -184,6 +184,21 @@ export default function PrintInvoicePage() {
                         <p className="text-[10px] text-gray-500 uppercase tracking-widest">Payment Method</p>
                         <p className="font-bold text-sm bg-gray-100 px-3 py-1 rounded-full uppercase">{invoice.paymentMethod || 'Cash'}</p>
                     </div>
+
+                    {/* THÊM KHỐI NÀY ĐỂ HIỂN THỊ MÃ QR */}
+                    {invoice.paymentMethod === 'Mã QR' && invoice.qrCodeImage && (
+                        <div className="mt-6 flex flex-col items-center border-t border-dashed border-gray-300 pt-6">
+                            <p className="text-[12px] font-black uppercase mb-2">Quét mã để thanh toán</p>
+                            <img src={invoice.qrCodeImage} alt="QR Code Payment" className="w-40 h-40 object-contain p-1 border border-gray-200 rounded-lg" />
+                            {invoice.bankDetails && (
+                                <div className="text-[10px] text-center mt-2 space-y-0.5">
+                                    <p className="font-bold text-[11px]">{invoice.bankDetails.split('|')[0]}</p>
+                                    <p className=" text-[12px] font-black">{invoice.bankDetails.split('|')[1]}</p>
+                                    <p className="text-gray-500">{invoice.bankDetails.split('|')[2]}</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="pt-6 relative">
                         <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div>

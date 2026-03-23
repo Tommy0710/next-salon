@@ -20,6 +20,8 @@ export interface IInvoice extends Document {
     totalAmount: number;
     amountPaid: number;
     paymentMethod: string; // Cash, Card, etc.
+    qrCodeImage?: string;
+    bankDetails?: string;
     status: 'paid' | 'pending' | 'partially_paid' | 'cancelled';
     staff?: mongoose.Types.ObjectId;
     staffAssignments: {
@@ -54,6 +56,8 @@ const invoiceSchema = new Schema<IInvoice>(
         totalAmount: { type: Number, required: true },
         amountPaid: { type: Number, default: 0 },
         paymentMethod: { type: String, default: 'Cash' },
+        qrCodeImage: String,
+        bankDetails: String,
         status: {
             type: String,
             enum: ['paid', 'pending', 'partially_paid', 'cancelled'],
@@ -70,6 +74,7 @@ const invoiceSchema = new Schema<IInvoice>(
         commission: { type: Number, default: 0 },
         notes: String,
         date: { type: Date, default: Date.now },
+        
     },
     { timestamps: true }
 );

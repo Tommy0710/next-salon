@@ -10,6 +10,12 @@ interface Settings {
     taxRate: number;
     logoUrl: string;
     symbol: string;
+    qrCodes: {
+        name: string;
+        bankName: string;
+        accountNumber: string;
+        image: string;
+    }[];
 }
 
 interface SettingsContextType {
@@ -24,7 +30,8 @@ const defaultSettings: Settings = {
     timezone: 'UTC',
     taxRate: 0,
     logoUrl: '',
-    symbol: '$'
+    symbol: '$',
+    qrCodes: []
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -35,7 +42,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch('/api/settings');
+            const res = await fetch('/api/settings', { credentials: 'include' });
             const data = await res.json();
             if (data.success) {
                 // Get currency symbol from our utility
@@ -48,7 +55,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                     timezone: data.data.timezone || 'UTC',
                     taxRate: data.data.taxRate || 0,
                     logoUrl: data.data.logoUrl || '',
-                    symbol: symbol
+                    symbol: symbol,
+                    qrCodes: data.data.qrCodes || []
                 });
             }
         } catch (error) {

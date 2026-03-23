@@ -76,11 +76,18 @@ export async function PUT(request: NextRequest) {
 
         const body = await request.json();
 
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json(
+                { success: false, error: 'Invalid request body' },
+                { status: 400 }
+            );
+        }
+
         // Update the first document found (singleton pattern)
-        // upsert: true ensures it creates one if it doesn't exist (though GET handles creation usually)
+        // $set ensures we don't accidentally replace the entire document if new fields are missing.
         const settings = await Settings.findOneAndUpdate(
             {},
-            body,
+            { $set: body },
             { new: true, upsert: true, runValidators: true }
         );
 
