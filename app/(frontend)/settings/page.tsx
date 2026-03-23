@@ -193,8 +193,8 @@ export default function SettingsPage() {
     return (
         <div className="max-w-4xl mx-auto p-6">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">Store Settings</h1>
-                <p className="text-gray-500">Manage your store details and configuration</p>
+                <h1 className="text-2xl font-bold text-gray-900">Cài đặt cửa hàng</h1>
+                <p className="text-gray-500">Quản lý chi tiết và cấu hình cửa hàng của bạn</p>
             </div>
 
             {message.text && (
@@ -208,11 +208,11 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Store className="w-5 h-5 text-blue-900" />
-                        General Information
+                        Thông tin chung
                     </h2>
                     <div className="grid grid-cols-1 gap-6">
                         <FormInput
-                            label="Store Name"
+                            label="Tên cửa hàng"
                             value={settings.storeName}
                             onChange={(e) => setSettings({ ...settings, storeName: e.target.value })}
                             required
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                         />
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Store Logo
+                                Logo cửa hàng
                             </label>
                             <input
                                 type="file"
@@ -240,7 +240,7 @@ export default function SettingsPage() {
                         </div>
                         {settings.logoUrl && (
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Logo Preview</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Xem trước logo</label>
                                 <div className="flex items-center gap-4">
                                     <img src={settings.logoUrl} alt="Store Logo" className="h-20 object-contain border rounded p-2" />
                                     <button
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                                         onClick={() => setSettings({ ...settings, logoUrl: "" })}
                                         className="text-sm text-red-600 hover:text-red-700"
                                     >
-                                        Remove Logo
+                                        Xóa logo
                                     </button>
                                 </div>
                             </div>
@@ -260,37 +260,37 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Phone className="w-5 h-5 text-blue-900" />
-                        Contact Details
+                        Chi tiết liên hệ
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput
-                            label="Phone Number"
+                            label="Số điện thoại"
                             value={settings.phone}
                             onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                             placeholder="+1 234 567 890"
                         />
                         <FormInput
-                            label="Email Address"
+                            label="Địa chỉ email"
                             value={settings.email}
                             onChange={(e) => setSettings({ ...settings, email: e.target.value })}
                             type="email"
                             placeholder="contact@store.com"
                         />
                         <FormInput
-                            label="Website"
+                            label="Trang web"
                             value={settings.website}
                             onChange={(e) => setSettings({ ...settings, website: e.target.value })}
                             placeholder="https://www.yourstore.com"
                         />
                         <FormInput
-                            label="Business Hours"
+                            label="Giờ làm việc"
                             value={settings.businessHours}
                             onChange={(e) => setSettings({ ...settings, businessHours: e.target.value })}
                             placeholder="Mon-Fri: 9:00 AM - 6:00 PM"
                         />
                         <div className="md:col-span-2">
                             <FormInput
-                                label="Address"
+                                label="Địa chỉ"
                                 value={settings.address}
                                 onChange={(e) => setSettings({ ...settings, address: e.target.value })}
                                 placeholder="123 Main St, City, Country"
@@ -303,11 +303,11 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <FileText className="w-5 h-5 text-blue-900" />
-                        Business Information
+                        Thông tin kinh doanh
                     </h2>
                     <div className="grid grid-cols-1 gap-6">
                         <FormInput
-                            label="Tax ID / Registration Number"
+                            label="Mã số thuế / Số đăng ký"
                             value={settings.taxId}
                             onChange={(e) => setSettings({ ...settings, taxId: e.target.value })}
                             placeholder="e.g. 123-456-789"
@@ -319,11 +319,11 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <DollarSign className="w-5 h-5 text-blue-900" />
-                        Financial Settings
+                        Cài đặt tài chính
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormSelect
-                            label="Currency"
+                            label="Tiền tệ"
                             value={settings.currency}
                             onChange={(e: any) => setSettings({ ...settings, currency: e.target.value })}
                             options={currencies.map(c => ({ value: c.code, label: `${c.symbol} ${c.code} - ${c.name}` }))}
