@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SalonNext",
   description: "Advanced Salon Management System",
+  other: {
+    "zalo-platform-site-verification": "MiIKBwMs539Zi8Kxbf8q7qElboAlsK9zC3St",
+  },
 };
 
 export default function RootLayout({
