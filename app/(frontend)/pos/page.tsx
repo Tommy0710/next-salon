@@ -494,6 +494,31 @@ export default function POSPage() {
                         }),
                     });
                 }
+
+                // --- BẮT ĐẦU ĐOẠN CODE GỬI ZALO ---
+                // Kiểm tra xem có phải khách lẻ không và khách có số điện thoại không
+                if (activeBill.selectedCustomer !== 'walking-customer') {
+                    const customerInfo = customers.find(c => c._id === activeBill.selectedCustomer);
+                    if (customerInfo && customerInfo.phone) {
+                        try {
+                            // Gọi API nội bộ của chúng ta một cách bất đồng bộ
+                            // Không dùng 'await' ở ngoài cùng để không làm chậm màn hình chuyển sang in hóa đơn
+                            fetch("/api/zalo/zns", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    phone: customerInfo.phone,
+                                    customerName: customerInfo.name,
+                                    invoiceId: data.data._id, // Mã hóa đơn
+                                    totalAmount: total
+                                })
+                            }).catch(err => console.error("Lỗi gọi API Zalo nội bộ:", err));
+                        } catch (e) {
+                            console.error("Lỗi cấu hình gửi Zalo:", e);
+                        }
+                    }
+                }
+                // --- KẾT THÚC ĐOẠN CODE GỬI ZALO ---
                 router.push(`/invoices/print/${data.data._id}`);
             } else {
                 alert(data.error || "Failed to create invoice");
@@ -982,6 +1007,7 @@ export default function POSPage() {
                     </div>
                 </div>
             )}
+            
         </div>
 
     );

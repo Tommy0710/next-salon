@@ -107,7 +107,7 @@ export default function PrintInvoicePage() {
                 </div>
 
                 {/* Items Table */}
-                <table className="w-full mb-6 border-collapse">
+                <table className="w-full border-collapse">
                     <thead>
                         <tr className="border-b-2 border-gray-100 text-[10px] text-left text-gray-500 uppercase tracking-wider">
                             <th className="py-2 font-semibold">Mô tả mặt hàng</th>
