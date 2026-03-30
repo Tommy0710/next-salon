@@ -129,7 +129,35 @@ const SettingsSchema = new mongoose.Schema({
         bankName: String,
         accountNumber: String,
         image: String
-    }]
+    }],
+    // --- THÊM PHẦN NÀY: Zalo ZNS Settings ---
+    zaloEnabled: {
+        type: Boolean,
+        default: false
+    },
+    zaloAppId: {
+        type: String,
+        default: ''
+    },
+    zaloSecretKey: {
+        type: String,
+        default: ''
+    },
+    zaloAccessToken: {
+        type: String,
+        default: ''
+    },
+    zaloRefreshToken: {
+        type: String,
+        default: ''
+    },
+    zaloTokenExpiresAt: {
+        type: Date
+    },
+    zaloTemplateId: {
+        type: String,
+        default: ''
+    },
 }, {
     timestamps: true
 });

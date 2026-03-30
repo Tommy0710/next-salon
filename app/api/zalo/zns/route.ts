@@ -1,48 +1,53 @@
 import { NextResponse } from 'next/server';
+import { getValidZaloToken } from '@/lib/zalo';
+import Settings from '@/models/Settings';
+import dbConnect from '@/lib/mongodb';
 
 export async function POST(request: Request) {
     try {
+        await dbConnect();
+        const settings = await Settings.findOne();
+        
+        if (!settings || !settings.zaloEnabled) {
+            return NextResponse.json({ success: false, error: "ZNS đang tắt" }, { status: 400 });
+        }
+
         const body = await request.json();
         const { phone, customerName, invoiceId, totalAmount } = body;
-
-        // Bắt buộc: Zalo yêu cầu số điện thoại định dạng mã quốc gia (ví dụ: 84901234567)
-        // Hàm này giúp chuyển đổi số 0 ở đầu thành 84
         const formattedPhone = phone.replace(/^0/, '84');
 
-        // Cấu trúc payload chuẩn của Zalo ZNS
+        // 👉 GỌI HÀM TRỢ LÝ Ở ĐÂY: Hàm này sẽ tự lo việc kiểm tra và refresh token
+        const validAccessToken = await getValidZaloToken();
+
         const zaloPayload = {
             phone: formattedPhone,
-            template_id: process.env.ZALO_TEMPLATE_ID, // Lấy từ file .env
+            template_id: settings.zaloTemplateId, 
             template_data: {
                 customer_name: customerName || "Quý khách",
                 invoice_id: invoiceId,
                 total_amount: totalAmount.toString()
             },
-            tracking_id: invoiceId // Dùng ID hóa đơn để dễ kiểm tra lỗi trên hệ thống Zalo sau này
+            tracking_id: invoiceId
         };
 
-        // Bắn API sang Zalo
         const zaloResponse = await fetch("https://business.openapi.zalo.me/message/template", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "access_token": process.env.ZALO_ACCESS_TOKEN as string, // Lấy từ file .env
+                "access_token": validAccessToken, // 👈 Truyền Token "tươi" vào đây
             },
             body: JSON.stringify(zaloPayload)
         });
 
         const zaloResult = await zaloResponse.json();
 
-        // Zalo trả về mã lỗi (nếu có)
         if (zaloResult.error) {
-            console.error("Zalo API Error:", zaloResult);
             return NextResponse.json({ success: false, error: zaloResult.message }, { status: 400 });
         }
 
         return NextResponse.json({ success: true, data: zaloResult });
 
-    } catch (error) {
-        console.error("Error sending ZNS:", error);
-        return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ success: false, error: error.message || "Internal Error" }, { status: 500 });
     }
 }
