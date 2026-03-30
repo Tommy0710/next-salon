@@ -12,37 +12,35 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "ZNS đang tắt" }, { status: 400 });
         }
 
+        // Thêm biến itemsName vào cục nhận dữ liệu
         const body = await request.json();
-        const { phone, customerName, invoiceId, totalAmount } = body;
+        const { phone, customerName, invoiceId, itemsName } = body;
         
-        // Zalo yêu cầu định dạng đầu số 84
-        const formattedPhone = phone.replace(/^0/, '84');
+        const formattedPhone = phone.replace(/^(\+?84|0)/, '84');
 
-        // 👉 1. Xử lý Định dạng ngày giờ hiện tại (VD: 30/03/2026 15:30)
+        // 1. Xử lý Định dạng ngày giờ
         const now = new Date();
-        const formattedDate = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`; // Format ngày theo đúng mẫu 01/08/2020
 
-        // 👉 2. Xử lý Định dạng tiền tệ VNĐ (VD: 150.000 ₫)
-        const formattedCost = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalAmount);
-
-        // 👉 3. Rút gọn Mã hóa đơn từ ID của Database (Lấy 6 ký tự cuối, viết hoa cho chuyên nghiệp)
+        // 2. Rút gọn Mã hóa đơn
         const shortOrderCode = invoiceId ? invoiceId.toString().slice(-6).toUpperCase() : "HD001";
 
-        // Gọi hàm tự động lấy Token (đã xử lý gia hạn 3 tháng)
         const validAccessToken = await getValidZaloToken();
 
-        // Đóng gói dữ liệu CHUẨN KHỚP 100% VỚI TEMPLATE DẠ SPA
+        // 3. ĐÓNG GÓI PAYLOAD CHUẨN XÁC 100% THEO TEMPLATE
         const zaloPayload = {
             phone: formattedPhone,
             template_id: settings.zaloTemplateId, 
             template_data: {
-                customer_name: customerName || "Quý khách",
-                order_code: shortOrderCode,
                 date: formattedDate,
-                total_cost: formattedCost,
-                note: "Cảm ơn quý khách đã tin tưởng và trải nghiệm dịch vụ tại Dạ Spa!"
+                Ma_Hoa_Don: shortOrderCode,
+                name: customerName || "Quý khách",
+                Ten_Hang_Hoa: itemsName || "Dịch vụ tại Dạ Spa"
             },
-            tracking_id: invoiceId // Lưu vết ID gốc để kiểm tra lỗi trên Zalo sau này
+            tracking_id: invoiceId
         };
 
         // Bắn API sang Zalo

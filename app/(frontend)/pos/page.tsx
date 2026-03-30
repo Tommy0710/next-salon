@@ -496,21 +496,21 @@ export default function POSPage() {
                 }
 
                 // --- BẮT ĐẦU ĐOẠN CODE GỬI ZALO ---
-                // Kiểm tra xem có phải khách lẻ không và khách có số điện thoại không
                 if (activeBill.selectedCustomer !== 'walking-customer') {
                     const customerInfo = customers.find(c => c._id === activeBill.selectedCustomer);
                     if (customerInfo && customerInfo.phone) {
                         try {
-                            // Gọi API nội bộ của chúng ta một cách bất đồng bộ
-                            // Không dùng 'await' ở ngoài cùng để không làm chậm màn hình chuyển sang in hóa đơn
+                            // Gom tên tất cả sản phẩm/dịch vụ trong giỏ hàng lại, cách nhau bằng dấu phẩy
+                            const tenHangHoa = activeBill.cart.map(item => item.name).join(', ');
+
                             fetch("/api/zalo/zns", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     phone: customerInfo.phone,
                                     customerName: customerInfo.name,
-                                    invoiceId: data.data._id, // Mã hóa đơn
-                                    totalAmount: total
+                                    invoiceId: data.data._id, 
+                                    itemsName: tenHangHoa // Gửi thêm Tên Hàng Hóa xuống Backend
                                 })
                             }).catch(err => console.error("Lỗi gọi API Zalo nội bộ:", err));
                         } catch (e) {
