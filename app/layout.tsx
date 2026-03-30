@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SalonNext",
+  title: "Daspa Salon Management System",
   description: "Advanced Salon Management System",
   other: {
     "zalo-platform-site-verification": "MiIKBwMs539Zi8Kxbf8q7qElboAlsK9zC3St",

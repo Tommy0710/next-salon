@@ -18,6 +18,10 @@ export const authConfig = {
                 nextUrl.pathname === "/setup" ||
                 nextUrl.pathname === "/api/setup" ||
                 nextUrl.pathname === "/api/settings" ||
+                // 👇 THÊM 2 DÒNG NÀY ĐỂ MỞ KHÓA CHO ZALO 👇
+                nextUrl.pathname === "/zalo_verifierMiIKBwMs539Zi8Kxbf8q7qElboAlsK9zC3St.html" || 
+                nextUrl.pathname.startsWith("/api/zalo") || 
+                // 👆 --------------------------------- 👆
                 nextUrl.pathname.startsWith("/api/auth") ||
                 nextUrl.pathname.startsWith("/api/public");
 

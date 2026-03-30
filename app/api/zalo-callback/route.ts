@@ -1,52 +1,57 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-    // 1. "Bắt" cái mã dài ngoằng Zalo trả về trên thanh URL
+    // 1. Zalo đá về link này, ta sẽ "tóm" lấy cái mã code trên thanh URL
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
 
+    // Nếu không có code (user bấm Hủy hoặc lỗi), báo lỗi ngay
     if (!code) {
-        return NextResponse.json({ error: "Không tìm thấy authorization code từ Zalo" }, { status: 400 });
+        return NextResponse.json({ error: "Không tìm thấy mã xác thực từ Zalo" }, { status: 400 });
     }
 
-    // 2. Chuẩn bị thông tin ứng dụng
-    // LƯU Ý: Bạn cần thay 2 biến này bằng App ID và Secret Key thật của Zalo App Daspanotification
-    const appId = process.env.ZALO_APP_ID || "2880551396517666421"; 
-    const secretKey = process.env.ZALO_SECRET_KEY || "GuIB3iFSdIXNeRqGEABZ"; 
-    const codeVerifier = "doancode_tommy_quin_yeu_bi_mat_cua_daspa_0905836456"; // Chuỗi bí mật của bạn
+    // 2. Gọi các biến bảo mật từ file .env
+    const appId = process.env.ZALO_APP_ID;
+    const secretKey = process.env.ZALO_SECRET_KEY;
+    // Chuỗi code_verifier GỐC của bạn (Chưa mã hóa)
+    const codeVerifier = "doancode_tommy_quin_yeu_bi_mat_cua_daspa_0905836456"; 
 
     try {
-        // 3. Bắn API cuối cùng để đổi Code lấy Access Token
+        // 3. Bắn API (S2S - Server to Server) sang Zalo để đổi mã lấy Chìa khóa
         const response = await fetch("https://oauth.zaloapp.com/v4/oa/access_token", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
-                "secret_key": secretKey,
+                "secret_key": secretKey as string, // Bắt buộc phải truyền Secret Key ở header
             },
             body: new URLSearchParams({
-                code: code,
-                app_id: appId,
+                app_id: appId as string,
                 grant_type: "authorization_code",
-                code_verifier: codeVerifier,
+                code: code,
+                code_verifier: codeVerifier, // Trình lên chuỗi gốc để Zalo đối chiếu
             })
         });
 
         const data = await response.json();
 
-        // 4. In ra Terminal (Console của VS Code) để bạn copy
-        console.log("=========================================");
-        console.log("🎉 THÀNH CÔNG! CHÌA KHÓA ZALO CỦA BẠN ĐÂY:");
-        console.log("Access Token:", data.access_token);
-        console.log("Refresh Token:", data.refresh_token);
-        console.log("=========================================");
-
-        return NextResponse.json({
-            message: "Lấy token thành công! Hãy mở Terminal (VS Code) để xem và copy chìa khóa.",
-            zalo_response: data
-        });
+        // 4. Hiển thị kết quả
+        if (data.access_token) {
+            // In thẳng ra màn hình trình duyệt để bạn copy cho dễ
+            return NextResponse.json({
+                message: "🎉 XÁC THỰC THÀNH CÔNG! BẠN HÃY COPY MÃ NÀY VÀO FILE .ENV",
+                access_token: data.access_token,
+                refresh_token: data.refresh_token,
+                expires_in_seconds: data.expires_in
+            });
+        } else {
+            // In ra lỗi nếu Zalo từ chối
+            return NextResponse.json({ 
+                message: "Zalo từ chối cấp quyền", 
+                error: data 
+            }, { status: 400 });
+        }
 
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: "Đã xảy ra lỗi khi gọi Zalo" }, { status: 500 });
+        return NextResponse.json({ message: "Lỗi máy chủ nội bộ", error: String(error) }, { status: 500 });
     }
 }
