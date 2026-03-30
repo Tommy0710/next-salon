@@ -45,6 +45,13 @@ interface Settings {
     openaiApiKey: string;
     openaiModel: string;
     qrCodes: { name: string; bankName: string; accountNumber: string; image: string }[];
+    // 👇 THÊM DÒNG NÀY VÀO:
+    zaloEnabled: boolean;
+    zaloAppId: string;
+    zaloSecretKey: string;
+    zaloTemplateId: string;
+    zaloAccessToken: string;
+    zaloRefreshToken: string;
 }
 
 export default function SettingsPage() {
@@ -83,7 +90,14 @@ export default function SettingsPage() {
         aiEnabled: false,
         openaiApiKey: "",
         openaiModel: "gpt-4o",
-        qrCodes: []
+        qrCodes: [],
+        // 👇 THÊM DÒNG NÀY VÀO:
+        zaloEnabled: false,
+        zaloAppId: '',
+        zaloSecretKey: '',
+        zaloTemplateId: '',
+        zaloAccessToken: '',
+        zaloRefreshToken: '',
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -139,7 +153,14 @@ export default function SettingsPage() {
                     aiEnabled: data.data.aiEnabled || false,
                     openaiApiKey: data.data.openaiApiKey || "",
                     openaiModel: data.data.openaiModel || "gpt-4o",
-                    qrCodes: data.data.qrCodes || []
+                    qrCodes: data.data.qrCodes || [],
+                    // Zalo Settings
+                    zaloEnabled: data.data.zaloEnabled || true,
+                    zaloAppId: data.data.zaloAppId || '',
+                    zaloSecretKey: data.data.zaloSecretKey || '',
+                    zaloTemplateId: data.data.zaloTemplateId || '',
+                    zaloAccessToken: data.data.zaloAccessToken || '',
+                    zaloRefreshToken: data.data.zaloRefreshToken || '',
                 });
             }
         } catch (error) {
@@ -384,7 +405,7 @@ export default function SettingsPage() {
                         <QrCode className="w-5 h-5 text-blue-900" />
                         Quản lý Mã QR Thanh Toán
                     </h2>
-                    
+
                     {/* Danh sách QR đã thêm */}
                     {settings.qrCodes && settings.qrCodes.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -400,7 +421,7 @@ export default function SettingsPage() {
                                         <p className="text-sm text-gray-600">{qr.bankName}</p>
                                         <p className="text-sm font-mono text-gray-800">{qr.accountNumber}</p>
                                     </div>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setSettings({ ...settings, qrCodes: settings.qrCodes.filter((_, i) => i !== index) })}
                                         className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 transition-colors"
@@ -416,9 +437,9 @@ export default function SettingsPage() {
                     <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg bg-white">
                         <h3 className="text-sm font-bold text-gray-700 mb-3">Thêm mã QR mới</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <FormInput label="Tên gợi nhớ (VD: Momo, VCB...)" value={newQr.name} onChange={(e) => setNewQr({...newQr, name: e.target.value})} />
-                            <FormInput label="Tên Ngân Hàng / Ví" value={newQr.bankName} onChange={(e) => setNewQr({...newQr, bankName: e.target.value})} />
-                            <FormInput label="Số Tài Khoản" value={newQr.accountNumber} onChange={(e) => setNewQr({...newQr, accountNumber: e.target.value})} />
+                            <FormInput label="Tên gợi nhớ (VD: Momo, VCB...)" value={newQr.name} onChange={(e) => setNewQr({ ...newQr, name: e.target.value })} />
+                            <FormInput label="Tên Ngân Hàng / Ví" value={newQr.bankName} onChange={(e) => setNewQr({ ...newQr, bankName: e.target.value })} />
+                            <FormInput label="Số Tài Khoản" value={newQr.accountNumber} onChange={(e) => setNewQr({ ...newQr, accountNumber: e.target.value })} />
                         </div>
                         <div className="flex items-end gap-4">
                             <div className="flex-1">
@@ -439,7 +460,7 @@ export default function SettingsPage() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    if(!newQr.name || !newQr.image) return alert("Vui lòng nhập tên và chọn ảnh QR");
+                                    if (!newQr.name || !newQr.image) return alert("Vui lòng nhập tên và chọn ảnh QR");
                                     setSettings({ ...settings, qrCodes: [...(settings.qrCodes || []), newQr] });
                                     setNewQr({ name: "", bankName: "", accountNumber: "", image: "" }); // Reset form
                                 }}
@@ -613,7 +634,81 @@ export default function SettingsPage() {
                         </p>
                     </div>
                 </div>
+                {/* --- KHỐI CẤU HÌNH ZALO ZNS --- */}
+                <div className="bg-white p-5 md:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                        <div>
+                            <h3 className="text-base md:text-lg font-bold text-gray-900">Tích hợp Zalo ZNS</h3>
+                            <p className="text-xs md:text-sm text-gray-500 mt-1">Tự động gửi tin nhắn báo hóa đơn qua Zalo cho khách hàng.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only peer" 
+                                checked={settings.zaloEnabled}
+                                onChange={(e) => setSettings({ ...settings, zaloEnabled: e.target.checked })}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
 
+                    {settings.zaloEnabled && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Zalo App ID</label>
+                                <input 
+                                    type="text" 
+                                    value={settings.zaloAppId}
+                                    onChange={(e) => setSettings({ ...settings, zaloAppId: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                    placeholder="VD: 123456789012345678"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Zalo Secret Key</label>
+                                <input 
+                                    type="password" 
+                                    value={settings.zaloSecretKey}
+                                    onChange={(e) => setSettings({ ...settings, zaloSecretKey: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                    placeholder="Chuỗi bí mật của ứng dụng"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Template ID (Mẫu tin nhắn)</label>
+                                <input 
+                                    type="text" 
+                                    value={settings.zaloTemplateId}
+                                    onChange={(e) => setSettings({ ...settings, zaloTemplateId: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                    placeholder="VD: 312345"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Access Token</label>
+                                <textarea 
+                                    value={settings.zaloAccessToken}
+                                    onChange={(e) => setSettings({ ...settings, zaloAccessToken: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono"
+                                    rows={2}
+                                    placeholder="Dán Access Token vào đây (Chỉ cần làm lần đầu tiên)"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Refresh Token</label>
+                                <textarea 
+                                    value={settings.zaloRefreshToken}
+                                    onChange={(e) => setSettings({ ...settings, zaloRefreshToken: e.target.value })}
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono text-red-600"
+                                    rows={2}
+                                    placeholder="Dán Refresh Token vào đây (Quan trọng: Dùng để hệ thống tự động gia hạn)"
+                                />
+                                <p className="text-[11px] text-gray-500 mt-1 italic">* Hệ thống sẽ tự động sử dụng Refresh Token để gia hạn mã Zalo mỗi khi hết hạn.</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                {/* --- KẾT THÚC KHỐI ZALO --- */}                
                 {/* AI Settings */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
