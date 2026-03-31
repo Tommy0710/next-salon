@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getValidZaloToken } from '@/lib/zalo';
+import { buildTemplateData } from '@/lib/zalo-payloads';
 import Settings from '@/models/Settings';
 import dbConnect from '@/lib/mongodb';
 
@@ -12,38 +13,30 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: "ZNS đang tắt" }, { status: 400 });
         }
 
-        // Thêm biến itemsName vào cục nhận dữ liệu
         const body = await request.json();
-        const { phone, customerName, invoiceId, itemsName } = body;
-        
+        // payloadData chứa các thông tin thô (Tên khách, ID hóa đơn...) từ Frontend gửi lên
+        const { phone, eventType, payloadData } = body; 
+
+        // 1. Tìm Template ID tương ứng với Sự kiện trong Database
+        const templateConfig = settings.zaloTemplates?.find((t: any) => t.eventType === eventType);
+        if (!templateConfig || !templateConfig.templateId) {
+            return NextResponse.json({ success: false, error: `Chưa cấu hình Template ID cho sự kiện ${eventType}` }, { status: 400 });
+        }
+
         const formattedPhone = phone.replace(/^(\+?84|0)/, '84');
 
-        // 1. Xử lý Định dạng ngày giờ
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = now.getFullYear();
-        const formattedDate = `${day}/${month}/${year}`; // Format ngày theo đúng mẫu 01/08/2020
-
-        // 2. Rút gọn Mã hóa đơn
-        const shortOrderCode = invoiceId ? invoiceId.toString().slice(-6).toUpperCase() : "HD001";
+        // 2. Tự động đóng gói tham số nhờ vào file thư viện mới tạo
+        const finalTemplateData = buildTemplateData(eventType, payloadData);
 
         const validAccessToken = await getValidZaloToken();
 
-        // 3. ĐÓNG GÓI PAYLOAD CHUẨN XÁC 100% THEO TEMPLATE
         const zaloPayload = {
             phone: formattedPhone,
-            template_id: settings.zaloTemplateId, 
-            template_data: {
-                date: formattedDate,
-                Ma_Hoa_Don: shortOrderCode,
-                name: customerName || "Quý khách",
-                Ten_Hang_Hoa: itemsName || "Dịch vụ tại Dạ Spa"
-            },
-            tracking_id: invoiceId
+            template_id: templateConfig.templateId, 
+            template_data: finalTemplateData,
+            tracking_id: payloadData.invoiceId || Date.now().toString()
         };
 
-        // Bắn API sang Zalo
         const zaloResponse = await fetch("https://business.openapi.zalo.me/message/template", {
             method: "POST",
             headers: {
@@ -55,7 +48,6 @@ export async function POST(request: Request) {
 
         const zaloResult = await zaloResponse.json();
 
-        // Kiểm tra lỗi từ phía Zalo
         if (zaloResult.error) {
             console.error("Zalo API Error:", zaloResult);
             return NextResponse.json({ success: false, error: zaloResult.message }, { status: 400 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2 } from "lucide-react";
+import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { getAllCurrencies } from "@/lib/currency";
@@ -49,7 +49,7 @@ interface Settings {
     zaloEnabled: boolean;
     zaloAppId: string;
     zaloSecretKey: string;
-    zaloTemplateId: string;
+    zaloTemplates: Array<{ eventType: string; name: string; templateId: string }>;
     zaloAccessToken: string;
     zaloRefreshToken: string;
 }
@@ -95,7 +95,10 @@ export default function SettingsPage() {
         zaloEnabled: false,
         zaloAppId: '',
         zaloSecretKey: '',
-        zaloTemplateId: '',
+        zaloTemplates: [
+            { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
+            { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
+        ],
         zaloAccessToken: '',
         zaloRefreshToken: '',
     });
@@ -104,10 +107,17 @@ export default function SettingsPage() {
     const [message, setMessage] = useState({ type: "", text: "" });
     const [newQr, setNewQr] = useState({ name: "", bankName: "", accountNumber: "", image: "" });
     const [openTabs, setOpenTabs] = useState({
-        general: true,   // Mặc định cho mở sẵn tab Cài đặt chung
-        zalo: false,     // Tab Zalo mặc định đóng cho gọn
+        general: true, 
+        contact: false,
+        business: false,
+        financial: false,
+        receipt: false,
+        reminder: false,
+        ai: false,
+        zalo: false,
         sms: false,
-        ai: false
+        email: false,
+        qrcode: false,
     });
     const toggleTab = (tabName: keyof typeof openTabs) => {
         setOpenTabs(prev => ({ ...prev, [tabName]: !prev[tabName] }));
@@ -166,7 +176,10 @@ export default function SettingsPage() {
                     zaloEnabled: data.data.zaloEnabled || true,
                     zaloAppId: data.data.zaloAppId || '',
                     zaloSecretKey: data.data.zaloSecretKey || '',
-                    zaloTemplateId: data.data.zaloTemplateId || '',
+                    zaloTemplates: data.data.zaloTemplates || [
+                        { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
+                        { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
+                    ],
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
                 });
@@ -218,6 +231,11 @@ export default function SettingsPage() {
             </div>
         );
     }
+    const handleTemplateChange = (index: number, newId: string) => {
+        const updatedTemplates = [...settings.zaloTemplates];
+        updatedTemplates[index].templateId = newId;
+        setSettings({ ...settings, zaloTemplates: updatedTemplates });
+    };
 
     return (
         <div className="max-w-4xl mx-auto p-6">
@@ -234,11 +252,22 @@ export default function SettingsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* General Information */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Store className="w-5 h-5 text-blue-900" />
-                        Thông tin chung
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('general')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Store className="w-5 h-5 text-blue-900" />
+                            Thông tin chung
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.general ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.general && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="grid grid-cols-1 gap-6">
                         <FormInput
                             label="Tên cửa hàng"
@@ -283,14 +312,27 @@ export default function SettingsPage() {
                             </div>
                         )}
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Contact Details */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Phone className="w-5 h-5 text-blue-900" />
-                        Chi tiết liên hệ
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('contact')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Phone className="w-5 h-5 text-blue-900" />
+                            Chi tiết liên hệ
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.contact ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.contact && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput
                             label="Số điện thoại"
@@ -326,14 +368,27 @@ export default function SettingsPage() {
                             />
                         </div>
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Business Information */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-900" />
-                        Thông tin kinh doanh
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('business')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-blue-900" />
+                            Thông tin kinh doanh
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.business ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.business && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="grid grid-cols-1 gap-6">
                         <FormInput
                             label="Mã số thuế / Số đăng ký"
@@ -342,14 +397,27 @@ export default function SettingsPage() {
                             placeholder="e.g. 123-456-789"
                         />
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Financial Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <DollarSign className="w-5 h-5 text-blue-900" />
-                        Cài đặt tài chính
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('financial')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <DollarSign className="w-5 h-5 text-blue-900" />
+                            Cài đặt tài chính
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.financial ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.financial && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormSelect
                             label="Tiền tệ"
@@ -372,14 +440,27 @@ export default function SettingsPage() {
                             placeholder="0"
                         />
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Receipt Customization */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-900" />
-                        Receipt Customization
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('receipt')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-blue-900" />
+                            Receipt Customization
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.receipt ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.receipt && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -406,9 +487,26 @@ export default function SettingsPage() {
                             />
                         </div>
                     </div>
+                    </div>
+                    )}
                 </div>
                 {/* --- MỚI: QUẢN LÝ MÃ QR THANH TOÁN --- */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('qrcode')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <QrCode className="w-5 h-5 text-blue-900" />
+                            Quản lý Mã QR Thanh Toán
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.qrcode ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.qrcode && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <QrCode className="w-5 h-5 text-blue-900" />
                         Quản lý Mã QR Thanh Toán
@@ -478,13 +576,26 @@ export default function SettingsPage() {
                             </button>
                         </div>
                     </div>
+                    </div>
+                    )}
                 </div>
                 {/* SMS Settings (Twilio) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-blue-900" />
-                        SMS Settings (Twilio)
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('sms')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <MessageSquare className="w-5 h-5 text-blue-900" />
+                            SMS Settings (Twilio)
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.sms ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.sms && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
                             <input
@@ -527,14 +638,27 @@ export default function SettingsPage() {
                             </div>
                         )}
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Email Settings (SMTP) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Send className="w-5 h-5 text-blue-900" />
-                        Email Settings (SMTP)
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('email')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Send className="w-5 h-5 text-blue-900" />
+                            Email Settings (SMTP)
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.email ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.email && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
                             <input
@@ -604,14 +728,27 @@ export default function SettingsPage() {
                             </div>
                         )}
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* Reminder Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Bell className="w-5 h-5 text-blue-900" />
-                        Appointment Reminder Settings
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('reminder')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Bell className="w-5 h-5 text-blue-900" />
+                            Appointment Reminder Settings
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.reminder ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.reminder && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput
                             label="Send Reminders (Days Before)"
@@ -641,27 +778,41 @@ export default function SettingsPage() {
                             }.
                         </p>
                     </div>
+                    </div>
+                    )}
                 </div>
                 {/* --- KHỐI CẤU HÌNH ZALO ZNS --- */}
-                <div className="bg-white p-5 md:p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                        <div>
-                            <h3 className="text-base md:text-lg font-bold text-gray-900">Tích hợp Zalo ZNS</h3>
-                            <p className="text-xs md:text-sm text-gray-500 mt-1">Tự động gửi tin nhắn báo hóa đơn qua Zalo cho khách hàng.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
-                            <input 
-                                type="checkbox" 
-                                className="sr-only peer" 
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('zalo')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <MessageSquare className="w-5 h-5 text-blue-900" />
+                            Tích hợp Zalo ZNS
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.zalo ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.zalo && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <input
+                                type="checkbox"
+                                id="zaloEnabled"
                                 checked={settings.zaloEnabled}
                                 onChange={(e) => setSettings({ ...settings, zaloEnabled: e.target.checked })}
+                                className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
                             />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                    </div>
+                            <label htmlFor="zaloEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
+                                Enable Zalo ZNS Notifications
+                            </label>
+                        </div>
 
-                    {settings.zaloEnabled && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {settings.zaloEnabled && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 pt-4 animate-in fade-in slide-in-from-top-2 duration-300">
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Zalo App ID</label>
                                 <input 
@@ -682,15 +833,27 @@ export default function SettingsPage() {
                                     placeholder="Chuỗi bí mật của ứng dụng"
                                 />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Template ID (Mẫu tin nhắn)</label>
-                                <input 
-                                    type="text" 
-                                    value={settings.zaloTemplateId}
-                                    onChange={(e) => setSettings({ ...settings, zaloTemplateId: e.target.value })}
-                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
-                                    placeholder="VD: 312345"
-                                />
+                            <div className="md:col-span-2 mt-4 border-t border-gray-100 pt-4">
+                                <label className="block text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Quản lý Mẫu tin nhắn (Template IDs)</label>
+                                <div className="space-y-3">
+                                    {settings.zaloTemplates.map((template, index) => (
+                                        <div key={template.eventType} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-lg border border-gray-200">
+                                            <div className="md:w-1/3">
+                                                <p className="text-sm font-bold text-gray-800">{template.name}</p>
+                                                <p className="text-[10px] text-gray-500 uppercase tracking-wider">{template.eventType}</p>
+                                            </div>
+                                            <div className="flex-1">
+                                                <input 
+                                                    type="text" 
+                                                    value={template.templateId}
+                                                    onChange={(e) => handleTemplateChange(index, e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none text-sm"
+                                                    placeholder="Nhập Template ID từ Zalo..."
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Access Token</label>
@@ -713,16 +876,29 @@ export default function SettingsPage() {
                                 />
                                 <p className="text-[11px] text-gray-500 mt-1 italic">* Hệ thống sẽ tự động sử dụng Refresh Token để gia hạn mã Zalo mỗi khi hết hạn.</p>
                             </div>
-                        </div>
+                            </div>
+                        )}
+                    </div>
                     )}
                 </div>
                 {/* --- KẾT THÚC KHỐI ZALO --- */}                
                 {/* AI Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-blue-900" />
-                        AI Power Reporting Settings
-                    </h2>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('ai')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-blue-900" />
+                            AI Power Reporting Settings
+                        </h2>
+                        <ChevronDown 
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.ai ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.ai && (
+                    <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
                             <input
@@ -764,6 +940,8 @@ export default function SettingsPage() {
                             </div>
                         )}
                     </div>
+                    </div>
+                    )}
                 </div>
 
                 {/* System Management */}

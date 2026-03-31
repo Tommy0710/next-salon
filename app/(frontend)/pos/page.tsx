@@ -508,9 +508,12 @@ export default function POSPage() {
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     phone: customerInfo.phone,
-                                    customerName: customerInfo.name,
-                                    invoiceId: data.data._id, 
-                                    itemsName: tenHangHoa // Gửi thêm Tên Hàng Hóa xuống Backend
+                                    eventType: 'checkout', // Báo cho hệ thống biết đây là sự kiện thanh toán
+                                    payloadData: {         // Nhét toàn bộ dữ liệu thô vào đây
+                                        customerName: customerInfo.name,
+                                        invoiceId: data.data._id,
+                                        itemsName: tenHangHoa
+                                    }
                                 })
                             }).catch(err => console.error("Lỗi gọi API Zalo nội bộ:", err));
                         } catch (e) {
@@ -1007,7 +1010,7 @@ export default function POSPage() {
                     </div>
                 </div>
             )}
-            
+
         </div>
 
     );

@@ -154,9 +154,13 @@ const SettingsSchema = new mongoose.Schema({
     zaloTokenExpiresAt: {
         type: Date
     },
-    zaloTemplateId: {
-        type: String,
-        default: ''
+    zaloTemplates: {
+        type: [{
+            eventType: String, // Ví dụ: 'checkout', 'reminder'
+            name: String,      // Tên bạn tự đặt: "Tin nhắn thanh toán"
+            templateId: String // Mã ID từ Zalo
+        }],
+        default: []
     },
 }, {
     timestamps: true
