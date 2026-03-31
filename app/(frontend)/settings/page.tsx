@@ -103,7 +103,15 @@ export default function SettingsPage() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
     const [newQr, setNewQr] = useState({ name: "", bankName: "", accountNumber: "", image: "" });
-
+    const [openTabs, setOpenTabs] = useState({
+        general: true,   // Mặc định cho mở sẵn tab Cài đặt chung
+        zalo: false,     // Tab Zalo mặc định đóng cho gọn
+        sms: false,
+        ai: false
+    });
+    const toggleTab = (tabName: keyof typeof openTabs) => {
+        setOpenTabs(prev => ({ ...prev, [tabName]: !prev[tabName] }));
+    };
 
     const currencies = getAllCurrencies();
     const timezones = getAllTimezones();
