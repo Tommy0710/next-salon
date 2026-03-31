@@ -94,6 +94,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
     const pathname = usePathname();
     const { canView } = usePermission();
     const [storeName, setStoreName] = useState("SalonNext");
+    const [logoUrl, setLogoUrl] = useState("");
 
     useEffect(() => {
         fetchSettings();
@@ -103,8 +104,13 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
         try {
             const res = await fetch("/api/settings");
             const data = await res.json();
-            if (data.success && data.data?.storeName) {
-                setStoreName(data.data.storeName);
+            if (data.success && data.data) {
+                if (data.data.storeName) {
+                    setStoreName(data.data.storeName);
+                }
+                if (data.data.logoUrl) {
+                    setLogoUrl(data.data.logoUrl);
+                }
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
@@ -163,8 +169,12 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                     {!isSidebarCollapsed ? (
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                    <Sparkles className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 overflow-hidden">
+                                    {logoUrl ? (
+                                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <Sparkles className="w-5 h-5 text-white" />
+                                    )}
                                 </div>
                             </div>
                             <div>
@@ -173,8 +183,12 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                             </div>
                         </div>
                     ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                            <Sparkles className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 overflow-hidden">
+                            {logoUrl ? (
+                                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                            ) : (
+                                <Sparkles className="w-5 h-5 text-white" />
+                            )}
                         </div>
                     )}
 

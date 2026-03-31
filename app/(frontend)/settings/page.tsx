@@ -173,13 +173,15 @@ export default function SettingsPage() {
                     openaiModel: data.data.openaiModel || "gpt-4o",
                     qrCodes: data.data.qrCodes || [],
                     // Zalo Settings
-                    zaloEnabled: data.data.zaloEnabled || true,
+                    zaloEnabled: data.data.zaloEnabled || false,
                     zaloAppId: data.data.zaloAppId || '',
                     zaloSecretKey: data.data.zaloSecretKey || '',
-                    zaloTemplates: data.data.zaloTemplates || [
-                        { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
-                        { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
-                    ],
+                    zaloTemplates: Array.isArray(data.data.zaloTemplates) && data.data.zaloTemplates.length > 0 
+                        ? data.data.zaloTemplates 
+                        : [
+                            { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
+                            { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
+                        ],
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
                 });
@@ -232,9 +234,13 @@ export default function SettingsPage() {
         );
     }
     const handleTemplateChange = (index: number, newId: string) => {
+        if (!settings.zaloTemplates || !Array.isArray(settings.zaloTemplates)) return;
+        
         const updatedTemplates = [...settings.zaloTemplates];
-        updatedTemplates[index].templateId = newId;
-        setSettings({ ...settings, zaloTemplates: updatedTemplates });
+        if (updatedTemplates[index]) {
+            updatedTemplates[index].templateId = newId;
+            setSettings({ ...settings, zaloTemplates: updatedTemplates });
+        }
     };
 
     return (
@@ -836,23 +842,29 @@ export default function SettingsPage() {
                             <div className="md:col-span-2 mt-4 border-t border-gray-100 pt-4">
                                 <label className="block text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Quản lý Mẫu tin nhắn (Template IDs)</label>
                                 <div className="space-y-3">
-                                    {settings.zaloTemplates.map((template, index) => (
-                                        <div key={template.eventType} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-lg border border-gray-200">
-                                            <div className="md:w-1/3">
-                                                <p className="text-sm font-bold text-gray-800">{template.name}</p>
-                                                <p className="text-[10px] text-gray-500 uppercase tracking-wider">{template.eventType}</p>
+                                    {settings.zaloTemplates && Array.isArray(settings.zaloTemplates) && settings.zaloTemplates.length > 0 ? (
+                                        settings.zaloTemplates.map((template, index) => (
+                                            <div key={template.eventType} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-lg border border-gray-200">
+                                                <div className="md:w-1/3">
+                                                    <p className="text-sm font-bold text-gray-800">{template.name}</p>
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">{template.eventType}</p>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <input 
+                                                        type="text" 
+                                                        value={template.templateId || ''}
+                                                        onChange={(e) => handleTemplateChange(index, e.target.value)}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none text-sm"
+                                                        placeholder="Nhập Template ID từ Zalo..."
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <input 
-                                                    type="text" 
-                                                    value={template.templateId}
-                                                    onChange={(e) => handleTemplateChange(index, e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none text-sm"
-                                                    placeholder="Nhập Template ID từ Zalo..."
-                                                />
-                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                                            <p className="text-sm text-gray-600">Không có mẫu tin nhắn nào</p>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </div>
                             <div className="md:col-span-2">
