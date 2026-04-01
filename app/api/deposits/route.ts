@@ -33,7 +33,8 @@ export async function POST(request: Request) {
         // 2. Update the invoice paidAmount and status
         const invoice = await Invoice.findById(body.invoice);
         if (invoice) {
-            const newPaidAmount = (invoice.amountPaid || 0) + body.amount;
+            // const newPaidAmount = (invoice.amountPaid || 0) + body.amount;
+            const newPaidAmount = (invoice.amountPaid || 0);
             invoice.amountPaid = newPaidAmount;
 
             if (newPaidAmount >= invoice.totalAmount) {

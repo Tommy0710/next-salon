@@ -7,6 +7,7 @@ import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormButton } from "@/components/dashboard/FormInput";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatDate } from "@/lib/dateUtils";
+import { useRouter } from "next/navigation";
 
 interface Invoice {
     _id: string;
@@ -50,6 +51,7 @@ interface PaginationData {
 }
 
 export default function InvoicesPage() {
+    const router = useRouter();
     const { settings } = useSettings();
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
@@ -71,7 +73,7 @@ export default function InvoicesPage() {
     // Payment Modal State
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [payingInvoice, setPayingInvoice] = useState<Invoice | null>(null);
-    const [paymentData, setPaymentData] = useState({ amount: "", method: "Cash", notes: "" });
+    const [paymentData, setPaymentData] = useState({ amount: "", method: "Tiền mặt", selectedQrIndex: 0, notes: "" });
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -170,7 +172,7 @@ export default function InvoicesPage() {
     const openPaymentModal = (inv: Invoice) => {
         setPayingInvoice(inv);
         const due = (inv.totalAmount || 0) - (inv.amountPaid || 0);
-        setPaymentData({ amount: due.toString(), method: "Cash", notes: "" });
+        setPaymentData({ amount: due.toString(), method: "Tiền mặt", selectedQrIndex: 0, notes: "" });
         setIsPaymentModalOpen(true);
     };
 
@@ -180,6 +182,10 @@ export default function InvoicesPage() {
 
         setSubmitting(true);
         try {
+            // Quy đổi sang định dạng mà hệ thống đang lưu
+            const paymentMethodString = paymentData.method === 'Mã QR'
+                ? `QR Code - ${settings?.qrCodes?.[paymentData.selectedQrIndex]?.bankName || ''}`
+                : 'Cash';
             const res = await fetch("/api/deposits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -193,9 +199,8 @@ export default function InvoicesPage() {
             });
             const data = await res.json();
             if (data.success) {
-                fetchInvoices(pagination.page);
                 setIsPaymentModalOpen(false);
-                alert("Payment recorded successfully!");
+                router.push(`/invoices/print/${payingInvoice._id}`);
             } else {
                 alert(data.error || "Failed to record payment");
             }
@@ -495,23 +500,38 @@ export default function InvoicesPage() {
                         max={payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0}
                     />
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {/* Cash + Các QR Code trong Setting */}
-                            {[
-                                'Cash', 
-                                ...(settings?.qrCodes?.map((qr: any) => `QR Code - ${qr.bankName}`) || ['QR Code'])
-                            ].map(m => (
-                                <button
-                                    key={m}
-                                    type="button"
-                                    onClick={() => setPaymentData({ ...paymentData, method: m })}
-                                    className={`py-2 px-3 text-sm font-semibold rounded-lg border transition-all ${paymentData.method === m ? 'bg-blue-900 text-white border-blue-900 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-blue-300'}`}
-                                >
-                                    {m}
-                                </button>
-                            ))}
+                    {/* Phần Giao Diện Chọn Phương Thức Thanh Toán Mới */}
+                    <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <div className="mb-3 space-y-2">
+                            <div className="grid grid-cols-2 gap-2">
+                                {['Tiền mặt', 'Mã QR'].map(method => (
+                                    <button
+                                        key={method}
+                                        type="button"
+                                        onClick={() => setPaymentData({ ...paymentData, method: method })}
+                                        className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${paymentData.method === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                    >
+                                        {method}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Hiển thị danh sách QR nếu chọn Mã QR */}
+                            {paymentData.method === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
+                                <div className="animate-in fade-in slide-in-from-top-1">
+                                    <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
+                                    <select
+                                        value={paymentData.selectedQrIndex}
+                                        onChange={(e) => setPaymentData({ ...paymentData, selectedQrIndex: parseInt(e.target.value) })}
+                                        className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium text-black"
+                                    >
+                                        {settings.qrCodes.map((qr: any, idx: number) => (
+                                            <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                         </div>
                     </div>
 
