@@ -55,6 +55,7 @@ export default function InvoicesPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [sourceFilter, setSourceFilter] = useState("all");
     const [pagination, setPagination] = useState<PaginationData>({
         total: 0,
         page: 1,
@@ -75,14 +76,15 @@ export default function InvoicesPage() {
     const [submitting, setSubmitting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const fetchInvoices = useCallback(async (page = 1, searchQuery = search, status = statusFilter) => {
+    const fetchInvoices = useCallback(async (page = 1, searchQuery = search, status = statusFilter, source = sourceFilter) => {
         setLoading(true);
         try {
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: "10",
                 search: searchQuery,
-                status: status
+                status: status,
+                source: source
             });
             const res = await fetch(`/api/invoices?${params.toString()}`);
             const data = await res.json();
@@ -95,14 +97,14 @@ export default function InvoicesPage() {
         } finally {
             setLoading(false);
         }
-    }, [search, statusFilter]);
+    }, [search, statusFilter, sourceFilter]);
 
     useEffect(() => {
         const delaySearch = setTimeout(() => {
-            fetchInvoices(1, search, statusFilter);
+            fetchInvoices(1, search, statusFilter, sourceFilter);
         }, 500);
         return () => clearTimeout(delaySearch);
-    }, [search, statusFilter, fetchInvoices]);
+    }, [search, statusFilter, sourceFilter, fetchInvoices]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -237,6 +239,20 @@ export default function InvoicesPage() {
                         />
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto text-black">
+                        {/* (SOURCE) */}
+                        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
+                            <Filter className="w-4 h-4 text-gray-400" />
+                            <select
+                                value={sourceFilter}
+                                onChange={(e) => setSourceFilter(e.target.value)}
+                                className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700"
+                            >
+                                <option value="all">Tất cả nguồn</option>
+                                <option value="pos">Từ POS</option>
+                                <option value="appointment">Từ Đặt lịch</option>
+                            </select>
+                        </div>
+                        {/* (STATUS) */}
                         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
                             <Filter className="w-4 h-4 text-gray-400" />
                             <select
@@ -482,12 +498,16 @@ export default function InvoicesPage() {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                         <div className="grid grid-cols-3 gap-2">
-                            {['Cash', 'Card', 'Wallet'].map(m => (
+                            {/* Cash + Các QR Code trong Setting */}
+                            {[
+                                'Cash', 
+                                ...(settings?.qrCodes?.map((qr: any) => `QR Code - ${qr.bankName}`) || ['QR Code'])
+                            ].map(m => (
                                 <button
                                     key={m}
                                     type="button"
                                     onClick={() => setPaymentData({ ...paymentData, method: m })}
-                                    className={`py-2 px-3 text-sm font-semibold rounded-lg border transition-all ${paymentData.method === m ? 'bg-blue-900 text-white border-blue-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                                    className={`py-2 px-3 text-sm font-semibold rounded-lg border transition-all ${paymentData.method === m ? 'bg-blue-900 text-white border-blue-900 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-blue-300'}`}
                                 >
                                     {m}
                                 </button>

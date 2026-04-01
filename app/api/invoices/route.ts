@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get("limit") || "10");
         const search = searchParams.get("search") || "";
         const status = searchParams.get("status") || "all";
+        const source = searchParams.get('source');
 
         const skip = (page - 1) * limit;
 
@@ -87,7 +88,12 @@ export async function GET(request: NextRequest) {
         if (status !== "all") {
             query.status = status;
         }
-
+        // lọc Source
+        if (source === 'appointment') {
+            query.appointment = { $exists: true, $ne: null }; // Chỉ lấy đơn có link với lịch hẹn
+        } else if (source === 'pos') {
+            query.appointment = { $exists: false }; // Hoặc { $eq: null } tùy vào DB của bạn (Chỉ lấy đơn tạo thẳng từ POS)
+        }
         if (search) {
             // Search in invoiceNumber
             const searchQueries: any[] = [
