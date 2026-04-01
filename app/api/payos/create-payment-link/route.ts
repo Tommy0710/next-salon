@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 1. Dùng require thuần của Node.js thay vì import để Turbopack không can thiệp sai cách
-// @ts-ignore
-const PayOS = require("@payos/node");
-
-// 2. Ép kiểu (PayOS as any) để TypeScript không còn báo lỗi "not constructable" (ts 2351)
-const payos = new (PayOS as any)(
-    process.env.PAYOS_CLIENT_ID as string,
-    process.env.PAYOS_API_KEY as string,
-    process.env.PAYOS_CHECKSUM_KEY as string
-);
+// Ép kiểu ': any' ngay từ lúc require để TypeScript bị "mù" hoàn toàn với thư viện này
+const PayOS: any = require("@payos/node");
 
 export async function POST(req: NextRequest) {
     try {
+        // Ép kiểu String() để đảm bảo biến môi trường luôn là chuỗi, tránh lỗi undefined
+        const payos = new PayOS(
+            String(process.env.PAYOS_CLIENT_ID),
+            String(process.env.PAYOS_API_KEY),
+            String(process.env.PAYOS_CHECKSUM_KEY)
+        );
+
         const body = await req.json();
         const { invoiceId, amount, description } = body;
 
