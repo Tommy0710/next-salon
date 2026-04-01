@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// @ts-ignore
+// 1. Import chuẩn theo ES Modules
 import PayOS from "@payos/node";
 
-// Ép kiểu về 'any' để TypeScript ngừng phàn nàn về thuộc tính .default
-const PayOSConstructor = (PayOS as any).default || PayOS;
-
-const payos = new PayOSConstructor(
+// 2. Dùng @ts-ignore ngay trên dòng khởi tạo để bỏ qua lỗi đỏ của TypeScript
+// (Vì lúc chạy thực tế Vercel đã nhận đúng đây là Constructor rồi)
+// @ts-ignore
+const payos = new PayOS(
     process.env.PAYOS_CLIENT_ID as string,
     process.env.PAYOS_API_KEY as string,
     process.env.PAYOS_CHECKSUM_KEY as string
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { invoiceId, amount, description } = body;
 
-        // Tạo mã đơn hàng ngẫu nhiên (PayOS yêu cầu orderCode là số)
+        // Tạo mã đơn hàng ngẫu nhiên (PayOS yêu cầu orderCode là số nguyên)
         const orderCode = Number(String(Date.now()).slice(-6) + Math.floor(Math.random() * 1000));
 
         const requestData = {
@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
     } catch (error: unknown) {
         console.error("PayOS Error:", error);
 
-        // Kiểm tra kiểu của error trước khi lấy .message
         const errorMessage = error instanceof Error ? error.message : "Lỗi không xác định từ PayOS";
 
         return NextResponse.json(
