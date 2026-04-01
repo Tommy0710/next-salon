@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 1. Vẫn dùng require ở ngoài để Next.js biết đường gom thư viện này lên Vercel
-const PayOSModule: any = require("@payos/node");
+// 1. Đổi thành import có dấu ngoặc nhọn (Named Import) theo chuẩn V2
+import { PayOS } from "@payos/node";
 
 export async function POST(req: NextRequest) {
     try {
-        // 2. ĐÂY LÀ CHÌA KHÓA: Lấy đúng class constructor ở lúc chạy (Runtime)
-        // Nếu nó bị bọc trong .default thì lấy .default, còn không thì lấy chính nó
-        const PayOSConstructor = PayOSModule.default || PayOSModule;
-
-        // 3. Khởi tạo PayOS bằng constructor chuẩn vừa lấy được
-        const payos = new PayOSConstructor(
-            String(process.env.PAYOS_CLIENT_ID),
-            String(process.env.PAYOS_API_KEY),
-            String(process.env.PAYOS_CHECKSUM_KEY)
-        );
+        // 2. Khởi tạo bằng một Object chứa các key
+        const payos = new PayOS({
+            clientId: String(process.env.PAYOS_CLIENT_ID),
+            apiKey: String(process.env.PAYOS_API_KEY),
+            checksumKey: String(process.env.PAYOS_CHECKSUM_KEY)
+        });
 
         const body = await req.json();
         const { invoiceId, amount, description } = body;
@@ -25,12 +21,13 @@ export async function POST(req: NextRequest) {
         const requestData = {
             orderCode: orderCode,
             amount: amount,
-            description: description.substring(0, 25), // PayOS giới hạn tối đa 25 ký tự
+            description: description.substring(0, 25), // PayOS giới hạn 25 ký tự
             returnUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/invoices/${invoiceId}?payos=success`,
             cancelUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/invoices/${invoiceId}?payos=cancel`,
         };
 
-        const paymentLinkData = await payos.createPaymentLink(requestData);
+        // 3. Sử dụng API mới của bản V2: paymentRequests.create
+        const paymentLinkData = await payos.paymentRequests.create(requestData);
 
         return NextResponse.json({
             success: true,
