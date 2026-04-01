@@ -90,6 +90,9 @@ export default function POSPage() {
     // THÊM DÒNG NÀY: State để lưu ID của bill đang chuẩn bị xóa (mở modal)
     const [billToDelete, setBillToDelete] = useState<string | null>(null);
     const [billSearchQuery, setBillSearchQuery] = useState("");
+    const [showPayosModal, setShowPayosModal] = useState(false);
+    const [payosCheckoutUrl, setPayosCheckoutUrl] = useState("");
+    const [pendingInvoiceId, setPendingInvoiceId] = useState("");
     // Load bills from localStorage on mount
     useEffect(() => {
         setIsMounted(true);
@@ -395,16 +398,32 @@ export default function POSPage() {
         return { subtotal, tax, total, commission: totalCommission, assignments: updatedAssignments };
     };
 
+    // Hàm helper để xóa bill sau khi xong (Tách ra để dùng chung)
+    const removeCompletedBill = () => {
+        setBills(prev => {
+            const remaining = prev.filter(b => b.id !== activeBillId);
+            if (remaining.length === 0) {
+                const fresh = createEmptyBill();
+                setActiveBillId(fresh.id);
+                return [fresh];
+            }
+            setActiveBillId(remaining[0].id);
+            return remaining;
+        });
+    };
+
     const handleCheckout = async () => {
         if (!activeBill) return;
         if (!activeBill.selectedCustomer) {
-            alert("Please select a customer");
+            alert("Vui lòng chọn khách hàng");
             return;
         }
         if (activeBill.cart.length === 0) {
-            alert("Cart is empty");
+            alert("Giỏ hàng trống");
             return;
         }
+
+        // Kiểm tra validate phần trăm hoa hồng nhân viên cho Dịch vụ
         const serviceItems = activeBill.cart.filter(item => item.type === 'Service');
         for (const item of serviceItems) {
             const key = getCartItemKey(item._id, item.type);
@@ -416,22 +435,14 @@ export default function POSPage() {
             }
         }
 
-        let qrCodeImage = "";
-        let bankDetails = "";
-        if (activeBill.paymentMethod === "Mã QR" && settings?.qrCodes?.[activeBill.selectedQrIndex]) {
-            const qr = settings.qrCodes[activeBill.selectedQrIndex];
-            qrCodeImage = qr.image;
-            bankDetails = `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`;
-        }
-
         setSubmitting(true);
         try {
             const { subtotal, tax, total, commission, assignments } = calculateTotal();
-
             const paid = activeBill.amountPaid === "" ? total : parseFloat(activeBill.amountPaid.toString());
-            const status = paid >= total ? "paid" : "partially_paid";
 
-            // Handle walking customer by setting customer to undefined
+            // Xác định trạng thái dựa trên phương thức thanh toán
+            const isQR = activeBill.paymentMethod === "Mã QR";
+            const status = isQR ? "pending" : (paid >= total ? "paid" : "partially_paid");
             const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
 
             const payload = {
@@ -454,39 +465,58 @@ export default function POSPage() {
                     percentage: a.percentage,
                     commission: a.commission
                 })),
-                staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
-                amountPaid: paid,
+                staff: assignments[0]?.staffId || undefined,
+                amountPaid: isQR ? 0 : paid, // Nếu là QR, tiền trả ban đầu là 0 chờ webhook PayOS
                 paymentMethod: activeBill.paymentMethod,
                 status: status,
-                qrCodeImage: qrCodeImage,
-                bankDetails: bankDetails
             };
 
+            // 1. Tạo hóa đơn trong Database trước
             const res = await fetch("/api/invoices", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
             const data = await res.json();
+
             if (data.success) {
-                // IMPORTANT: Remove this bill after successful checkout
-                setBills(prev => {
-                    const remaining = prev.filter(b => b.id !== activeBillId);
-                    if (remaining.length === 0) {
-                        const fresh = createEmptyBill();
-                        setActiveBillId(fresh.id);
-                        return [fresh];
+                const invoiceId = data.data._id;
+
+                // 2. NẾU LÀ THANH TOÁN QR -> GỌI API PAYOS
+                if (isQR) {
+                    const payosRes = await fetch("/api/payos/create-payment-link", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            invoiceId: invoiceId,
+                            amount: total,
+                            description: `Thanh toan don ${invoiceId.slice(-6)}`
+                        })
+                    });
+
+                    const payosData = await payosRes.json();
+
+                    if (payosData.success) {
+                        // Mở Modal hiển thị mã QR PayOS
+                        setPayosCheckoutUrl(payosData.checkoutUrl);
+                        setPendingInvoiceId(invoiceId);
+                        setShowPayosModal(true);
+                        setSubmitting(false);
+                        return; // Dừng lại ở đây, chờ khách quét QR
+                    } else {
+                        alert("Lỗi khi tạo mã QR PayOS: " + payosData.message);
+                        setSubmitting(false);
+                        return;
                     }
-                    setActiveBillId(remaining[0].id);
-                    return remaining;
-                });
-                // If there's a payment, create a deposit record
-                if (paid > 0) {
+                }
+
+                // --- CÁC BƯỚC DÀNH CHO THANH TOÁN TIỀN MẶT ---
+                if (paid > 0 && !isQR) {
                     await fetch("/api/deposits", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            invoice: data.data._id,
+                            invoice: invoiceId,
                             customer: customerId,
                             amount: paid,
                             paymentMethod: activeBill.paymentMethod,
@@ -495,23 +525,21 @@ export default function POSPage() {
                     });
                 }
 
-                // --- BẮT ĐẦU ĐOẠN CODE GỬI ZALO ---
+                // --- BẮT ĐẦU ĐOẠN CODE GỬI ZALO (Chỉ chạy khi thanh toán trực tiếp) ---
                 if (activeBill.selectedCustomer !== 'walking-customer') {
                     const customerInfo = customers.find(c => c._id === activeBill.selectedCustomer);
                     if (customerInfo && customerInfo.phone) {
                         try {
-                            // Gom tên tất cả sản phẩm/dịch vụ trong giỏ hàng lại, cách nhau bằng dấu phẩy
                             const tenHangHoa = activeBill.cart.map(item => item.name).join(', ');
-
                             fetch("/api/zalo/zns", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     phone: customerInfo.phone,
-                                    eventType: 'checkout', // Báo cho hệ thống biết đây là sự kiện thanh toán
-                                    payloadData: {         // Nhét toàn bộ dữ liệu thô vào đây
+                                    eventType: 'checkout',
+                                    payloadData: {
                                         customerName: customerInfo.name,
-                                        invoiceId: data.data._id,
+                                        invoiceId: invoiceId,
                                         itemsName: tenHangHoa
                                     }
                                 })
@@ -522,13 +550,17 @@ export default function POSPage() {
                     }
                 }
                 // --- KẾT THÚC ĐOẠN CODE GỬI ZALO ---
-                router.push(`/invoices/print/${data.data._id}`);
+
+                // Dọn dẹp bill và chuyển trang in hóa đơn
+                removeCompletedBill();
+                router.push(`/invoices/print/${invoiceId}`);
+
             } else {
-                alert(data.error || "Failed to create invoice");
+                alert(data.error || "Lỗi tạo hóa đơn");
             }
         } catch (error) {
             console.error(error);
-            alert("Error processing checkout");
+            alert("Lỗi xử lý thanh toán");
         } finally {
             setSubmitting(false);
         }
@@ -854,18 +886,12 @@ export default function POSPage() {
                                     </div>
 
                                     {/* Hiển thị danh sách QR nếu chọn Mã QR */}
-                                    {activeBill.paymentMethod === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
-                                        <div className="animate-in fade-in slide-in-from-top-1">
-                                            <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
-                                            <select
-                                                value={activeBill.selectedQrIndex}
-                                                onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
-                                                className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium"
-                                            >
-                                                {settings.qrCodes.map((qr: any, idx: number) => (
-                                                    <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
-                                                ))}
-                                            </select>
+                                    {/* Hiển thị thông báo khi chọn Mã QR */}
+                                    {activeBill.paymentMethod === 'Mã QR' && (
+                                        <div className="animate-in fade-in slide-in-from-top-1 bg-blue-50 border border-blue-200 p-2 rounded-lg">
+                                            <p className="text-[10px] md:text-xs text-blue-900 font-medium text-center">
+                                                Hệ thống sẽ tự động tạo mã QR động qua PayOS khi bạn bấm "Hoàn thành đơn hàng".
+                                            </p>
                                         </div>
                                     )}
                                 </div>
@@ -1005,6 +1031,49 @@ export default function POSPage() {
                                 ) : (
                                     "Lưu khách hàng"
                                 )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Modal Hiển thị PayOS */}
+            {showPayosModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col mx-4">
+                        <div className="flex justify-between items-center mb-4 border-b pb-3">
+                            <h3 className="text-xl font-bold text-blue-900">Khách hàng quét mã QR để thanh toán</h3>
+                            <button
+                                onClick={() => {
+                                    setShowPayosModal(false);
+                                    removeCompletedBill();
+                                    // Chuyển đến trang chi tiết đơn hàng (đơn hàng đang ở trạng thái pending)
+                                    router.push(`/invoices/${pendingInvoiceId}`);
+                                }}
+                                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 w-full relative bg-gray-50 rounded-lg overflow-hidden">
+                            {/* Nhúng trang thanh toán của PayOS trực tiếp vào iFrame */}
+                            <iframe
+                                src={payosCheckoutUrl}
+                                className="w-full h-full border-0"
+                                title="PayOS Checkout"
+                            />
+                        </div>
+
+                        <div className="mt-4 flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowPayosModal(false);
+                                    removeCompletedBill();
+                                    router.push(`/invoices/${pendingInvoiceId}`);
+                                }}
+                                className="px-5 py-2.5 bg-blue-900 text-white rounded-lg font-bold hover:bg-blue-800 transition-colors"
+                            >
+                                Đóng và chờ thanh toán
                             </button>
                         </div>
                     </div>

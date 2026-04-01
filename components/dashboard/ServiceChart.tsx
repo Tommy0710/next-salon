@@ -34,7 +34,7 @@ export default function ServiceChart({ data }: ServiceChartProps) {
     const displayData = data.slice(0, 6);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-80">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-90">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Service Revenue Distribution</h3>
             <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
