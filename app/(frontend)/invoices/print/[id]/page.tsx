@@ -14,6 +14,8 @@ export default function PrintInvoicePage() {
     const [settings, setSettings] = useState<any>(null);
     const [deposits, setDeposits] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [statusMessage, setStatusMessage] = useState<string>("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,6 +41,106 @@ export default function PrintInvoicePage() {
         fetchData();
     }, [id]);
 
+    const currentStatus = invoice?.status;
+    const dueAmount = invoice ? (invoice.totalAmount - invoice.amountPaid) : 0;
+
+    const defaultQr = settings?.qrCodes?.[0];
+    const qrSource = invoice?.qrCodeImage || defaultQr?.image;
+    const bankDetailsSource = invoice?.bankDetails || (defaultQr ? `${defaultQr.bankName} | ${defaultQr.accountNumber} | ${defaultQr.name}` : "");
+    const showQr = !!qrSource && (invoice?.paymentMethod === 'Mã QR' || currentStatus !== 'paid');
+
+    const handleMarkAsPaid = async () => {
+        if (!invoice || currentStatus === 'paid' || actionLoading) return;
+
+        if (!confirm("Xác nhận thanh toán thành công và gửi Zalo cảm ơn?")) return;
+
+        setActionLoading(true);
+        setStatusMessage("");
+
+        try {
+            const paymentMethod = invoice.paymentMethod || (showQr ? 'Mã QR' : 'Tiền mặt');
+            const updateBody: any = {
+                status: 'paid',
+                amountPaid: invoice.totalAmount,
+                paymentMethod
+            };
+
+            const res = await fetch(`/api/invoices/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updateBody),
+            });
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.error || "Cập nhật hóa đơn thất bại");
+            }
+
+            // Fetch lại invoice với đầy đủ thông tin customer
+            const updatedRes = await fetch(`/api/invoices/${id}`);
+            const updatedData = await updatedRes.json();
+            let updatedInvoice;
+            if (updatedData.success) {
+                setInvoice(updatedData.data);
+                updatedInvoice = updatedData.data;
+            } else {
+                setInvoice(data.data); // Fallback nếu fetch lại thất bại
+                updatedInvoice = data.data;
+            }
+
+            const outstanding = updatedInvoice.totalAmount - updatedInvoice.amountPaid;
+            if (outstanding > 0) {
+                await fetch("/api/deposits", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        invoice: updatedInvoice._id,
+                        customer: updatedInvoice.customer?._id,
+                        amount: outstanding,
+                        paymentMethod: updatedInvoice.paymentMethod,
+                        notes: "Thanh toán hoàn tất từ trang hóa đơn"
+                    })
+                });
+            }
+
+            if (updatedInvoice.customer?.phone) {
+                const itemsName = (updatedInvoice.items || []).map((item: any) => item.name).join(', ');
+                try {
+                    const zaloResponse = await fetch("/api/zalo/zns", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            phone: updatedInvoice.customer.phone,
+                            eventType: 'checkout',
+                            payloadData: {
+                                customerName: updatedInvoice.customer?.name || "Quý khách",
+                                invoiceId: updatedInvoice._id,
+                                itemsName: itemsName,
+                            }
+                        })
+                    });
+                    const zaloResult = await zaloResponse.json();
+                    if (zaloResult.success) {
+                        setStatusMessage("Cập nhật thành công: Đã thanh toán và gửi Zalo cảm ơn.");
+                    } else {
+                        setStatusMessage("Cập nhật thành công: Đã thanh toán. Zalo gửi thất bại: " + (zaloResult.error || "Lỗi không xác định"));
+                    }
+                } catch (zaloError) {
+                    console.error("Zalo API error:", zaloError);
+                    setStatusMessage("Cập nhật thành công: Đã thanh toán. Zalo gửi thất bại:");
+                }
+            } else {
+                setStatusMessage("Cập nhật thành công: Đã thanh toán. Không có số điện thoại để gửi Zalo.");
+            }
+        } catch (error: any) {
+            console.error("Error mark as paid:", error);
+            alert(error?.message || "Không thể cập nhật trạng thái thanh toán");
+            setStatusMessage("Lỗi: " + (error?.message || "Không thể cập nhật"));
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handlePrint = () => {
         window.print();
     };
@@ -51,21 +153,37 @@ export default function PrintInvoicePage() {
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white text-black">
             {/* Header / Controls */}
-            <div className="max-w-[400px] mx-auto flex justify-between items-center mb-6 print:hidden">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    Quay lại
-                </button>
-                <FormButton
-                    onClick={handlePrint}
-                    icon={<Printer className="w-4 h-4" />}
-                >
-                    In Biên Lai
-                </FormButton>
+            <div className="max-w-[400px] mx-auto flex flex-col sm:flex-row gap-2 justify-between items-center mb-6 print:hidden">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Quay lại
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <FormButton
+                        onClick={handleMarkAsPaid}
+                        loading={actionLoading}
+                        disabled={currentStatus === 'paid' || actionLoading}
+                        className={`gap-2 ${currentStatus === 'paid' ? 'bg-green-600 hover:bg-green-600' : 'bg-blue-900 hover:bg-blue-800'}`}
+                    >
+                        {currentStatus === 'paid' ? 'Đã thanh toán' : 'Hoàn thành'}
+                    </FormButton>
+                    <FormButton
+                        onClick={handlePrint}
+                        icon={<Printer className="w-4 h-4" />}
+                    >
+                        In Biên Lai
+                    </FormButton>
+                </div>
             </div>
+                {statusMessage && (
+                    <div className="max-w-[400px] mx-auto text-sm text-blue-700 mb-4 print:hidden">{statusMessage}</div>
+                )}
 
             {/* Thermal Receipt Content */}
             <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-blue-900 print:border-t-0">
@@ -97,6 +215,12 @@ export default function PrintInvoicePage() {
                     <div className="flex justify-between">
                         <span className="text-gray-500">Khách hàng:</span>
                         <span className="font-bold">{invoice.customer?.name || "Khách vãng lai"}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-gray-500">Trạng thái:</span>
+                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-blue-50 text-blue-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
+                            {invoice.status?.replace('_', ' ') || 'N/A'}
+                        </span>
                     </div>
                     {invoice.appointment && (
                         <div className="flex justify-between">
@@ -164,25 +288,6 @@ export default function PrintInvoicePage() {
                     )}
                 </div>
 
-                {/* Payment History */}
-                {deposits.length > 0 && (
-                    <div className="mt-6 border-t border-gray-100 pt-4">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Lịch sử thanh toán</p>
-                        <div className="space-y-2">
-                            {deposits.map((dep, idx) => (
-                                <div key={idx} className="flex justify-between text-[11px]">
-                                    <div className="text-gray-500">
-                                        <span>{format(new Date(dep.date), "dd/MM/yy HH:mm")}</span>
-                                        <span className="mx-2">•</span>
-                                        <span className="uppercase">{dep.paymentMethod}</span>
-                                    </div>
-                                    <span className="font-bold">{currencySymbol}{dep.amount.toFixed(2)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
                 {/* Footer Section */}
                 <div className="mt-10 text-center space-y-4">
                     <div className="flex flex-col items-center gap-1">
@@ -191,15 +296,15 @@ export default function PrintInvoicePage() {
                     </div>
 
                     {/* THÊM KHỐI NÀY ĐỂ HIỂN THỊ MÃ QR */}
-                    {invoice.paymentMethod === 'Mã QR' && invoice.qrCodeImage && (
+                    {showQr && qrSource && (
                         <div className="mt-6 flex flex-col items-center border-t border-dashed border-gray-300 pt-6">
                             <p className="text-[12px] font-black uppercase mb-2">Quét mã để thanh toán</p>
-                            <img src={invoice.qrCodeImage} alt="QR Code Payment" className="w-40 h-40 object-contain p-1 border border-gray-200 rounded-lg" />
-                            {invoice.bankDetails && (
+                            <img src={qrSource} alt="QR Code Payment" className="w-40 h-40 object-contain p-1 border border-gray-200 rounded-lg" />
+                            {bankDetailsSource && (
                                 <div className="text-[10px] text-center mt-2 space-y-0.5">
-                                    <p className="font-bold text-[11px]">{invoice.bankDetails.split('|')[0]}</p>
-                                    <p className=" text-[12px] font-black">{invoice.bankDetails.split('|')[1]}</p>
-                                    <p className="text-gray-500">{invoice.bankDetails.split('|')[2]}</p>
+                                    <p className="font-bold text-[11px]">{bankDetailsSource.split('|')[0]}</p>
+                                    <p className=" text-[12px] font-black">{bankDetailsSource.split('|')[1]}</p>
+                                    <p className="text-gray-500">{bankDetailsSource.split('|')[2]}</p>
                                 </div>
                             )}
                         </div>
@@ -215,10 +320,9 @@ export default function PrintInvoicePage() {
                         <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p>
                     </div>
 
-                    <div className="pt-4 flex justify-center opacity-20">
-                        {/* Placeholder for barcode-like aesthetic */}
+                    {/* <div className="pt-4 flex justify-center opacity-20">
                         <div className="flex gap-px h-8 bg-gray-900 w-full max-w-[200px]"></div>
-                    </div>
+                    </div> */}
                     <p className="text-[8px] text-gray-300 tracking-[4px] uppercase">{invoice.invoiceNumber}</p>
                 </div>
             </div>

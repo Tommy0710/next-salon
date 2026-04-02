@@ -428,8 +428,8 @@ export default function POSPage() {
         try {
             const { subtotal, tax, total, commission, assignments } = calculateTotal();
 
-            const paid = activeBill.amountPaid === "" ? total : parseFloat(activeBill.amountPaid.toString());
-            const status = paid >= total ? "paid" : "partially_paid";
+            const paid = activeBill.amountPaid === "" ? 0 : parseFloat(activeBill.amountPaid.toString());
+            const status = "pending"; // POS tạo đơn luôn pending, hoàn tất ở trang invoice
 
             // Handle walking customer by setting customer to undefined
             const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
@@ -495,33 +495,8 @@ export default function POSPage() {
                     });
                 }
 
-                // --- BẮT ĐẦU ĐOẠN CODE GỬI ZALO ---
-                if (activeBill.selectedCustomer !== 'walking-customer') {
-                    const customerInfo = customers.find(c => c._id === activeBill.selectedCustomer);
-                    if (customerInfo && customerInfo.phone) {
-                        try {
-                            // Gom tên tất cả sản phẩm/dịch vụ trong giỏ hàng lại, cách nhau bằng dấu phẩy
-                            const tenHangHoa = activeBill.cart.map(item => item.name).join(', ');
-
-                            fetch("/api/zalo/zns", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    phone: customerInfo.phone,
-                                    eventType: 'checkout', // Báo cho hệ thống biết đây là sự kiện thanh toán
-                                    payloadData: {         // Nhét toàn bộ dữ liệu thô vào đây
-                                        customerName: customerInfo.name,
-                                        invoiceId: data.data._id,
-                                        itemsName: tenHangHoa
-                                    }
-                                })
-                            }).catch(err => console.error("Lỗi gọi API Zalo nội bộ:", err));
-                        } catch (e) {
-                            console.error("Lỗi cấu hình gửi Zalo:", e);
-                        }
-                    }
-                }
-                // --- KẾT THÚC ĐOẠN CODE GỬI ZALO ---
+                // NOTE: tắt gửi Zalo đối với POS ở đây theo yêu cầu.
+                // Khi nhấn nút "Thanh toán thành công" trên trang invoice id mới gửi Zalo.
                 router.push(`/invoices/print/${data.data._id}`);
             } else {
                 alert(data.error || "Failed to create invoice");
