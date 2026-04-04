@@ -1,49 +1,14 @@
 import mongoose, { Schema, Model, models } from 'mongoose';
 
-export interface IPermission {
-    view: 'all' | 'own' | 'none';
-    create: boolean;
-    edit: boolean;
-    delete: boolean;
-}
-
 export interface IRole {
     _id: string;
     name: string;
     description?: string;
-    permissions: {
-        dashboard: { view: boolean };
-        appointments: IPermission;
-        pos: IPermission;
-        services: IPermission;
-        products: IPermission;
-        staff: IPermission;
-        customers: IPermission;
-        suppliers: IPermission;
-        expenses: IPermission;
-        reports: IPermission;
-        users: IPermission;
-        roles: IPermission;
-        staffSlots: IPermission;
-        aiReports: { view: boolean };
-        settings: { view: boolean; edit: boolean };
-        [key: string]: any; // Allow dynamic permissions for future modules
-    };
-    isSystem: boolean; // Prevent deleting system roles like 'Admin'
+    isAdmin: boolean; // Chỉ cần 1 cờ này là đủ
+    isSystem: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
-
-const permissionSchema = {
-    view: {
-        type: String,
-        enum: ['all', 'own', 'none'],
-        default: 'none'
-    },
-    create: { type: Boolean, default: false },
-    edit: { type: Boolean, default: false },
-    delete: { type: Boolean, default: false }
-};
 
 const RoleSchema = new Schema<IRole>(
     {
@@ -57,29 +22,13 @@ const RoleSchema = new Schema<IRole>(
             type: String,
             trim: true,
         },
+        isAdmin: {
+            type: Boolean,
+            default: false, // Mặc định tạo ra sẽ là Staff
+        },
         isSystem: {
             type: Boolean,
             default: false,
-        },
-        permissions: {
-            type: Schema.Types.Mixed, // Use Mixed type to allow flexible permissions
-            default: {
-                dashboard: { view: true },
-                appointments: { view: 'none', create: false, edit: false, delete: false },
-                pos: { view: 'none', create: false, edit: false, delete: false },
-                services: { view: 'none', create: false, edit: false, delete: false },
-                products: { view: 'none', create: false, edit: false, delete: false },
-                staff: { view: 'none', create: false, edit: false, delete: false },
-                customers: { view: 'none', create: false, edit: false, delete: false },
-                suppliers: { view: 'none', create: false, edit: false, delete: false },
-                expenses: { view: 'none', create: false, edit: false, delete: false },
-                reports: { view: 'none', create: false, edit: false, delete: false },
-                users: { view: 'none', create: false, edit: false, delete: false },
-                roles: { view: 'none', create: false, edit: false, delete: false },
-                staffSlots: { view: 'none', create: false, edit: false, delete: false },
-                aiReports: { view: false },
-                settings: { view: false, edit: false }
-            }
         }
     },
     {

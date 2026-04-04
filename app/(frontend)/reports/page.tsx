@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -31,6 +30,9 @@ import { getCurrentDateInTimezone, getMonthDateRangeInTimezone } from "@/lib/dat
 type ReportType = 'summary' | 'sales' | 'services' | 'staff' | 'customers' | 'inventory' | 'expenses' | 'profit' | 'daily' | 'activity-log';
 
 export default function ReportsPage() {
+    // 🔴 [QUAN TRỌNG]: THAY THẾ BIẾN NÀY BẰNG DATA TỪ AUTH CỦA BẠN
+    const currentUserIsAdmin = false;
+
     const { settings } = useSettings();
     const [activeTab, setActiveTab] = useState<ReportType>('sales');
     const [loading, setLoading] = useState(true);
@@ -54,23 +56,33 @@ export default function ReportsPage() {
         { id: 'activity-log', label: 'System Audit', icon: Shield },
     ];
 
+    // Thêm settings vào dependency để cập nhật khi settings tải xong (có chứa QR)
     useEffect(() => {
         fetchData();
-    }, [activeTab, dateRange]);
+    }, [activeTab, dateRange, settings]);
 
     const fetchData = async () => {
         setLoading(true);
         // Clear previous report data to avoid mapping errors during transition
         setReportData(null);
         try {
+            // Lấy thông tin QR thứ 2
+            const secondQrInfo = settings?.qrCodes?.length > 1 ? settings.qrCodes[1] : null;
+
+            // Tạo extraFilter nếu KHÔNG PHẢI admin và CÓ cài đặt QR thứ 2
+            const extraFilter = (!currentUserIsAdmin && secondQrInfo)
+                ? `&qrAccount=${encodeURIComponent(secondQrInfo.accountNumber)}`
+                : '';
+
             if (activeTab === 'summary') {
+                // Nhét thêm extraFilter vào các API cần lấy dữ liệu tổng quan
                 const [invoicesRes, expensesRes, appointmentsRes, customersRes, productsRes, purchasesRes] = await Promise.all([
-                    fetch(`/api/invoices?startDate=${dateRange.start}&endDate=${dateRange.end}`),
-                    fetch(`/api/expenses?startDate=${dateRange.start}&endDate=${dateRange.end}`),
-                    fetch(`/api/appointments?start=${dateRange.start}&end=${dateRange.end}`),
-                    fetch('/api/customers'),
-                    fetch('/api/products'),
-                    fetch(`/api/purchases?startDate=${dateRange.start}&endDate=${dateRange.end}`)
+                    fetch(`/api/invoices?startDate=${dateRange.start}&endDate=${dateRange.end}${extraFilter}`),
+                    fetch(`/api/expenses?startDate=${dateRange.start}&endDate=${dateRange.end}${extraFilter}`),
+                    fetch(`/api/appointments?start=${dateRange.start}&end=${dateRange.end}${extraFilter}`),
+                    fetch(`/api/customers?_t=1${extraFilter}`),
+                    fetch(`/api/products?_t=1${extraFilter}`),
+                    fetch(`/api/purchases?startDate=${dateRange.start}&endDate=${dateRange.end}${extraFilter}`)
                 ]);
 
                 const [invoicesData, expensesData, appointmentsData, customersData, productsData, purchasesData] = await Promise.all([
@@ -98,7 +110,8 @@ export default function ReportsPage() {
                     lowStockCount: lowStock
                 });
             } else {
-                const res = await fetch(`/api/reports?type=${activeTab}&startDate=${dateRange.start}&endDate=${dateRange.end}`);
+                // Nhét extraFilter vào tab báo cáo chi tiết
+                const res = await fetch(`/api/reports?type=${activeTab}&startDate=${dateRange.start}&endDate=${dateRange.end}${extraFilter}`);
                 const data = await res.json();
                 if (data.success) {
                     setReportData(data.data);
@@ -550,4 +563,3 @@ export default function ReportsPage() {
         </div>
     );
 }
-

@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
     try {
         await connectDB();
 
-        // Check Permissions
+        // LƯU Ý: Bạn cần đảm bảo hàm checkPermission trong file rbac.ts 
+        // đã được sửa lại để chỉ check xem user có phải là Admin hay không.
         const permissionError = await checkPermission(request, 'roles', 'view');
         if (permissionError) return permissionError;
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     try {
         await connectDB();
 
-        // Check Permissions
+        // Kiểm tra quyền (Chỉ Admin mới được tạo Role)
         const permissionError = await checkPermission(request, 'roles', 'create');
         if (permissionError) return permissionError;
 
@@ -69,7 +70,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const role = await Role.create(body);
+        // TẠO PAYLOAD MỚI: Chỉ trích xuất đúng các trường cần thiết theo Model mới
+        // Loại bỏ hoàn toàn object `permissions` phức tạp cũ
+        const roleData = {
+            name: body.name,
+            description: body.description || "",
+            isAdmin: Boolean(body.isAdmin), // Đảm bảo luôn là boolean
+            isSystem: false // Role do user tạo mặc định không phải system role
+        };
+
+        const role = await Role.create(roleData);
         return NextResponse.json({ success: true, data: role }, { status: 201 });
     } catch (error: any) {
         if (error.code === 11000) {

@@ -38,13 +38,12 @@ export async function PUT(
         const { id } = await params;
         const body = await request.json();
 
-        // Prevent modifying system roles significantly if needed
-        // For now, we allow modifying permissions but maybe not the name of system roles
         const existingRole = await Role.findById(id);
         if (!existingRole) {
             return NextResponse.json({ success: false, error: "Role not found" }, { status: 404 });
         }
 
+        // Không cho phép đổi tên của các Role mặc định của hệ thống
         if (existingRole.isSystem && body.name && body.name !== existingRole.name) {
             return NextResponse.json(
                 { success: false, error: "Cannot rename system roles" },
@@ -52,12 +51,13 @@ export async function PUT(
             );
         }
 
-        // Update the role
+        // Cập nhật các trường thông tin cơ bản
         if (body.name) existingRole.name = body.name;
         if (body.description !== undefined) existingRole.description = body.description;
-        if (body.permissions) {
-            existingRole.permissions = body.permissions;
-            existingRole.markModified('permissions'); // Important for Mixed type
+
+        // Cập nhật quyền Admin (nếu có truyền lên)
+        if (body.isAdmin !== undefined) {
+            existingRole.isAdmin = body.isAdmin;
         }
 
         await existingRole.save();
@@ -92,7 +92,7 @@ export async function DELETE(
             );
         }
 
-        // Check if users are assigned to this role
+        // Kiểm tra xem có user nào đang được gán role này không
         const usersCount = await User.countDocuments({ role: id });
         if (usersCount > 0) {
             return NextResponse.json(
