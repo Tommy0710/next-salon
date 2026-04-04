@@ -1,10 +1,40 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 import Role from "@/models/Role";
 
+// ==========================================
+// 1. MODULE AUGMENTATION (KHAI BÁO TYPE)
+// ==========================================
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            role: string;
+            isAdmin: boolean; // Dùng isAdmin thay cho permissions
+        } & DefaultSession["user"];
+    }
+
+    interface User {
+        role?: any; // Thêm dấu ? để không bị lỗi identical modifiers
+    }
+}
+
+declare module "next-auth/jwt" {
+    interface JWT {
+        id: string; // CHÚ Ý: Không có dấu ? ở đây để khớp với code gốc của next-auth
+        role?: string;
+        isAdmin?: boolean;
+        roleId?: string;
+    }
+}
+
+// ==========================================
+// 2. CẤU HÌNH NEXTAUTH
+// ==========================================
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
     providers: [
@@ -60,13 +90,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // Keep specialized callbacks that need DB here if they can't be in config
     callbacks: {
         ...authConfig.callbacks,
-        async jwt({ token, user, trigger, session }) {
+
+        async jwt({ token, user }) {
             // Initial sign in
             if (user) {
                 token.id = user.id;
                 if (user.role) {
                     token.role = user.role.name;
-                    token.permissions = user.role.permissions;
+                    // Lấy quyền isAdmin từ database gắn vào token
+                    token.isAdmin = user.role.isAdmin;
                     token.roleId = user.role._id?.toString() || user.role.id;
                 }
             }
@@ -80,7 +112,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     const role = await Role.findById(token.roleId);
                     if (role) {
                         token.role = role.name;
-                        token.permissions = role.permissions;
+                        // Cập nhật lại quyền isAdmin nếu có thay đổi trong DB
+                        token.isAdmin = role.isAdmin;
                     }
                 } catch (error) {
                     console.error("Error refreshing permissions in JWT callback:", error);
@@ -89,5 +122,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             return token;
         },
+
+        async session({ session, token }) {
+            // Đẩy dữ liệu từ JWT xuống Session để giao diện (Client) có thể gọi useSession() lấy ra dùng
+            if (token && session.user) {
+                session.user.id = token.id as string;
+                session.user.role = token.role as string;
+                session.user.isAdmin = token.isAdmin as boolean;
+            }
+
+            if (authConfig.callbacks?.session) {
+                return await authConfig.callbacks.session({ session, token } as any);
+            }
+
+            return session;
+        }
     }
 });
