@@ -1,8 +1,8 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"; // <-- IMPORT USE SESSION
 import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit, X } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -39,7 +39,7 @@ interface StaffAssignment {
     staffId: string;
     percentage: number;
 }
-// Add these to your existing interfaces
+
 interface Bill {
     id: string;
     name: string;
@@ -66,9 +66,15 @@ const createEmptyBill = (): Bill => {
         amountPaid: ""
     };
 };
+
 export default function POSPage() {
     const router = useRouter();
     const { settings } = useSettings();
+
+    // 🔴 LẤY QUYỀN ADMIN TỪ SESSION
+    const { data: session } = useSession();
+    const currentUserIsAdmin = session?.user?.isAdmin === true;
+
     const [activeTab, setActiveTab] = useState<'services' | 'products'>('services');
     const [services, setServices] = useState<Item[]>([]);
     const [products, setProducts] = useState<Item[]>([]);
@@ -77,20 +83,22 @@ export default function POSPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
-    // --- NEW MULTI-BILL STATE ---
     const [isMounted, setIsMounted] = useState(false);
     const [bills, setBills] = useState<Bill[]>([]);
     const [activeBillId, setActiveBillId] = useState<string>("");
     const [submitting, setSubmitting] = useState(false);
-    // --- THÊM STATE CHO TẠO KHÁCH HÀNG NHANH ---
     const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
     const [newCustomerName, setNewCustomerName] = useState("");
     const [newCustomerPhone, setNewCustomerPhone] = useState("");
     const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
-    // THÊM DÒNG NÀY: State để lưu ID của bill đang chuẩn bị xóa (mở modal)
     const [billToDelete, setBillToDelete] = useState<string | null>(null);
     const [billSearchQuery, setBillSearchQuery] = useState("");
-    // Load bills from localStorage on mount
+
+    // 🔴 LỌC QR THEO QUYỀN ĐỂ SỬ DỤNG TRONG TOÀN BỘ COMPONENT NÀY
+    const visibleQRCodes = currentUserIsAdmin
+        ? (settings?.qrCodes || [])
+        : (settings?.qrCodes?.length > 1 ? [settings.qrCodes[1]] : []);
+
     useEffect(() => {
         setIsMounted(true);
         const savedBills = localStorage.getItem("pos_waiting_bills");
@@ -105,13 +113,11 @@ export default function POSPage() {
             }
         }
 
-        // Default: Create 1 empty bill
         const initialBill = createEmptyBill();
         setBills([initialBill]);
         setActiveBillId(initialBill.id);
     }, []);
 
-    // Save bills to localStorage whenever they change
     useEffect(() => {
         if (isMounted && bills.length > 0) {
             localStorage.setItem("pos_waiting_bills", JSON.stringify(bills));
@@ -119,10 +125,8 @@ export default function POSPage() {
         }
     }, [bills, activeBillId, isMounted]);
 
-    // Derived active bill for easy access
     const activeBill = bills.find(b => b.id === activeBillId) || bills[0];
 
-    // Helper to safely update ONLY the active bill
     const updateActiveBill = (updates: Partial<Bill> | ((prev: Bill) => Partial<Bill>)) => {
         setBills(prevBills => prevBills.map(bill => {
             if (bill.id === activeBillId) {
@@ -132,7 +136,7 @@ export default function POSPage() {
             return bill;
         }));
     }
-    // --- BILL MANAGEMENT ACTIONS ---
+
     const addNewBill = () => {
         const newBill = createEmptyBill();
         setBills(prev => [...prev, newBill]);
@@ -140,23 +144,20 @@ export default function POSPage() {
     };
 
     const switchBill = (id: string) => setActiveBillId(id);
-    // 1. Hàm này chỉ mở popup xác nhận lên
+
     const handleRemoveClick = (id: string, e: React.MouseEvent) => {
-        e.stopPropagation(); // Ngăn chặn việc click vào tab làm đổi tab
-        setBillToDelete(id); // Gọi popup lên
+        e.stopPropagation();
+        setBillToDelete(id);
     };
 
-    // 2. Hàm này mới thực sự xóa bill khi bấm "Đồng ý"
     const confirmRemoveBill = () => {
         if (!billToDelete) return;
 
         setBills(prev => {
             const filtered = prev.filter(b => b.id !== billToDelete);
-            // Nếu xóa trúng bill đang mở, tự động lùi về bill cuối cùng
             if (billToDelete === activeBillId) {
                 setActiveBillId(filtered.length > 0 ? filtered[filtered.length - 1].id : "");
             }
-            // Nếu xóa sạch không còn bill nào, tạo 1 bill mới tinh
             if (filtered.length === 0) {
                 const fresh = createEmptyBill();
                 setActiveBillId(fresh.id);
@@ -165,11 +166,9 @@ export default function POSPage() {
             return filtered;
         });
 
-        // Đóng popup sau khi xóa xong
         setBillToDelete(null);
     };
 
-    // --- HÀM TẠO KHÁCH HÀNG NHANH ---
     const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) {
             alert("Vui lòng nhập tên khách hàng");
@@ -189,13 +188,8 @@ export default function POSPage() {
             const data = await res.json();
 
             if (data.success) {
-                // 1. Thêm khách hàng mới vào danh sách hiện tại
                 setCustomers(prev => [...prev, data.data]);
-
-                // 2. Tự động chọn khách hàng này cho hóa đơn đang mở
                 updateActiveBill({ selectedCustomer: data.data._id });
-
-                // 3. Đóng modal và reset form
                 setIsAddCustomerModalOpen(false);
                 setNewCustomerName("");
                 setNewCustomerPhone("");
@@ -248,15 +242,12 @@ export default function POSPage() {
         }
     };
 
-
-
     const filteredItems = (activeTab === 'services' ? services : products).filter(item =>
         item.name.toLowerCase().includes(search.toLowerCase())
     );
 
     const getCartItemKey = (itemId: string, type: string) => `${type}:${itemId}`;
 
-    // --- CART ACTIONS (Refactored) ---
     const addToCart = (item: Item) => {
         if (!activeBill) return;
         updateActiveBill((bill) => {
@@ -292,8 +283,6 @@ export default function POSPage() {
                 : i)
         }));
     };
-
-    // Note: Apply similar `updateActiveBill` logic to `addServiceStaffAssignment`, `removeServiceStaffAssignment`, and `updateServiceStaffPercentage`.
 
     const addServiceStaffAssignment = (itemId: string, type: string, staffId: string) => {
         if (!activeBill) return;
@@ -355,7 +344,6 @@ export default function POSPage() {
         const tax = subtotal * (settings.taxRate / 100);
         const total = subtotal + tax - activeBill.discount;
 
-        // Commission calculation aggregated per staff from per-service assignments
         let totalCommission = 0;
         const perStaff: Record<string, { staffId: string; commission: number }> = {};
 
@@ -416,10 +404,11 @@ export default function POSPage() {
             }
         }
 
+        // 🔴 ĐÃ SỬA: Lấy đúng QR code đã được lọc theo quyền (visibleQRCodes)
         let qrCodeImage = "";
         let bankDetails = "";
-        if (activeBill.paymentMethod === "Mã QR" && settings?.qrCodes?.[activeBill.selectedQrIndex]) {
-            const qr = settings.qrCodes[activeBill.selectedQrIndex];
+        if (activeBill.paymentMethod === "Mã QR" && visibleQRCodes[activeBill.selectedQrIndex]) {
+            const qr = visibleQRCodes[activeBill.selectedQrIndex];
             qrCodeImage = qr.image;
             bankDetails = `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`;
         }
@@ -429,9 +418,8 @@ export default function POSPage() {
             const { subtotal, tax, total, commission, assignments } = calculateTotal();
 
             const paid = activeBill.amountPaid === "" ? 0 : parseFloat(activeBill.amountPaid.toString());
-            const status = "pending"; // POS tạo đơn luôn pending, hoàn tất ở trang invoice
+            const status = "pending";
 
-            // Handle walking customer by setting customer to undefined
             const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
 
             const payload = {
@@ -454,7 +442,7 @@ export default function POSPage() {
                     percentage: a.percentage,
                     commission: a.commission
                 })),
-                staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
+                staff: assignments[0]?.staffId || undefined,
                 amountPaid: paid,
                 paymentMethod: activeBill.paymentMethod,
                 status: status,
@@ -469,7 +457,6 @@ export default function POSPage() {
             });
             const data = await res.json();
             if (data.success) {
-                // IMPORTANT: Remove this bill after successful checkout
                 setBills(prev => {
                     const remaining = prev.filter(b => b.id !== activeBillId);
                     if (remaining.length === 0) {
@@ -480,7 +467,7 @@ export default function POSPage() {
                     setActiveBillId(remaining[0].id);
                     return remaining;
                 });
-                // If there's a payment, create a deposit record
+
                 if (paid > 0) {
                     await fetch("/api/deposits", {
                         method: "POST",
@@ -495,8 +482,6 @@ export default function POSPage() {
                     });
                 }
 
-                // NOTE: tắt gửi Zalo đối với POS ở đây theo yêu cầu.
-                // Khi nhấn nút "Thanh toán thành công" trên trang invoice id mới gửi Zalo.
                 router.push(`/invoices/print/${data.data._id}`);
             } else {
                 alert(data.error || "Failed to create invoice");
@@ -513,12 +498,12 @@ export default function POSPage() {
     const [mobileTab, setMobileTab] = useState<'catalog' | 'cart'>('catalog');
 
     const filteredBills = bills.filter(b => b.name.toLowerCase().includes(billSearchQuery.toLowerCase()));
+
     return (
         <div className="flex h-[100dvh] w-full bg-gray-50 overflow-hidden flex-col md:flex-row">
             {/* Left Side: Items Catalog */}
             <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 border-r border-gray-200 bg-white ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
                 <div className="bg-white flex flex-col h-full overflow-hidden">
-                    {/* Header/Tabs */}
                     <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                             <h1 className="text-lg md:text-xl font-bold text-gray-800">Hệ thống POS</h1>
@@ -558,7 +543,6 @@ export default function POSPage() {
                         </div>
                     </div>
 
-                    {/* Grid */}
                     <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 pb-20 md:pb-4">
                         {loading ? (
                             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-900 border-t-transparent"></div></div>
@@ -594,7 +578,6 @@ export default function POSPage() {
             {/* Right Side: Cart */}
             <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col bg-white border-l border-gray-200 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
 
-                {/* --- MỚI: THANH TÌM KIẾM BILL & TẠO BILL MỚI --- */}
                 <div className="p-2 border-b border-gray-200 bg-gray-50 flex items-center gap-2 flex-shrink-0">
                     <div className="relative flex-1">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
@@ -615,7 +598,6 @@ export default function POSPage() {
                     </button>
                 </div>
 
-                {/* 1. BILL TABS UI */}
                 <div className="flex overflow-x-auto bg-gray-100 border-b border-gray-200 hide-scrollbar p-1 flex-shrink-0">
                     {filteredBills.map((bill) => (
                         <div
@@ -639,14 +621,9 @@ export default function POSPage() {
                     ))}
                 </div>
 
-                {/* 2. ACTIVE BILL CONTENT */}
                 {isMounted && activeBill && (
                     <div className="bg-white flex flex-col h-full overflow-hidden">
-
-                        {/* Customer Selection & Bill Renaming */}
                         <div className="p-3 md:p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 space-y-3">
-
-                            {/* --- MỚI: Ô ĐỔI TÊN BILL --- */}
                             <div className="flex items-center gap-2">
                                 <Edit className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                                 <input
@@ -678,7 +655,6 @@ export default function POSPage() {
                             </div>
                         </div>
 
-                        {/* Cart Items */}
                         <div className="flex-grow overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
                             {activeBill.cart.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-gray-400 py-10">
@@ -758,7 +734,6 @@ export default function POSPage() {
                             )}
                         </div>
 
-                        {/* Summary Section */}
                         <div className="flex-shrink-0 p-3 bg-gray-50 border-t border-gray-200 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="space-y-1 mb-3 text-[10px] md:text-xs">
                                 <div className="flex justify-between text-gray-600">
@@ -828,8 +803,8 @@ export default function POSPage() {
                                         ))}
                                     </div>
 
-                                    {/* Hiển thị danh sách QR nếu chọn Mã QR */}
-                                    {activeBill.paymentMethod === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
+                                    {/* 🔴 SỬA RENDER QR THEO QUYỀN ĐÃ LỌC */}
+                                    {activeBill.paymentMethod === 'Mã QR' && visibleQRCodes && visibleQRCodes.length > 0 && (
                                         <div className="animate-in fade-in slide-in-from-top-1">
                                             <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
                                             <select
@@ -837,7 +812,7 @@ export default function POSPage() {
                                                 onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
                                                 className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium"
                                             >
-                                                {settings.qrCodes.map((qr: any, idx: number) => (
+                                                {visibleQRCodes.map((qr: any, idx: number) => (
                                                     <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
                                                 ))}
                                             </select>
@@ -860,7 +835,6 @@ export default function POSPage() {
                 )}
             </div>
 
-            {/* Mobile Navigation Bar */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-center justify-around h-16 z-50 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
                 <button
                     onClick={() => setMobileTab('catalog')}
@@ -887,7 +861,7 @@ export default function POSPage() {
                     {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-blue-900 rounded-b-full"></div>}
                 </button>
             </div>
-            {/* THÊM VÀO ĐÂY: Modal Xác nhận xóa Bill */}
+
             {billToDelete && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
                     <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
@@ -917,7 +891,7 @@ export default function POSPage() {
                     </div>
                 </div>
             )}
-            {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
+
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
                     <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
@@ -985,8 +959,6 @@ export default function POSPage() {
                     </div>
                 </div>
             )}
-
         </div>
-
     );
 }

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import { initModels } from "@/lib/initModels";
@@ -16,6 +15,22 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const startDateParam = searchParams.get("startDate");
         const endDateParam = searchParams.get("endDate");
+        const qrAccount = searchParams.get("qrAccount"); // <-- LẤY THAM SỐ LỌC TỪ FRONTEND
+
+        // 🔴 BẢO MẬT: CHẶN TRUY CẬP NẾU LÀ STAFF NHƯNG KHÔNG CÓ QR THỨ 2
+        if (qrAccount === 'RESTRICTED_ACCESS_NO_QR_FOUND') {
+            return NextResponse.json({
+                success: true,
+                data: {
+                    sales: { totalSales: 0, totalCollected: 0, count: 0 },
+                    purchases: { totalPurchases: 0, totalPaid: 0, count: 0 },
+                    expenses: { totalExpenses: 0, count: 0 },
+                    netProfit: 0,
+                    cashFlow: 0
+                }
+            });
+        }
+
         const settings = await Settings.findOne({}, { timezone: 1 }).lean();
         const timezone = settings?.timezone || "UTC";
 
@@ -26,15 +41,23 @@ export async function GET(request: Request) {
             timezone
         );
 
+        // Khởi tạo bộ lọc chung (theo ngày)
         const query: any = {
             date: { $gte: start, $lte: end }
         };
 
-        // Calculate Totals
-        // 1. Sales (Invoices) - we might want to use paidAmount for cash flow or totalAmount for accrued revenue
-        // Usually financial reports show Sales Revenue (Total Amount) and actual Cash Collected (Paid Amount)
-        // Let's return both.
+        // 🔴 BỘ LỌC TÀI KHOẢN QR
+        if (qrAccount) {
+            // Frontend truyền bankDetails dưới dạng `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`
+            // Nên chúng ta dùng $regex để tìm những giao dịch có chứa số tài khoản này
+            query.bankDetails = { $regex: qrAccount, $options: 'i' };
 
+            // LƯU Ý: Nếu trong Model Purchase hoặc Expense của bạn KHÔNG CÓ field `bankDetails`,
+            // bạn cần đảm bảo thêm field này vào lúc lưu dữ liệu, hoặc sửa lại tên field cho khớp.
+        }
+
+        // Calculate Totals
+        // 1. Sales (Invoices) 
         const invoiceStats = await Invoice.aggregate([
             { $match: { ...query, status: { $ne: 'cancelled' } } },
             {
@@ -48,9 +71,6 @@ export async function GET(request: Request) {
         ]);
 
         // 2. Purchases
-        // Query for purchases might use 'date' or 'createdAt'. Purchase model has 'date'.
-        // Assuming 'date' field in Purchase matches the query param (which is checking 'date')
-
         const purchaseStats = await Purchase.aggregate([
             { $match: { ...query, status: { $ne: 'cancelled' } } },
             {
@@ -80,7 +100,7 @@ export async function GET(request: Request) {
         const expenses = expenseStats[0] || { totalExpenses: 0, count: 0 };
 
         const netProfit = sales.totalSales - purchases.totalPurchases - expenses.totalExpenses;
-        const cashFlow = sales.totalCollected - purchases.totalPaid - expenses.totalExpenses; // Assuming expenses are paid immediately or we track expense payment separately (Expense model has amount, assume paid)
+        const cashFlow = sales.totalCollected - purchases.totalPaid - expenses.totalExpenses;
 
         return NextResponse.json({
             success: true,

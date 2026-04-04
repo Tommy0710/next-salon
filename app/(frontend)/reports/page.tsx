@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react"; // <-- IMPORT THÊM USE SESSION
 import {
     BarChart3,
     DollarSign,
@@ -30,8 +31,9 @@ import { getCurrentDateInTimezone, getMonthDateRangeInTimezone } from "@/lib/dat
 type ReportType = 'summary' | 'sales' | 'services' | 'staff' | 'customers' | 'inventory' | 'expenses' | 'profit' | 'daily' | 'activity-log';
 
 export default function ReportsPage() {
-    // 🔴 [QUAN TRỌNG]: THAY THẾ BIẾN NÀY BẰNG DATA TỪ AUTH CỦA BẠN
-    const currentUserIsAdmin = false;
+    // LẤY QUYỀN ADMIN TỪ SESSION ĐĂNG NHẬP THỰC TẾ
+    const { data: session } = useSession();
+    const currentUserIsAdmin = session?.user?.isAdmin === true;
 
     const { settings } = useSettings();
     const [activeTab, setActiveTab] = useState<ReportType>('sales');
@@ -59,20 +61,29 @@ export default function ReportsPage() {
     // Thêm settings vào dependency để cập nhật khi settings tải xong (có chứa QR)
     useEffect(() => {
         fetchData();
-    }, [activeTab, dateRange, settings]);
+    }, [activeTab, dateRange, settings, currentUserIsAdmin]);
 
     const fetchData = async () => {
         setLoading(true);
         // Clear previous report data to avoid mapping errors during transition
         setReportData(null);
         try {
-            // Lấy thông tin QR thứ 2
-            const secondQrInfo = settings?.qrCodes?.length > 1 ? settings.qrCodes[1] : null;
+            // LOGIC SIẾT CHẶT QUYỀN: PHÂN TÁCH ADMIN VÀ STAFF
+            let extraFilter = '';
 
-            // Tạo extraFilter nếu KHÔNG PHẢI admin và CÓ cài đặt QR thứ 2
-            const extraFilter = (!currentUserIsAdmin && secondQrInfo)
-                ? `&qrAccount=${encodeURIComponent(secondQrInfo.accountNumber)}`
-                : '';
+            if (!currentUserIsAdmin) {
+                // Nếu KHÔNG phải Admin, kiểm tra xem có QR thứ 2 không
+                if (settings?.qrCodes && settings.qrCodes.length > 1) {
+                    const secondQrInfo = settings.qrCodes[1];
+                    // Chỉ lấy dữ liệu của số tài khoản thuộc QR thứ 2
+                    extraFilter = `&qrAccount=${encodeURIComponent(secondQrInfo.accountNumber)}`;
+                } else {
+                    // Tránh việc Staff thấy toàn bộ dữ liệu nếu chưa set QR thứ 2
+                    // Truyền một giá trị chặn để API trả về rỗng thay vì trả về tất cả
+                    extraFilter = `&qrAccount=RESTRICTED_ACCESS_NO_QR_FOUND`;
+                }
+            }
+            // Nếu là Admin, extraFilter = '' -> Mặc định lấy tất cả dữ liệu
 
             if (activeTab === 'summary') {
                 // Nhét thêm extraFilter vào các API cần lấy dữ liệu tổng quan

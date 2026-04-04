@@ -1,13 +1,17 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react"; // <-- IMPORT THÊM USE SESSION
 import { DollarSign, TrendingUp, TrendingDown, ShoppingBag, CreditCard, Calendar, RefreshCcw } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { getMonthDateRangeInTimezone } from "@/lib/dateUtils";
 
 export default function FinancialReportPage() {
+    // 🔴 LẤY QUYỀN ADMIN TỪ SESSION
+    const { data: session } = useSession();
+    const currentUserIsAdmin = session?.user?.isAdmin === true;
+
     const { settings } = useSettings();
     const [loading, setLoading] = useState(true);
     const [dateRange, setDateRange] = useState(() => getMonthDateRangeInTimezone(settings.timezone || "UTC"));
@@ -17,14 +21,29 @@ export default function FinancialReportPage() {
         setDateRange(getMonthDateRangeInTimezone(settings.timezone || "UTC"));
     }, [settings.timezone]);
 
+    // Thêm settings và currentUserIsAdmin vào dependency để đảm bảo load đúng dữ liệu khi có QR
     useEffect(() => {
         fetchReport();
-    }, [dateRange]);
+    }, [dateRange, settings, currentUserIsAdmin]);
 
     const fetchReport = async () => {
         setLoading(true);
         try {
-            const query = new URLSearchParams(dateRange);
+            // Tạo đối tượng query từ dateRange
+            const query = new URLSearchParams(dateRange as any);
+
+            // 🔴 LOGIC LỌC DỮ LIỆU DỰA TRÊN QUYỀN VÀ CẤU HÌNH MÃ QR
+            if (!currentUserIsAdmin) {
+                if (settings?.qrCodes && settings.qrCodes.length > 1) {
+                    const secondQrInfo = settings.qrCodes[1]; // Lấy QR thứ 2 (Index = 1)
+                    query.append('qrAccount', secondQrInfo.accountNumber);
+                } else {
+                    // Nếu Staff không có QR thứ 2, chặn luôn không cho tải dữ liệu tổng
+                    query.append('qrAccount', 'RESTRICTED_ACCESS_NO_QR_FOUND');
+                }
+            }
+
+            // Gọi API với query đã được nối thêm tham số lọc
             const res = await fetch(`/api/reports/financial?${query.toString()}`);
             const json = await res.json();
             if (json.success) {

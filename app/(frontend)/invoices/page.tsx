@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react"; // <-- IMPORT USE SESSION
 import { Search, Plus, Trash2, Edit, Eye, FileText, Filter, DollarSign, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
 import Link from "next/link";
 import Modal from "@/components/dashboard/Modal";
@@ -53,6 +54,11 @@ interface PaginationData {
 export default function InvoicesPage() {
     const router = useRouter();
     const { settings } = useSettings();
+
+    // 🔴 LẤY QUYỀN TỪ SESSION
+    const { data: session } = useSession();
+    const currentUserIsAdmin = session?.user?.isAdmin === true;
+
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -65,12 +71,10 @@ export default function InvoicesPage() {
         pages: 0
     });
 
-    // Edit Modal State
     const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
     const [editFormData, setEditFormData] = useState({ status: "", notes: "" });
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    // Payment Modal State
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [payingInvoice, setPayingInvoice] = useState<Invoice | null>(null);
     const [paymentData, setPaymentData] = useState({ amount: "", method: "Tiền mặt", selectedQrIndex: 0, notes: "" });
@@ -78,9 +82,25 @@ export default function InvoicesPage() {
     const [submitting, setSubmitting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
+    // 🔴 LỌC QR THEO QUYỀN ĐỂ DÙNG TRONG MODAL THANH TOÁN
+    const visibleQRCodes = currentUserIsAdmin
+        ? (settings?.qrCodes || [])
+        : (settings?.qrCodes?.length > 1 ? [settings.qrCodes[1]] : []);
+
     const fetchInvoices = useCallback(async (page = 1, searchQuery = search, status = statusFilter, source = sourceFilter) => {
         setLoading(true);
         try {
+            // 🔴 THÊM LOGIC FILTER QR ACCOUNT VÀO API NẾU LÀ STAFF
+            let extraFilter = '';
+            if (!currentUserIsAdmin) {
+                if (settings?.qrCodes && settings.qrCodes.length > 1) {
+                    const secondQrInfo = settings.qrCodes[1];
+                    extraFilter = `&qrAccount=${encodeURIComponent(secondQrInfo.accountNumber)}`;
+                } else {
+                    extraFilter = `&qrAccount=RESTRICTED_ACCESS_NO_QR_FOUND`;
+                }
+            }
+
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: "10",
@@ -88,7 +108,9 @@ export default function InvoicesPage() {
                 status: status,
                 source: source
             });
-            const res = await fetch(`/api/invoices?${params.toString()}`);
+
+            // 🔴 NỐI EXTRA FILTER VÀO CUỐI URL
+            const res = await fetch(`/api/invoices?${params.toString()}${extraFilter}`);
             const data = await res.json();
             if (data.success) {
                 setInvoices(data.data);
@@ -99,7 +121,7 @@ export default function InvoicesPage() {
         } finally {
             setLoading(false);
         }
-    }, [search, statusFilter, sourceFilter]);
+    }, [search, statusFilter, sourceFilter, currentUserIsAdmin, settings]);
 
     useEffect(() => {
         const delaySearch = setTimeout(() => {
@@ -182,10 +204,11 @@ export default function InvoicesPage() {
 
         setSubmitting(true);
         try {
-            // Quy đổi sang định dạng mà hệ thống đang lưu
+            // 🔴 SỬ DỤNG DỮ LIỆU ĐÃ ĐƯỢC LỌC (visibleQRCodes)
             const paymentMethodString = paymentData.method === 'Mã QR'
-                ? `QR Code - ${settings?.qrCodes?.[paymentData.selectedQrIndex]?.bankName || ''}`
+                ? `QR Code - ${visibleQRCodes[paymentData.selectedQrIndex]?.bankName || ''}`
                 : 'Cash';
+
             const res = await fetch("/api/deposits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -193,7 +216,7 @@ export default function InvoicesPage() {
                     invoice: payingInvoice._id,
                     customer: payingInvoice.customer?._id,
                     amount: parseFloat(paymentData.amount),
-                    paymentMethod: paymentData.method,
+                    paymentMethod: paymentData.method, // Lưu trữ tên phương thức thay vì text cứng
                     notes: paymentData.notes
                 }),
             });
@@ -231,7 +254,6 @@ export default function InvoicesPage() {
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
-                {/* Filters */}
                 <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -244,7 +266,6 @@ export default function InvoicesPage() {
                         />
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto text-black">
-                        {/* (SOURCE) */}
                         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
                             <Filter className="w-4 h-4 text-gray-400" />
                             <select
@@ -257,7 +278,6 @@ export default function InvoicesPage() {
                                 <option value="appointment">Từ Đặt lịch</option>
                             </select>
                         </div>
-                        {/* (STATUS) */}
                         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
                             <Filter className="w-4 h-4 text-gray-400" />
                             <select
@@ -275,7 +295,6 @@ export default function InvoicesPage() {
                     </div>
                 </div>
 
-                {/* Table */}
                 <div className="overflow-x-auto text-black">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
@@ -428,7 +447,6 @@ export default function InvoicesPage() {
                     </table>
                 </div>
 
-                {/* Pagination */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
                         Showing <span className="text-gray-900">{invoices.length}</span> of <span className="text-gray-900">{pagination.total}</span> invoices
@@ -500,7 +518,6 @@ export default function InvoicesPage() {
                         max={payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0}
                     />
 
-                    {/* Phần Giao Diện Chọn Phương Thức Thanh Toán Mới */}
                     <div className="mb-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
                         <div className="mb-3 space-y-2">
@@ -517,8 +534,8 @@ export default function InvoicesPage() {
                                 ))}
                             </div>
 
-                            {/* Hiển thị danh sách QR nếu chọn Mã QR */}
-                            {paymentData.method === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
+                            {/* 🔴 SỬA RENDER QR THEO QUYỀN ĐÃ LỌC */}
+                            {paymentData.method === 'Mã QR' && visibleQRCodes && visibleQRCodes.length > 0 && (
                                 <div className="animate-in fade-in slide-in-from-top-1">
                                     <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
                                     <select
@@ -526,7 +543,7 @@ export default function InvoicesPage() {
                                         onChange={(e) => setPaymentData({ ...paymentData, selectedQrIndex: parseInt(e.target.value) })}
                                         className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium text-black"
                                     >
-                                        {settings.qrCodes.map((qr: any, idx: number) => (
+                                        {visibleQRCodes.map((qr: any, idx: number) => (
                                             <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
                                         ))}
                                     </select>
