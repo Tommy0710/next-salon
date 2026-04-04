@@ -15,9 +15,9 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const startDateParam = searchParams.get("startDate");
         const endDateParam = searchParams.get("endDate");
-        const qrAccount = searchParams.get("qrAccount"); // <-- LẤY THAM SỐ LỌC TỪ FRONTEND
+        const qrAccount = searchParams.get("qrAccount"); // Nhận tham số lọc QR từ Frontend
 
-        // 🔴 BẢO MẬT: CHẶN TRUY CẬP NẾU LÀ STAFF NHƯNG KHÔNG CÓ QR THỨ 2
+        // 🔴 BẢO MẬT: Chặn truy cập nếu là Staff nhưng hệ thống chưa có QR thứ 2
         if (qrAccount === 'RESTRICTED_ACCESS_NO_QR_FOUND') {
             return NextResponse.json({
                 success: true,
@@ -41,25 +41,21 @@ export async function GET(request: Request) {
             timezone
         );
 
-        // Khởi tạo bộ lọc chung (theo ngày)
-        const query: any = {
+        // Khởi tạo bộ lọc chung theo thời gian
+        const baseQuery: any = {
             date: { $gte: start, $lte: end }
         };
 
-        // 🔴 BỘ LỌC TÀI KHOẢN QR
+        // 🔴 BỘ LỌC TÀI KHOẢN QR CHO INVOICE
+        const invoiceQuery: any = { ...baseQuery, status: { $ne: 'cancelled' } };
         if (qrAccount) {
-            // Frontend truyền bankDetails dưới dạng `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`
-            // Nên chúng ta dùng $regex để tìm những giao dịch có chứa số tài khoản này
-            query.bankDetails = { $regex: qrAccount, $options: 'i' };
-
-            // LƯU Ý: Nếu trong Model Purchase hoặc Expense của bạn KHÔNG CÓ field `bankDetails`,
-            // bạn cần đảm bảo thêm field này vào lúc lưu dữ liệu, hoặc sửa lại tên field cho khớp.
+            // Tìm các hóa đơn có chuỗi bankDetails chứa số tài khoản được chỉ định
+            invoiceQuery.bankDetails = { $regex: qrAccount, $options: 'i' };
         }
 
-        // Calculate Totals
-        // 1. Sales (Invoices) 
+        // Tính toán doanh thu (Sales)
         const invoiceStats = await Invoice.aggregate([
-            { $match: { ...query, status: { $ne: 'cancelled' } } },
+            { $match: invoiceQuery },
             {
                 $group: {
                     _id: null,
@@ -70,9 +66,9 @@ export async function GET(request: Request) {
             }
         ]);
 
-        // 2. Purchases
+        // Tính toán nhập hàng (Purchases)
         const purchaseStats = await Purchase.aggregate([
-            { $match: { ...query, status: { $ne: 'cancelled' } } },
+            { $match: { ...baseQuery, status: { $ne: 'cancelled' } } },
             {
                 $group: {
                     _id: null,
@@ -83,9 +79,9 @@ export async function GET(request: Request) {
             }
         ]);
 
-        // 3. Expenses
+        // Tính toán chi phí (Expenses)
         const expenseStats = await Expense.aggregate([
-            { $match: query },
+            { $match: baseQuery },
             {
                 $group: {
                     _id: null,

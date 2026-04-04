@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react"; // <-- IMPORT THÊM USE SESSION
+import { useSession } from "next-auth/react"; // Lấy session người dùng
 import { DollarSign, TrendingUp, TrendingDown, ShoppingBag, CreditCard, Calendar, RefreshCcw } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { getMonthDateRangeInTimezone } from "@/lib/dateUtils";
 
 export default function FinancialReportPage() {
-    // 🔴 LẤY QUYỀN ADMIN TỪ SESSION
     const { data: session } = useSession();
-    const currentUserIsAdmin = session?.user?.isAdmin === true;
+    const currentUserIsAdmin = session?.user?.isAdmin === true; // Xác định quyền Admin
 
     const { settings } = useSettings();
     const [loading, setLoading] = useState(true);
@@ -21,7 +20,7 @@ export default function FinancialReportPage() {
         setDateRange(getMonthDateRangeInTimezone(settings.timezone || "UTC"));
     }, [settings.timezone]);
 
-    // Thêm settings và currentUserIsAdmin vào dependency để đảm bảo load đúng dữ liệu khi có QR
+    // Tự động tải lại báo cáo khi ngày tháng, cài đặt hoặc quyền hạn thay đổi
     useEffect(() => {
         fetchReport();
     }, [dateRange, settings, currentUserIsAdmin]);
@@ -29,21 +28,22 @@ export default function FinancialReportPage() {
     const fetchReport = async () => {
         setLoading(true);
         try {
-            // Tạo đối tượng query từ dateRange
-            const query = new URLSearchParams(dateRange as any);
+            const query = new URLSearchParams({
+                startDate: dateRange.startDate,
+                endDate: dateRange.endDate
+            });
 
-            // 🔴 LOGIC LỌC DỮ LIỆU DỰA TRÊN QUYỀN VÀ CẤU HÌNH MÃ QR
+            // 🔴 LOGIC LỌC: Nếu không phải Admin, chỉ lấy dữ liệu của QR thứ 2
             if (!currentUserIsAdmin) {
                 if (settings?.qrCodes && settings.qrCodes.length > 1) {
-                    const secondQrInfo = settings.qrCodes[1]; // Lấy QR thứ 2 (Index = 1)
-                    query.append('qrAccount', secondQrInfo.accountNumber);
+                    const secondQr = settings.qrCodes[1]; // Lấy QR thứ 2 (Index = 1)
+                    query.append('qrAccount', secondQr.accountNumber);
                 } else {
-                    // Nếu Staff không có QR thứ 2, chặn luôn không cho tải dữ liệu tổng
+                    // Nếu Staff vào mà chưa có QR thứ 2, gửi cờ chặn bảo mật
                     query.append('qrAccount', 'RESTRICTED_ACCESS_NO_QR_FOUND');
                 }
             }
 
-            // Gọi API với query đã được nối thêm tham số lọc
             const res = await fetch(`/api/reports/financial?${query.toString()}`);
             const json = await res.json();
             if (json.success) {
@@ -66,14 +66,15 @@ export default function FinancialReportPage() {
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Financial Report</h1>
-                        <p className="text-gray-500 text-sm">Overview of income, expenses, and profitability</p>
-                        <p className="text-xs text-blue-700 mt-1">Timezone: {settings.timezone}</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Báo cáo Tài chính</h1>
+                        <p className="text-gray-500 text-sm">
+                            {currentUserIsAdmin ? "Tổng quan thu chi toàn hệ thống" : "Báo cáo doanh thu theo mã QR được chỉ định"}
+                        </p>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-gray-500 uppercase px-2">From</span>
+                            <span className="text-xs font-semibold text-gray-500 uppercase px-2">Từ</span>
                             <input
                                 type="date"
                                 value={dateRange.startDate}
@@ -81,9 +82,8 @@ export default function FinancialReportPage() {
                                 className="border-none bg-gray-50 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-900/20 py-1.5 px-3"
                             />
                         </div>
-                        <div className="hidden sm:block w-px bg-gray-200" />
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-gray-500 uppercase px-2">To</span>
+                            <span className="text-xs font-semibold text-gray-500 uppercase px-2">Đến</span>
                             <input
                                 type="date"
                                 value={dateRange.endDate}
@@ -91,14 +91,7 @@ export default function FinancialReportPage() {
                                 className="border-none bg-gray-50 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-900/20 py-1.5 px-3"
                             />
                         </div>
-                        <div className="hidden sm:block w-px bg-gray-200" />
-                        <FormButton
-                            onClick={fetchReport}
-                            loading={loading}
-                            variant="ghost"
-                            className="p-2"
-                            title="Refresh Data"
-                        >
+                        <FormButton onClick={fetchReport} loading={loading} variant="ghost" className="p-2" title="Làm mới dữ liệu">
                             <RefreshCcw className="w-4 h-4" />
                         </FormButton>
                     </div>
@@ -106,104 +99,80 @@ export default function FinancialReportPage() {
 
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
-                        ))}
+                        {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>)}
                     </div>
                 ) : data ? (
                     <div className="space-y-6">
-                        {/* Primary Metrics */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* Net Profit */}
+                            {/* Lợi nhuận */}
                             <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                    <TrendingUp className="w-24 h-24" />
-                                </div>
+                                <TrendingUp className="absolute top-0 right-0 p-4 w-24 h-24 opacity-10" />
                                 <div className="relative z-10">
-                                    <p className="text-blue-200 font-medium mb-1">Net Profit</p>
+                                    <p className="text-blue-200 font-medium mb-1">Lợi nhuận ròng</p>
                                     <h3 className="text-3xl font-bold mb-4">{formatCurrency(data.netProfit)}</h3>
-                                    <div className="flex items-center gap-2 text-sm bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
-                                        <span>Sales - (Purchases + Expenses)</span>
+                                    <div className="text-xs bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
+                                        Doanh thu - (Nhập hàng + Chi phí)
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Sales Revenue */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-blue-900/30 transition-all">
+                            {/* Doanh thu */}
+                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative group hover:border-blue-900/30 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
                                         <DollarSign className="w-6 h-6 text-emerald-600" />
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Sales</p>
-                                        <p className="text-sm font-medium text-emerald-600">Collected: {formatCurrency(data.sales.totalCollected)}</p>
+                                        <p className="text-xs font-semibold text-gray-400 uppercase">Tổng doanh số</p>
+                                        <p className="text-sm font-medium text-emerald-600">Thực thu: {formatCurrency(data.sales.totalCollected)}</p>
                                     </div>
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.sales.totalSales)}</h3>
-                                <p className="text-sm text-gray-500">{data.sales.count} Invoices</p>
+                                <p className="text-sm text-gray-500">{data.sales.count} Hóa đơn</p>
                             </div>
 
-                            {/* Cash Flow */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-blue-900/30 transition-all">
+                            {/* Dòng tiền */}
+                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative group hover:border-blue-900/30 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-indigo-50 rounded-xl group-hover:bg-indigo-100 transition-colors">
                                         <CreditCard className="w-6 h-6 text-indigo-600" />
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Cash Flow</p>
-                                    </div>
+                                    <div className="text-right"><p className="text-xs font-semibold text-gray-400 uppercase">Dòng tiền mặt</p></div>
                                 </div>
                                 <h3 className={`text-2xl font-bold mb-1 ${data.cashFlow >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
                                     {formatCurrency(data.cashFlow)}
                                 </h3>
-                                <p className="text-sm text-gray-500">Actual Cash In - Out</p>
+                                <p className="text-sm text-gray-500">Tiền mặt thực tế vào - ra</p>
                             </div>
                         </div>
 
-                        <h2 className="text-lg font-bold text-gray-900 pt-4">Expense Breakdown</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Purchases */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-orange-200 transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="p-3 bg-orange-50 rounded-xl group-hover:bg-orange-100 transition-colors">
-                                        <ShoppingBag className="w-6 h-6 text-orange-600" />
+                        {/* Chỉ hiện chi phí chi tiết nếu là Admin */}
+                        {currentUserIsAdmin && (
+                            <>
+                                <h2 className="text-lg font-bold text-gray-900 pt-4">Phân tích chi tiêu</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="p-3 bg-orange-50 rounded-xl"><ShoppingBag className="w-6 h-6 text-orange-600" /></div>
+                                            <p className="text-xs font-semibold text-gray-400 uppercase">Nhập hàng</p>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(data.purchases.totalPurchases)}</h3>
+                                        <p className="text-sm text-gray-500">Đã trả: {formatCurrency(data.purchases.totalPaid)}</p>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory Purchases</p>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-end">
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.purchases.totalPurchases)}</h3>
-                                        <p className="text-sm text-gray-500">{data.purchases.count} Orders</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-medium text-gray-600">Paid: {formatCurrency(data.purchases.totalPaid)}</p>
-                                        <p className="text-xs text-red-500">Due: {formatCurrency(data.purchases.totalPurchases - data.purchases.totalPaid)}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Operational Expenses */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="p-3 bg-red-50 rounded-xl group-hover:bg-red-100 transition-colors">
-                                        <TrendingDown className="w-6 h-6 text-red-600" />
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Operational Expenses</p>
+                                    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="p-3 bg-red-50 rounded-xl"><TrendingDown className="w-6 h-6 text-red-600" /></div>
+                                            <p className="text-xs font-semibold text-gray-400 uppercase">Chi phí vận hành</p>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(data.expenses.totalExpenses)}</h3>
+                                        <p className="text-sm text-gray-500">{data.expenses.count} Bản ghi chi phí</p>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.expenses.totalExpenses)}</h3>
-                                <p className="text-sm text-gray-500">{data.expenses.count} Records</p>
-                            </div>
-                        </div>
+                            </>
+                        )}
                     </div>
                 ) : (
-                    <div className="text-center py-20 text-gray-500">
-                        Failed to load data
-                    </div>
+                    <div className="text-center py-20 text-gray-500">Không tìm thấy dữ liệu trong khoảng thời gian này.</div>
                 )}
             </div>
         </div>
