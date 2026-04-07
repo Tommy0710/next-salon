@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import {
@@ -13,16 +12,31 @@ import {
     Purchase
 } from "@/lib/initModels";
 import Settings from "@/models/Settings";
+import Role from "@/models/Role"; // 👉 Thêm Role
+import { auth } from "@/auth"; // 👉 Thêm auth
 import { getMonthDateRangeInTimezone, getUtcRangeForDateRange } from "@/lib/dateUtils";
 
 export async function GET(request: Request) {
     try {
         await connectToDB();
+
+        // 1. KIỂM TRA QUYỀN TRUY CẬP
+        const session = await auth();
+        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        
+        const userRole = await Role.findById((session.user as any).roleId).lean();
+        const reportPermission = userRole?.permissions?.reports;
+
+        if (!reportPermission || reportPermission.view === 'none') {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
         const { searchParams } = new URL(request.url);
         const type = searchParams.get("type");
         const startDate = searchParams.get("startDate");
         const endDate = searchParams.get("endDate");
-        const settings = await Settings.findOne({}, { timezone: 1 }).lean();
+        
+        const settings = await Settings.findOne().lean();
         const timezone = settings?.timezone || "UTC";
         const defaultRange = getMonthDateRangeInTimezone(timezone);
         const { start, end } = getUtcRangeForDateRange(
@@ -31,24 +45,35 @@ export async function GET(request: Request) {
             timezone
         );
 
+        // 2. CHUẨN BỊ QUERY LỌC THEO QR (GIỐNG FINANCIAL REPORT)
+        const invoiceQuery: any = {
+            date: { $gte: start, $lte: end }
+        };
+
+        // Lấy mảng QR ra một biến riêng để chiều lòng TypeScript
+        const allowedQrCodes = reportPermission.allowedQrCodes || [];
+
+        if (reportPermission.view === 'own' && allowedQrCodes.length > 0) {
+            const allowedBankNames = settings.qrCodes
+                .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
+                .map((qr: any) => `QR Code - ${qr.bankName}`);
+
+            // Chỉ cho phép xem Tiền mặt và các QR được chỉ định
+            invoiceQuery.paymentMethod = { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] };
+        }
+
         let data: any = null;
 
         switch (type) {
             case "sales":
-                // Sales Report: Invoices breakdown
-                data = await Invoice.find({
-                    date: { $gte: start, $lte: end }
-                }).populate('customer staff');
+                // Sử dụng invoiceQuery đã được lọc
+                data = await Invoice.find(invoiceQuery).populate('customer staff').lean();
                 break;
 
             case "services":
-                // Service Report: Revenue per service
-                const invoices = await Invoice.find({
-                    date: { $gte: start, $lte: end }
-                });
+                const serviceInvoices = await Invoice.find(invoiceQuery).lean();
                 const serviceStats: any = {};
-
-                invoices.forEach(inv => {
+                serviceInvoices.forEach(inv => {
                     inv.items.forEach((item: any) => {
                         if (item.itemModel === 'Service') {
                             const name = item.name;
@@ -64,112 +89,63 @@ export async function GET(request: Request) {
                 break;
 
             case "staff":
-                // Staff Performance: Account for multi-staff assignments
-                const staffInvoices = await Invoice.find({
-                    date: { $gte: start, $lte: end }
-                })
+                const staffInvoices = await Invoice.find(invoiceQuery)
                     .populate('staff staffAssignments.staff')
-                    .populate({ path: 'appointment', populate: { path: 'staff' } });
+                    .populate({ path: 'appointment', populate: { path: 'staff' } })
+                    .lean();
 
                 const staffStats: any = {};
-
                 staffInvoices.forEach(inv => {
-                    // If we have multi-staff assignments, process each one
                     if (inv.staffAssignments && inv.staffAssignments.length > 0) {
                         inv.staffAssignments.forEach((assignment: any) => {
                             const s = assignment.staff;
                             if (s) {
                                 const id = s._id.toString();
                                 if (!staffStats[id]) {
-                                    staffStats[id] = { name: s.name, appointments: 0, sales: 0, commission: 0, revenue: 0 };
+                                    staffStats[id] = { name: s.name, sales: 0, commission: 0, revenue: 0 };
                                 }
                                 staffStats[id].sales += 1;
-                                // For revenue, we could either give full credit to everyone or split it.
-                                // Typically, for performance reporting, we give 'sales credit' to everyone involved.
                                 staffStats[id].revenue += inv.totalAmount;
                                 staffStats[id].commission += (assignment.commission || 0);
                             }
                         });
                     } else if (inv.staff) {
-                        // Compatibility for old invoices or single staff invoices
                         const s = inv.staff;
                         const id = s._id.toString();
                         if (!staffStats[id]) {
-                            staffStats[id] = { name: s.name, appointments: 0, sales: 0, commission: 0, revenue: 0 };
+                            staffStats[id] = { name: s.name, sales: 0, commission: 0, revenue: 0 };
                         }
                         staffStats[id].sales += 1;
                         staffStats[id].revenue += inv.totalAmount;
                         staffStats[id].commission += (inv.commission || 0);
-                    } else if ((inv as any).appointment?.staff) {
-                        // Fallback for appointment-linked invoices missing staff/staffAssignments
-                        const apt: any = (inv as any).appointment;
-                        const s: any = apt.staff;
-                        const id = s._id.toString();
-                        if (!staffStats[id]) {
-                            staffStats[id] = { name: s.name, appointments: 0, sales: 0, commission: 0, revenue: 0 };
-                        }
-                        staffStats[id].sales += 1;
-                        staffStats[id].revenue += inv.totalAmount;
-                        staffStats[id].commission += ((inv as any).commission || apt.commission || 0);
                     }
                 });
                 data = Object.values(staffStats).sort((a: any, b: any) => b.revenue - a.revenue);
                 break;
 
-            case "customers":
-                // Customer Growth
-                const customers = await Customer.find({
-                    createdAt: { $gte: start, $lte: end }
-                });
-                data = customers;
-                break;
-
-            case "inventory":
-                // Inventory Report
-                data = await Product.find({}).sort({ stock: 1 });
-                break;
-
-            case "expenses":
-                // Expense Report
-                data = await Expense.find({
-                    date: { $gte: start, $lte: end }
-                });
-                break;
-
             case "profit":
-                // Profit Report: Revenue vs Expenses vs Payroll vs Purchases
-                const revInvoices = await Invoice.find({ date: { $gte: start, $lte: end } });
-                const expExpenses = await Expense.find({ date: { $gte: start, $lte: end } });
-                const payPayroll = await Payroll.find({
-                    createdAt: { $gte: start, $lte: end } // Using createdAt since payroll covers month/year
-                });
-                const purPurchases = await Purchase.find({ date: { $gte: start, $lte: end }, status: { $ne: 'cancelled' } });
+                const revInvoices = await Invoice.find(invoiceQuery).lean();
+                const expExpenses = await Expense.find({ date: { $gte: start, $lte: end } }).lean();
+                // Purchases và Payroll thường mặc định là Admin xem, nhưng ta vẫn lọc ngày cho đúng
+                const purPurchases = await Purchase.find({ date: { $gte: start, $lte: end }, status: { $ne: 'cancelled' } }).lean();
 
                 const totalRevenue = revInvoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
                 const totalExpenses = expExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-                const totalPayroll = payPayroll.reduce((sum, pay) => sum + pay.totalAmount, 0);
                 const totalPurchases = purPurchases.reduce((sum, pur) => sum + pur.totalAmount, 0);
 
                 data = {
                     totalRevenue,
                     totalExpenses,
-                    totalPayroll,
                     totalPurchases,
-                    netProfit: totalRevenue - totalExpenses - totalPayroll - totalPurchases
+                    netProfit: totalRevenue - totalExpenses - totalPurchases
                 };
                 break;
 
             case "daily":
-                // Daily Closing Report
-                const dailyInvoices = await Invoice.find({
-                    date: { $gte: start, $lte: end }
-                });
+                const dailyInvoices = await Invoice.find(invoiceQuery).lean();
+                const dailyExpenses = await Expense.find({ date: { $gte: start, $lte: end } }).lean();
 
-                const dailyExpenses = await Expense.find({
-                    date: { $gte: start, $lte: end }
-                });
-
-                const payments: any = { Cash: 0, Card: 0, Wallet: 0 };
+                const payments: any = {};
                 dailyInvoices.forEach(inv => {
                     payments[inv.paymentMethod] = (payments[inv.paymentMethod] || 0) + inv.amountPaid;
                 });
@@ -181,6 +157,14 @@ export async function GET(request: Request) {
                     totalExpenses: dailyExpenses.reduce((sum, exp) => sum + exp.amount, 0),
                     invoiceCount: dailyInvoices.length
                 };
+                break;
+
+            case "customers":
+                data = await Customer.find({ createdAt: { $gte: start, $lte: end } }).lean();
+                break;
+
+            case "inventory":
+                data = await Product.find({}).sort({ stock: 1 }).lean();
                 break;
 
             default:

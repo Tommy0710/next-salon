@@ -5,6 +5,7 @@ export interface IPermission {
     create: boolean;
     edit: boolean;
     delete: boolean;
+    allowedQrCodes?: string[];
 }
 
 export interface IRole {
@@ -42,7 +43,8 @@ const permissionSchema = {
     },
     create: { type: Boolean, default: false },
     edit: { type: Boolean, default: false },
-    delete: { type: Boolean, default: false }
+    delete: { type: Boolean, default: false },
+    allowedQrCodes: { type: [String], default: [] }
 };
 
 const RoleSchema = new Schema<IRole>(
@@ -73,7 +75,7 @@ const RoleSchema = new Schema<IRole>(
                 customers: { view: 'none', create: false, edit: false, delete: false },
                 suppliers: { view: 'none', create: false, edit: false, delete: false },
                 expenses: { view: 'none', create: false, edit: false, delete: false },
-                reports: { view: 'none', create: false, edit: false, delete: false },
+                reports: { view: 'none', create: false, edit: false, delete: false, allowedQrCodes: [] },
                 users: { view: 'none', create: false, edit: false, delete: false },
                 roles: { view: 'none', create: false, edit: false, delete: false },
                 staffSlots: { view: 'none', create: false, edit: false, delete: false },

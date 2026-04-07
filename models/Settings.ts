@@ -125,6 +125,7 @@ const SettingsSchema = new mongoose.Schema({
         default: 'gpt-4o'
     },
     qrCodes: [{
+        qrId: String,
         name: String,
         bankName: String,
         accountNumber: String,

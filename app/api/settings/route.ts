@@ -83,6 +83,17 @@ export async function PUT(request: NextRequest) {
             );
         }
 
+        // Ensure all QR codes have qrId (for backward compatibility)
+        if (body.qrCodes && Array.isArray(body.qrCodes)) {
+            body.qrCodes = body.qrCodes.map((qr: any) => {
+                if (!qr.qrId) {
+                    qr.qrId = qr.id || `qr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                }
+                delete qr.id; // Remove old id field
+                return qr;
+            });
+        }
+
         // Update the first document found (singleton pattern)
         // $set ensures we don't accidentally replace the entire document if new fields are missing.
         const settings = await Settings.findOneAndUpdate(

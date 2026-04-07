@@ -438,8 +438,8 @@ export default function AppointmentsPage() {
                 </button>
             </div>
 
-            <div className="flex-1 overflow-auto bg-white flex flex-col">
-                <div className="p-6 space-y-6">
+            <div className="h-full flex-1 overflow-auto bg-white flex flex-col">
+                <div className="h-full p-6 space-y-6">
                     {view === 'calendar' ? (
                         <StaffCalendar
                             refreshTrigger={refreshTrigger}
@@ -454,7 +454,7 @@ export default function AppointmentsPage() {
                             }}
                         />
                     ) : (
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                        <div className="h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
                             {/* List View Filters */}
                             <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
                                 <div className="relative w-full md:w-96">
@@ -491,7 +491,7 @@ export default function AppointmentsPage() {
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto h-full">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>

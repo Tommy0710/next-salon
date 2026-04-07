@@ -11,6 +11,7 @@ interface Settings {
     logoUrl: string;
     symbol: string;
     qrCodes: {
+        qrId: string;
         name: string;
         bankName: string;
         accountNumber: string;

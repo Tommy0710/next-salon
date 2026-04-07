@@ -52,6 +52,7 @@ export const authConfig = {
                 session.user.id = token.id;
                 session.user.role = token.role;
                 session.user.permissions = token.permissions;
+                session.user.roleId = token.roleId;
             }
             return session;
         },

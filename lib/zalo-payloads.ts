@@ -3,6 +3,7 @@
 // 1. Định nghĩa các "Sự kiện" sẽ gửi Zalo
 export const ZALO_EVENTS = {
     CHECKOUT: 'checkout',
+    APPOINTMENT: 'appointment',
     REMINDER: 'reminder',
     BIRTHDAY: 'birthday',
 };
@@ -32,6 +33,22 @@ export const buildTemplateData = (eventType: string, data: any) => {
                 time: data.appointmentTime,
                 date: data.appointmentDate,
                 service: data.serviceName
+            };
+        case ZALO_EVENTS.APPOINTMENT:
+            // Mẫu (Ví dụ): Xác nhận lịch hẹn
+            return {
+                name: data.customerName,
+                bookingId: data.bookingId,
+                time: data.appointmentTime,
+                date: data.appointmentDate,
+                service: data.serviceName
+            };
+        case ZALO_EVENTS.BIRTHDAY:
+            // Mẫu (Ví dụ): Chúc mừng sinh nhật
+            return {
+                name: data.customerName,
+                date: formattedDate,
+                offer: "Ưu đãi đặc biệt nhân dịp sinh nhật!"
             };
 
         default:

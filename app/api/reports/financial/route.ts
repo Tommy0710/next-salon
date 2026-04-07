@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import { initModels } from "@/lib/initModels";
@@ -6,17 +5,30 @@ import Purchase from "@/models/Purchase";
 import Invoice from "@/models/Invoice";
 import Expense from "@/models/Expense";
 import Settings from "@/models/Settings";
+import Role from "@/models/Role"; // 👉 Import thêm Role
 import { getMonthDateRangeInTimezone, getUtcRangeForDateRange } from "@/lib/dateUtils";
+import { auth } from "@/auth"; // 👉 Import auth để lấy session
 
 export async function GET(request: Request) {
     try {
         await connectToDB();
         initModels();
 
+        // 1. Kiểm tra Quyền (Role) của người đang gọi API
+        const session = await auth();
+        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        
+        const userRole = await Role.findById((session.user as any).roleId).lean();
+        const reportPermission = userRole?.permissions?.reports;
+
+        if (!reportPermission || reportPermission.view === 'none') {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
         const { searchParams } = new URL(request.url);
         const startDateParam = searchParams.get("startDate");
         const endDateParam = searchParams.get("endDate");
-        const settings = await Settings.findOne({}, { timezone: 1 }).lean();
+        const settings = await Settings.findOne().lean();
         const timezone = settings?.timezone || "UTC";
 
         const defaultRange = getMonthDateRangeInTimezone(timezone);
@@ -26,17 +38,27 @@ export async function GET(request: Request) {
             timezone
         );
 
-        const query: any = {
-            date: { $gte: start, $lte: end }
+        // 2. Query cơ bản theo ngày
+        const invoiceQuery: any = {
+            date: { $gte: start, $lte: end },
+            status: { $ne: 'cancelled' }
         };
 
-        // Calculate Totals
-        // 1. Sales (Invoices) - we might want to use paidAmount for cash flow or totalAmount for accrued revenue
-        // Usually financial reports show Sales Revenue (Total Amount) and actual Cash Collected (Paid Amount)
-        // Let's return both.
+        // 3. LOGIC LỌC THEO MÃ QR (Dành cho nhân viên)
+        const allowedQrCodes = reportPermission.allowedQrCodes || [];
 
+        if (reportPermission.view === 'own' && allowedQrCodes.length > 0) {
+            const allowedBankNames = settings.qrCodes
+                .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
+                .map((qr: any) => `QR Code - ${qr.bankName}`);
+
+            // Chỉ cho phép xem Tiền mặt và các QR được chỉ định
+            invoiceQuery.paymentMethod = { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] };
+        }
+
+        // 4. Bắt đầu tính toán
         const invoiceStats = await Invoice.aggregate([
-            { $match: { ...query, status: { $ne: 'cancelled' } } },
+            { $match: invoiceQuery }, // Sử dụng query đã được lọc
             {
                 $group: {
                     _id: null,
@@ -47,12 +69,8 @@ export async function GET(request: Request) {
             }
         ]);
 
-        // 2. Purchases
-        // Query for purchases might use 'date' or 'createdAt'. Purchase model has 'date'.
-        // Assuming 'date' field in Purchase matches the query param (which is checking 'date')
-
         const purchaseStats = await Purchase.aggregate([
-            { $match: { ...query, status: { $ne: 'cancelled' } } },
+            { $match: { date: { $gte: start, $lte: end }, status: { $ne: 'cancelled' } } },
             {
                 $group: {
                     _id: null,
@@ -63,9 +81,8 @@ export async function GET(request: Request) {
             }
         ]);
 
-        // 3. Expenses
         const expenseStats = await Expense.aggregate([
-            { $match: query },
+            { $match: { date: { $gte: start, $lte: end } } },
             {
                 $group: {
                     _id: null,
@@ -80,17 +97,11 @@ export async function GET(request: Request) {
         const expenses = expenseStats[0] || { totalExpenses: 0, count: 0 };
 
         const netProfit = sales.totalSales - purchases.totalPurchases - expenses.totalExpenses;
-        const cashFlow = sales.totalCollected - purchases.totalPaid - expenses.totalExpenses; // Assuming expenses are paid immediately or we track expense payment separately (Expense model has amount, assume paid)
+        const cashFlow = sales.totalCollected - purchases.totalPaid - expenses.totalExpenses; 
 
         return NextResponse.json({
             success: true,
-            data: {
-                sales,
-                purchases,
-                expenses,
-                netProfit,
-                cashFlow
-            }
+            data: { sales, purchases, expenses, netProfit, cashFlow }
         });
     } catch (error) {
         console.error("API Error Financial Report:", error);

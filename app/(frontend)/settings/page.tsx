@@ -44,8 +44,7 @@ interface Settings {
     aiEnabled: boolean;
     openaiApiKey: string;
     openaiModel: string;
-    qrCodes: { name: string; bankName: string; accountNumber: string; image: string }[];
-    // 👇 THÊM DÒNG NÀY VÀO:
+    qrCodes: { qrId: string; name: string; bankName: string; accountNumber: string; image: string }[];
     zaloEnabled: boolean;
     zaloAppId: string;
     zaloSecretKey: string;
@@ -216,7 +215,7 @@ export default function SettingsPage() {
             }
 
             setSettings(data.data);
-            await refreshSettings();
+            // await refreshSettings(); // Không cần refresh vì đã setSettings với data từ save
             setMessage({ type: "success", text: "Settings saved successfully!" });
         } catch (error) {
             console.error("Error saving settings:", error);
@@ -532,6 +531,7 @@ export default function SettingsPage() {
                                         <p className="font-bold text-gray-900">{qr.name}</p>
                                         <p className="text-sm text-gray-600">{qr.bankName}</p>
                                         <p className="text-sm font-mono text-gray-800">{qr.accountNumber}</p>
+                                        <p className="text-[10px] text-blue-600 font-mono mt-1 border border-blue-200 bg-blue-50 inline-block px-1 rounded">ID: {qr.qrId}</p>
                                     </div>
                                     <button
                                         type="button"
@@ -573,7 +573,8 @@ export default function SettingsPage() {
                                 type="button"
                                 onClick={() => {
                                     if (!newQr.name || !newQr.image) return alert("Vui lòng nhập tên và chọn ảnh QR");
-                                    setSettings({ ...settings, qrCodes: [...(settings.qrCodes || []), newQr] });
+                                    const qrWithId = { ...newQr, qrId: `qr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` };
+                                    setSettings({ ...settings, qrCodes: [...(settings.qrCodes || []), qrWithId] });
                                     setNewQr({ name: "", bankName: "", accountNumber: "", image: "" }); // Reset form
                                 }}
                                 className="px-4 py-2 bg-blue-900 text-white rounded-lg text-sm font-bold hover:bg-blue-800 h-10"
