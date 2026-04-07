@@ -418,10 +418,12 @@ export default function POSPage() {
 
         let qrCodeImage = "";
         let bankDetails = "";
+        let paymentQrId = undefined;
         if (activeBill.paymentMethod === "Mã QR" && settings?.qrCodes?.[activeBill.selectedQrIndex]) {
             const qr = settings.qrCodes[activeBill.selectedQrIndex];
             qrCodeImage = qr.image;
             bankDetails = `${qr.bankName} | ${qr.accountNumber} | ${qr.name}`;
+            paymentQrId = qr.qrId;
         }
 
         setSubmitting(true);
@@ -459,7 +461,8 @@ export default function POSPage() {
                 paymentMethod: activeBill.paymentMethod,
                 status: status,
                 qrCodeImage: qrCodeImage,
-                bankDetails: bankDetails
+                bankDetails: bankDetails,
+                paymentQrId
             };
 
             const res = await fetch("/api/invoices", {

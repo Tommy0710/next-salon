@@ -20,6 +20,7 @@ export interface IInvoice extends Document {
     totalAmount: number;
     amountPaid: number;
     paymentMethod: string; // Cash, Card, etc.
+    paymentQrId?: string;
     qrCodeImage?: string;
     bankDetails?: string;
     status: 'paid' | 'pending' | 'partially_paid' | 'cancelled';
@@ -56,6 +57,7 @@ const invoiceSchema = new Schema<IInvoice>(
         totalAmount: { type: Number, required: true },
         amountPaid: { type: Number, default: 0 },
         paymentMethod: { type: String, default: 'Cash' },
+        paymentQrId: String,
         qrCodeImage: String,
         bankDetails: String,
         status: {

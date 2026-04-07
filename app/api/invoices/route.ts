@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
 
         const invoice = await Invoice.create({
             ...body,
+            paymentQrId: body.paymentQrId,
             invoiceNumber
         }) as any;
 
