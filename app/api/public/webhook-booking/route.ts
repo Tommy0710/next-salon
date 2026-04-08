@@ -4,6 +4,7 @@ import { initModels } from "@/lib/initModels";
 import Appointment from "@/models/Appointment";
 import Customer from "@/models/Customer";
 import Service from "@/models/Service"; // 👉 Import thêm Model Service
+import ServiceCategory from "@/models/ServiceCategory";
 
 export async function POST(request: Request) {
     try {
@@ -52,6 +53,14 @@ export async function POST(request: Request) {
 
         // Nếu chưa có dịch vụ này trong hệ thống -> Tự động tạo mới
         if (!serviceDoc) {
+            // Tìm danh mục mặc định cho web, nếu không có thì tạo mới
+            let defaultCategory = await ServiceCategory.findOne({ name: 'Website Bookings' });
+            if (!defaultCategory) {
+                defaultCategory = await ServiceCategory.create({
+                    name: 'Website Bookings',
+                    description: 'Danh mục tự động tạo cho các dịch vụ từ Website'
+                });
+            }
             // Thử bóc tách thời gian (duration) nếu trong tên có chữ "60 phút", "90 phút"...
             let estimatedDuration = 60; // Mặc định 60 phút
             const durationMatch = rawServiceName.match(/(\d+)\s*phút/i);
@@ -80,9 +89,9 @@ export async function POST(request: Request) {
         // ==========================================
         // BƯỚC 3: TẠO LỊCH HẸN (Gắn ID Customer và ID Service)
         // ==========================================
-        const newAppointment = await Appointment.create({
+        const appointmentPayload = {
             customer: customer._id,
-            date: new Date(date), 
+            date: new Date(date),
             startTime: time,       // Chuẩn hóa theo trường của Appointment model
             endTime: endTimeString,
             status: 'pending',     // Lịch từ web luôn là chờ xác nhận
@@ -90,15 +99,30 @@ export async function POST(request: Request) {
             totalAmount: total_amount || serviceDoc.price,
             totalDuration: serviceDoc.duration,
             notes: services,       // Lưu lại chuỗi gốc của web để đối chiếu nếu cần
-            
-            // 👉 Gắn Dịch vụ vào mảng services của Appointment chuẩn theo cấu trúc DB
             services: [{
                 service: serviceDoc._id,
                 name: serviceDoc.name,
                 price: serviceDoc.price,
                 duration: serviceDoc.duration
             }]
+        };
+
+        console.log("[WebhookBooking] request body:", {
+            date,
+            time,
+            customer_first_name,
+            customer_last_name,
+            customer_phone,
+            customer_email,
+            services,
+            total_amount,
+            source
         });
+        console.log("[WebhookBooking] customer:", customer ? { _id: customer._id, name: customer.name, phone: customer.phone, email: customer.email } : null);
+        console.log("[WebhookBooking] serviceDoc:", serviceDoc ? { _id: serviceDoc._id, name: serviceDoc.name, duration: serviceDoc.duration, price: serviceDoc.price } : null);
+        console.log("[WebhookBooking] appointmentPayload:", appointmentPayload);
+
+        const newAppointment = await Appointment.create(appointmentPayload);
 
         console.log("✅ Đã tạo Lịch hẹn tự động:", newAppointment._id);
 
@@ -110,7 +134,10 @@ export async function POST(request: Request) {
         }, { status: 201 });
 
     } catch (error: any) {
-        console.error("❌ Lỗi xử lý Webhook:", error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        console.error("❌ Lỗi xử lý Webhook:", {
+            error: error?.message || error,
+            stack: error?.stack,
+        });
+        return NextResponse.json({ success: false, error: error?.message || "Unknown error" }, { status: 500 });
     }
 }
