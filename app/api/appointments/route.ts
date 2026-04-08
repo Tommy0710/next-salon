@@ -12,6 +12,25 @@ import { checkPermission } from "@/lib/rbac";
 import { handleApiError } from "@/lib/errorHandler";
 
 export async function GET(request: NextRequest) {
+    const generateFixedSlots = () => {
+        const slots = [];
+        let current = new Date();
+        current.setHours(9, 30, 0, 0); // Bắt đầu 09:30
+
+        const end = new Date();
+        end.setHours(20, 30, 0, 0);   // Kết thúc 20:30
+
+        while (current <= end) {
+            const timeString = current.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            slots.push(timeString);
+            current.setMinutes(current.getMinutes() + 30); // Cộng thêm 30 phút
+        }
+        return slots;
+    };
     try {
         // Security Check
         const permissionError = await checkPermission(request, 'appointments', 'view');
@@ -42,9 +61,9 @@ export async function GET(request: NextRequest) {
             query.status = status;
         }
 
-        if (staffId) {
-            query.staff = new mongoose.Types.ObjectId(staffId);
-        }
+        // if (staffId) {
+        //     query.staff = new mongoose.Types.ObjectId(staffId);
+        // }
 
         // Using aggregation for advanced searching and pagination
         const pipeline: any[] = [
@@ -58,15 +77,15 @@ export async function GET(request: NextRequest) {
                 }
             },
             { $unwind: '$customer' },
-            {
-                $lookup: {
-                    from: 'staffs',
-                    localField: 'staff',
-                    foreignField: '_id',
-                    as: 'staff'
-                }
-            },
-            { $unwind: '$staff' }
+            // {
+            //     $lookup: {
+            //         from: 'staffs',
+            //         localField: 'staff',
+            //         foreignField: '_id',
+            //         as: 'staff'
+            //     }
+            // },
+            // { $unwind: '$staff' }
         ];
 
         // Search filter (name or phone)
@@ -76,7 +95,7 @@ export async function GET(request: NextRequest) {
                     $or: [
                         { 'customer.name': { $regex: search, $options: 'i' } },
                         { 'customer.phone': { $regex: search, $options: 'i' } },
-                        { 'staff.name': { $regex: search, $options: 'i' } }
+                        // { 'staff.name': { $regex: search, $options: 'i' } }
                     ]
                 }
             });
@@ -131,8 +150,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
 
         // Basic validation
-        if (!body.customer || !body.staff || !body.startTime || !body.services || !Array.isArray(body.services) || body.services.length === 0) {
-            return NextResponse.json({ success: false, error: "Customer, staff, time slot and at least one service are required" }, { status: 400 });
+        if (!body.customer || /* !body.staff || */ !body.startTime || !body.services || !Array.isArray(body.services) || body.services.length === 0) {
+            return NextResponse.json({ success: false, error: "Customer, /* staff, */ time slot and at least one service are required" }, { status: 400 });
         }
 
         // Robustness: Handle if status is accidentally sent as an object
@@ -151,14 +170,14 @@ export async function POST(request: NextRequest) {
         const totalAmount = (subtotal + tax) - discount;
 
         // Calculate commission
-        const staff = await Staff.findById(body.staff);
-        const staffRate = staff?.commissionRate || 0;
+        // const staff = await Staff.findById(body.staff);
+        // const staffRate = staff?.commissionRate || 0;
 
         let commission = 0;
         for (const item of body.services) {
             const service = await Service.findById(item.service);
             const commType = service?.commissionType || 'percentage';
-            const commValue = service?.commissionValue || staffRate;
+            const commValue = service?.commissionValue || /* staffRate */ 0;
 
             if (commType === 'percentage') {
                 const shareOfTotal = subtotal > 0 ? (totalAmount * (item.price / subtotal)) : 0;
@@ -210,12 +229,12 @@ export async function POST(request: NextRequest) {
                 discount: discount || 0,
                 totalAmount: totalAmount || 0,
                 commission: commission || 0,
-                staff: appointment.staff,
-                staffAssignments: appointment.staff ? [{
-                    staff: appointment.staff,
-                    percentage: staffRate,
-                    commission: commission || 0
-                }] : [],
+                // staff: appointment.staff,
+                // staffAssignments: appointment.staff ? [{
+                //     staff: appointment.staff,
+                //     percentage: staffRate,
+                //     commission: commission || 0
+                // }] : [],
                 status: appointment.status === 'completed' ? 'paid' : 'pending',
                 date: appointment.date || new Date()
             });

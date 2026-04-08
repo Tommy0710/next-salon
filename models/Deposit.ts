@@ -6,6 +6,7 @@ export interface IDeposit extends Document {
     customer: mongoose.Types.ObjectId;
     amount: number;
     paymentMethod: string;
+    paymentQrId?: string;
     date: Date;
     notes?: string;
 }
@@ -16,6 +17,7 @@ const depositSchema = new Schema<IDeposit>(
         customer: { type: Schema.Types.ObjectId, ref: 'Customer' },
         amount: { type: Number, required: true },
         paymentMethod: { type: String, required: true, default: 'Cash' },
+        paymentQrId: { type: String },
         date: { type: Date, default: Date.now },
         notes: String,
     },

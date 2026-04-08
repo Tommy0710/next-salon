@@ -53,13 +53,17 @@ export async function GET(request: Request) {
         // Lấy mảng QR ra một biến riêng để chiều lòng TypeScript
         const allowedQrCodes = reportPermission.allowedQrCodes || [];
 
-        if (reportPermission.view === 'own' && allowedQrCodes.length > 0) {
-            const allowedBankNames = settings.qrCodes
+        if (reportPermission.view === 'own') {
+            // 1. DỰ PHÒNG CHO HÓA ĐƠN CŨ: Vẫn lấy tên ngân hàng để khớp với các hóa đơn tạo trước đây
+            const allowedBankNames = (settings.qrCodes || [])
                 .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
                 .map((qr: any) => `QR Code - ${qr.bankName}`);
 
-            // Chỉ cho phép xem Tiền mặt và các QR được chỉ định
-            invoiceQuery.paymentMethod = { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] };
+            invoiceQuery.$or = [
+                { paymentMethod: { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] } },
+                
+                { paymentQrId: { $in: allowedQrCodes } }
+            ];
         }
 
         let data: any = null;

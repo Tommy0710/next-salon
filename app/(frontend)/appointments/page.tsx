@@ -34,7 +34,7 @@ interface Customer {
 interface Appointment {
     _id: string;
     customer: Customer;
-    staff: Staff;
+    // staff: Staff;
     services: { service: Service; name: string; price: number; duration: number }[];
     date: string;
     startTime: string; // "14:00"
@@ -63,7 +63,7 @@ export default function AppointmentsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         customerId: "",
-        staffId: "",
+        /* staffId: "", */
         serviceIds: [] as string[],
         startTime: "",
         date: format(new Date(), "yyyy-MM-dd"),
@@ -82,6 +82,12 @@ export default function AppointmentsPage() {
     // Slot system state
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
     const [loadingSlots, setLoadingSlots] = useState(false);
+
+    // THÊM STATE CHO TẠO CUSTOMER NHANH
+    const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+    const [newCustomerName, setNewCustomerName] = useState("");
+    const [newCustomerPhone, setNewCustomerPhone] = useState("");
+    const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
 
     useEffect(() => {
         fetchResources();
@@ -113,14 +119,14 @@ export default function AppointmentsPage() {
         }
     }, [services, editingAppointment, isModalOpen]);
 
-    // Fetch available slots when staff and date are selected
+    // Fetch available slots when date is selected
     useEffect(() => {
-        if (formData.staffId && formData.date && isModalOpen) {
+        if (formData.date && isModalOpen) {
             fetchAvailableSlots();
         } else {
             setAvailableSlots([]);
         }
-    }, [formData.staffId, formData.date, isModalOpen]);
+    }, [formData.date, isModalOpen]);
 
     useEffect(() => {
         fetchAppointments();
@@ -146,16 +152,16 @@ export default function AppointmentsPage() {
     }, [activeDropdown]);
 
     const fetchResources = async () => {
-        const [staffRes, serviceRes, customerRes] = await Promise.all([
-            fetch("/api/staff"),
+        const [/* staffRes, */ serviceRes, customerRes] = await Promise.all([
+            // fetch("/api/staff"),
             fetch("/api/services"),
             fetch("/api/customers")
         ]);
-        const staffData = await staffRes.json();
+        // const staffData = await staffRes.json();
         const serviceData = await serviceRes.json();
         const customerData = await customerRes.json();
 
-        if (staffData.success) setStaffList(staffData.data);
+        // if (staffData.success) setStaffList(staffData.data);
         if (serviceData.success) setServices(serviceData.data);
         if (customerData.success) setCustomers(customerData.data);
     };
@@ -163,26 +169,21 @@ export default function AppointmentsPage() {
 
 
     const fetchAvailableSlots = async () => {
-        if (!formData.staffId || !formData.date) {
+        if (!formData.date) {
             setAvailableSlots([]);
             return;
         }
 
         setLoadingSlots(true);
         try {
-            const excludeId = editingAppointment?._id || "";
-            const res = await fetch(`/api/staff-slots?staffId=${formData.staffId}&date=${formData.date}&excludeAppointmentId=${excludeId}`);
+            const res = await fetch(`/api/appointments/slots?date=${formData.date}`);
             const data = await res.json();
             if (data.success) {
-                // Use availableSlotsForBooking if available, otherwise fall back to availableSlots
-                const slots = data.data.availableSlotsForBooking || data.data.availableSlots || [];
-                // Filter to only show available slots for booking
-                setAvailableSlots(slots.filter((slot: any) => slot.isAvailable !== false));
-            } else {
-                setAvailableSlots([]);
+                const slots = data.data.map((time: string) => ({ startTime: time }));
+                setAvailableSlots(slots);
             }
         } catch (error) {
-            console.error("Error fetching slots:", error);
+            console.error(error);
             setAvailableSlots([]);
         } finally {
             setLoadingSlots(false);
@@ -244,13 +245,13 @@ export default function AppointmentsPage() {
             const totalAmount = (subtotal + tax) - discount;
 
             // Calculate commission
-            const staff = staffList.find(s => s._id === formData.staffId);
-            const staffRate = staff?.commissionRate || 0;
+            // const staff = staffList.find(s => s._id === formData.staffId);
+            // const staffRate = staff?.commissionRate || 0;
 
             let commission = 0;
             selectedServices.forEach(svc => {
                 const commType = svc.commissionType || 'percentage';
-                const commValue = svc.commissionValue !== undefined ? svc.commissionValue : staffRate;
+                const commValue = svc.commissionValue !== undefined ? svc.commissionValue : /* staffRate */ 0;
 
                 if (commType === 'percentage') {
                     const shareOfTotal = subtotal > 0 ? (totalAmount * (svc.price / subtotal)) : 0;
@@ -267,7 +268,7 @@ export default function AppointmentsPage() {
 
             const payload = {
                 customer: formData.customerId,
-                staff: formData.staffId,
+                // staff: formData.staffId,
                 services: selectedServices.map(s => ({
                     service: s._id,
                     name: s.name,
@@ -343,7 +344,7 @@ export default function AppointmentsPage() {
 
         setFormData({
             customerId: apt.customer._id,
-            staffId: apt.staff._id,
+            // staffId: apt.staff._id,
             serviceIds: validServiceIds,
             startTime: apt.startTime,
             date: format(new Date(apt.date), "yyyy-MM-dd"),
@@ -361,7 +362,7 @@ export default function AppointmentsPage() {
         setFormError("");
         setFormData({
             customerId: "",
-            staffId: "",
+            /* staffId: "", */
             serviceIds: [],
             startTime: "",
             date: format(new Date(), "yyyy-MM-dd"),
@@ -371,29 +372,45 @@ export default function AppointmentsPage() {
         });
     };
 
-    const timeSlots: string[] = [];
-    for (let i = 9; i <= 20; i++) {
-        timeSlots.push(`${i.toString().padStart(2, '0')}:00`);
-        timeSlots.push(`${i.toString().padStart(2, '0')}:30`);
-    }
+    // HÀM TẠO CUSTOMER NHANH
+    const handleCreateCustomer = async () => {
+        if (!newCustomerName.trim()) {
+            alert("Vui lòng nhập tên khách hàng");
+            return;
+        }
 
-    const getAppointmentStyle = (apt: Appointment) => {
-        if (!apt.startTime) return {};
-        const start = parse(apt.startTime, "HH:mm", new Date());
-        const startMinutes = start.getHours() * 60 + start.getMinutes();
-        const startOffset = startMinutes - (9 * 60);
-        const top = (startOffset / 30) * 40;
-        const duration = apt.services.reduce((acc, s) => acc + s.duration, 0);
-        const height = (duration / 30) * 40;
+        setIsSubmittingCustomer(true);
+        try {
+            const res = await fetch("/api/customers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: newCustomerName,
+                    phone: newCustomerPhone
+                }),
+            });
+            const data = await res.json();
 
-        return {
-            top: `${top}px`,
-            height: `${height}px`,
-            position: 'absolute' as 'absolute',
-            width: '95%',
-            left: '2.5%',
-            zIndex: 10
-        };
+            if (data.success) {
+                // 1. Thêm khách hàng mới vào danh sách hiện tại
+                setCustomers(prev => [...prev, data.data]);
+
+                // 2. Tự động chọn khách hàng này cho appointment đang tạo
+                setFormData(prev => ({ ...prev, customerId: data.data._id }));
+
+                // 3. Đóng modal và reset form
+                setIsAddCustomerModalOpen(false);
+                setNewCustomerName("");
+                setNewCustomerPhone("");
+            } else {
+                alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Đã xảy ra lỗi khi tạo khách hàng");
+        } finally {
+            setIsSubmittingCustomer(false);
+        }
     };
 
     return (
@@ -427,7 +444,7 @@ export default function AppointmentsPage() {
                 <button
                     onClick={() => {
                         setEditingAppointment(null);
-                        setFormData({ customerId: "", staffId: "", serviceIds: [], startTime: "", date: format(new Date(), "yyyy-MM-dd"), discount: 0, notes: "", status: "confirmed" });
+                        setFormData({ customerId: "", /* staffId: "", */ serviceIds: [], startTime: "", date: format(new Date(), "yyyy-MM-dd"), discount: 0, notes: "", status: "confirmed" });
                         setFormError("");
                         setIsModalOpen(true);
                     }}
@@ -497,7 +514,7 @@ export default function AppointmentsPage() {
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Appointment</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th>
+                                            {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th> */}
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Services</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
@@ -508,12 +525,12 @@ export default function AppointmentsPage() {
                                         {loading && appointments.length === 0 ? (
                                             Array.from({ length: 5 }).map((_, i) => (
                                                 <tr key={i} className="animate-pulse">
-                                                    <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                                    <td colSpan={6} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                                 </tr>
                                             ))
                                         ) : appointments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                                     <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                     <p>No appointments found</p>
                                                 </td>
@@ -536,12 +553,12 @@ export default function AppointmentsPage() {
                                                         <div className="text-sm font-semibold text-gray-900">{apt.customer.name}</div>
                                                         {apt.customer.phone && <div className="text-[10px] text-gray-500">{apt.customer.phone}</div>}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2 text-sm text-gray-700">
                                                             <User className="w-3.5 h-3.5 text-gray-400" />
                                                             {apt.staff.name}
                                                         </div>
-                                                    </td>
+                                                    </td> */}
                                                     <td className="px-6 py-4">
                                                         <div className="flex flex-wrap gap-1 max-w-xs">
                                                             {apt.services.map((s, idx) => (
@@ -683,23 +700,33 @@ export default function AppointmentsPage() {
                         <FormInput label={`Discount (${settings.symbol})`} type="number" min="0" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                        <SearchableSelect
-                            label="Customer"
-                            placeholder="Select Customer"
-                            required
-                            value={formData.customerId}
-                            onChange={(value) => setFormData({ ...formData, customerId: value })}
-                            options={customers.map(c => ({ value: c._id, label: `${c.name} (${c.phone || 'No phone'})` }))}
-                        />
-                        <SearchableSelect
+                    <div className="mb-4">
+                        <div className="relative flex items-center gap-2">
+                            <SearchableSelect
+                                label="Customer"
+                                placeholder="Select Customer"
+                                required
+                                className="flex-1"
+                                value={formData.customerId}
+                                onChange={(value) => setFormData({ ...formData, customerId: value })}
+                                options={customers.map(c => ({ value: c._id, label: `${c.name} (${c.phone || 'No phone'})` }))}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setIsAddCustomerModalOpen(true)}
+                                className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                title="Thêm khách hàng mới"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
+                        {/* <SearchableSelect
                             label="Staff"
                             placeholder="Select Staff"
-                            required
                             value={formData.staffId}
                             onChange={(value) => setFormData({ ...formData, staffId: value })}
                             options={staffList.map(s => ({ value: s._id, label: s.name }))}
-                        />
+                        /> */}
                     </div>
 
                     <MultiSearchableSelect
@@ -716,14 +743,14 @@ export default function AppointmentsPage() {
                         <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                             <Clock className="w-4 h-4 text-blue-900" />
                             Select Available Time Slot
-                            {formData.staffId && formData.date && loadingSlots && (
-                                <span className="text-xs font-normal text-gray-400 animate-pulse">(Updating slots...)</span>
+                            {formData.date && loadingSlots && (
+                                <span className="text-xs font-normal text-gray-400 animate-pulse ml-2">(Updating slots...)</span>
                             )}
                         </label>
 
-                        {formData.staffId && formData.date ? (
+                        {formData.date ? (
                             availableSlots.length > 0 ? (
-                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
+                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
                                     {availableSlots.map((slot, idx) => (
                                         <button
                                             key={idx}
@@ -741,13 +768,13 @@ export default function AppointmentsPage() {
                             ) : (
                                 <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                    {loadingSlots ? "Loading available spots..." : "No available slots for this date/staff."}
+                                    {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
                             <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
-                                <User className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                Please select staff and date to view availability
+                                <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                Please select date to view availability
                             </div>
                         )}
                     </div>
@@ -799,6 +826,67 @@ export default function AppointmentsPage() {
                     </div>
                 </form>
             </Modal>
+
+            {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
+            {isAddCustomerModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900">Thêm Khách Hàng Mới</h3>
+                            <button
+                                onClick={() => setIsAddCustomerModalOpen(false)}
+                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    value={newCustomerName}
+                                    onChange={(e) => setNewCustomerName(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    placeholder="Nhập tên khách hàng"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <input
+                                    type="tel"
+                                    value={newCustomerPhone}
+                                    required
+                                    onChange={(e) => setNewCustomerPhone(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    placeholder="Nhập số điện thoại"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-3 mt-6">
+                            <button
+                                type="button"
+                                onClick={() => setIsAddCustomerModalOpen(false)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                disabled={isSubmittingCustomer}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCreateCustomer}
+                                disabled={isSubmittingCustomer}
+                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmittingCustomer ? "Đang tạo..." : "Tạo Khách Hàng"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

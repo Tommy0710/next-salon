@@ -29,7 +29,7 @@ export interface IAppointment extends Document {
 const appointmentSchema = new Schema<IAppointment>(
     {
         customer: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-        staff: { type: Schema.Types.ObjectId, ref: 'Staff', required: true },
+        staff: { type: Schema.Types.ObjectId, ref: 'Staff', required: false },
         services: [
             {
                 service: { type: Schema.Types.ObjectId, ref: 'Service' },

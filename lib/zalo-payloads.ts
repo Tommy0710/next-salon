@@ -21,7 +21,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
             // Mẫu: Thanh toán thành công (Mẫu Dạ Spa đang dùng)
             return {
                 date: formattedDate,
-                Ma_Hoa_Don: data.invoiceId ? data.invoiceId.toString().slice(-6).toUpperCase() : "HD001",
+                Ma_Hoa_Don: data.invoiceId || "HD123456",
                 name: data.customerName || "Quý khách",
                 Ten_Hang_Hoa: data.itemsName || "Dịch vụ tại Spa"
             };

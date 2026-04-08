@@ -114,7 +114,7 @@ export default function PrintInvoicePage() {
                             eventType: 'checkout',
                             payloadData: {
                                 customerName: updatedInvoice.customer?.name || "Quý khách",
-                                invoiceId: updatedInvoice._id,
+                                invoiceId: invoice.invoiceNumber,
                                 itemsName: itemsName,
                             }
                         })

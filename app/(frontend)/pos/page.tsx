@@ -435,7 +435,10 @@ export default function POSPage() {
 
             // Handle walking customer by setting customer to undefined
             const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
-
+            const selectedQr = settings?.qrCodes?.[activeBill.selectedQrIndex || 0];
+            const paymentQrIdString = activeBill.paymentMethod === 'Mã QR' 
+            ? selectedQr?.qrId 
+            : null;
             const payload = {
                 customer: customerId,
                 items: activeBill.cart.map(item => ({
@@ -459,11 +462,12 @@ export default function POSPage() {
                 staff: assignments[0]?.staffId || undefined, // Keep primary staff for compatibility
                 amountPaid: paid,
                 paymentMethod: activeBill.paymentMethod,
+                paymentQrId: paymentQrIdString,
                 status: status,
                 qrCodeImage: qrCodeImage,
-                bankDetails: bankDetails,
-                paymentQrId
+                bankDetails: bankDetails
             };
+            
 
             const res = await fetch("/api/invoices", {
                 method: "POST",
@@ -716,7 +720,7 @@ export default function POSPage() {
                                                 <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
                                             </div>
                                         </div>
-                                        {item.type === 'Service' && (
+                                        {/* {item.type === 'Service' && (
                                             <div className="pl-8 space-y-1.5">
                                                 <SearchableSelect
                                                     placeholder="Phân công nhân viên"
@@ -755,7 +759,7 @@ export default function POSPage() {
                                                     </div>
                                                 )}
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 ))
                             )}

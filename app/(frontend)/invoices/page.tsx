@@ -186,6 +186,8 @@ export default function InvoicesPage() {
             const paymentMethodString = paymentData.method === 'Mã QR'
                 ? `QR Code - ${settings?.qrCodes?.[paymentData.selectedQrIndex]?.bankName || ''}`
                 : 'Cash';
+            const selectedQr = settings?.qrCodes?.[paymentData.selectedQrIndex];
+            const paymentQrIdString = paymentData.method === 'Mã QR' ? selectedQr?.qrId : null;
             const res = await fetch("/api/deposits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -194,6 +196,7 @@ export default function InvoicesPage() {
                     customer: payingInvoice.customer?._id,
                     amount: parseFloat(paymentData.amount),
                     paymentMethod: paymentData.method,
+                    paymentQrId: paymentQrIdString,
                     notes: paymentData.notes
                 }),
             });
