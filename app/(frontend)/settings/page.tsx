@@ -96,7 +96,10 @@ export default function SettingsPage() {
         zaloSecretKey: '',
         zaloTemplates: [
             { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
-            { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
+            { eventType: 'appointment_reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' },
+            { eventType: 'appointment_confirmed', name: 'Mẫu Cảm ơn và confirm', templateId: '' },
+            { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
+            { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
         ],
         zaloAccessToken: '',
         zaloRefreshToken: '',
@@ -179,7 +182,10 @@ export default function SettingsPage() {
                         ? data.data.zaloTemplates 
                         : [
                             { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
-                            { eventType: 'reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' }
+                            { eventType: 'appointment_reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' },
+                            { eventType: 'appointment_confirmed', name: 'Mẫu Cảm ơn và confirm', templateId: '' },
+                            { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
+                            { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
                         ],
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',

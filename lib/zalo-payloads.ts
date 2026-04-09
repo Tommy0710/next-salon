@@ -4,8 +4,10 @@
 export const ZALO_EVENTS = {
     CHECKOUT: 'checkout',
     APPOINTMENT: 'appointment',
-    REMINDER: 'reminder',
     BIRTHDAY: 'birthday',
+    APPOINTMENT_REMINDER: 'appointment_reminder',
+    APPOINTMENT_CONFIRMED: 'appointment_confirmed',
+    APPOINTMENT_CANCELLED: 'appointment_cancelled',
 };
 
 // 2. Hàm tự động lắp ráp dữ liệu (Payload) tùy theo Sự kiện
@@ -26,13 +28,32 @@ export const buildTemplateData = (eventType: string, data: any) => {
                 Ten_Hang_Hoa: data.itemsName || "Dịch vụ tại Spa"
             };
 
-        case ZALO_EVENTS.REMINDER:
+        case ZALO_EVENTS.APPOINTMENT_REMINDER:
             // Mẫu (Ví dụ): Nhắc lịch hẹn
             return {
                 name: data.customerName,
                 time: data.appointmentTime,
                 date: data.appointmentDate,
-                service: data.serviceName
+                service: data.serviceName,
+                status: "Đang chờ xác nhận"
+            };
+        case ZALO_EVENTS.APPOINTMENT_CONFIRMED:
+            // Các biến này CẦN KHỚP CHÍNH XÁC với tên biến bạn đăng ký với Zalo cho Template Đặt lịch thành công
+            return {
+                name: data.customerName,
+                date: data.appointmentDate,
+                time: data.appointmentTime,
+                service: data.serviceName,
+                status: "Đã xác nhận"
+            };
+
+        case ZALO_EVENTS.APPOINTMENT_CANCELLED:
+            // Các biến này CẦN KHỚP CHÍNH XÁC với tên biến bạn đăng ký với Zalo cho Template Hủy lịch
+            return {
+                name: data.customerName,
+                date: data.appointmentDate,
+                time: data.appointmentTime,
+                status: "Đã bị hủy"
             };
         case ZALO_EVENTS.APPOINTMENT:
             // Mẫu (Ví dụ): Xác nhận lịch hẹn

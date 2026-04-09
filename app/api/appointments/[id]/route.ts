@@ -9,6 +9,8 @@ import Service from "@/models/Service";
 import { initModels } from "@/lib/initModels";
 import { checkPermission } from "@/lib/rbac";
 import { handleApiError } from "@/lib/errorHandler";
+import { sendZaloZNS } from "@/lib/zalo";
+import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -87,6 +89,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 totalCommission += commValue;
             }
         }
+        // 1. KIỂM TRA TRẠNG THÁI CÓ THAY ĐỔI KHÔNG TRƯỚC KHI LƯU
+        const isStatusChanged = cleanBody.status && cleanBody.status !== existingAppointment.status;
+        const newStatus = cleanBody.status;
 
         const appointment = await Appointment.findByIdAndUpdate(id, {
             ...cleanBody,
@@ -94,7 +99,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             tax,
             totalAmount,
             commission: totalCommission
-        }, { new: true });
+        }, { new: true }).populate('customer');
 
         // If updated to confirmed or completed, check if invoice exists, if not create one
         if (appointment && (appointment.status === 'confirmed' || appointment.status === 'completed')) {
@@ -141,6 +146,51 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 // Update existing invoice status to paid if appointment is completed
                 existingInvoice.status = 'paid';
                 await existingInvoice.save();
+            }
+        }
+        // ==========================================
+        // 2. TRIGGER GỬI ZALO ZNS (SMART & NON-BLOCKING)
+        // ==========================================
+        // ==========================================
+        // 2. TRIGGER GỬI ZALO ZNS (GỌI QUA API TRUNG TÂM - NON-BLOCKING)
+        // ==========================================
+        if (isStatusChanged && appointment.customer?.phone) {
+            let eventType = '';
+
+            // Xác định loại sự kiện dựa trên trạng thái mới
+            if (newStatus === 'confirmed') {
+                eventType = 'appointment_confirmed';
+            } else if (newStatus === 'cancelled') {
+                eventType = 'appointment_cancelled';
+            }
+
+            if (eventType) {
+                // Gom tên các dịch vụ thành 1 chuỗi (VD: "Massage 60p, Gội đầu")
+                const servicesString = appointment.services.map((s: any) => s.name).join(', ');
+
+                // 👉 Lấy URL gốc của server để gọi chéo API trong Next.js
+                const baseUrl = new URL(request.url).origin;
+
+                // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
+                fetch(`${baseUrl}/api/zalo/zns`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: appointment.customer.phone,
+                        eventType: eventType,
+                        payloadData: {
+                            customerName: appointment.customer.name || "Quý khách",
+                            appointmentDate: new Date(appointment.date).toLocaleDateString('vi-VN'),
+                            appointmentTime: appointment.startTime,
+                            serviceName: servicesString
+                        }
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) console.log("Cảnh báo API Zalo ZNS:", data.error || data.message);
+                    })
+                    .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS:", err));
             }
         }
 

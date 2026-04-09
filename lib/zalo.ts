@@ -52,3 +52,45 @@ export async function getValidZaloToken() {
         throw new Error("Không thể làm mới Zalo Token. Vui lòng cấp quyền lại.");
     }
 }
+// Thêm đoạn này vào dưới cùng của file lib/zalo.ts
+
+export async function sendZaloZNS(phone: string, templateId: string, templateData: any) {
+    try {
+        if (!phone) return { success: false, error: "Thiếu số điện thoại" };
+
+        const token = await getValidZaloToken();
+        
+        // ĐỊNH DẠNG SỐ ĐIỆN THOẠI THÔNG MINH:
+        // Zalo bắt buộc số điện thoại dạng 849xxx, nếu user nhập 09xxx thì phải tự động cắt đổi
+        let formattedPhone = phone.trim();
+        if (formattedPhone.startsWith('0')) {
+            formattedPhone = '84' + formattedPhone.slice(1);
+        }
+
+        const response = await fetch("https://business.openapi.zalo.me/message/template", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "access_token": token
+            },
+            body: JSON.stringify({
+                phone: formattedPhone,
+                template_id: templateId,
+                template_data: templateData
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.error) {
+            console.error(`❌ Lỗi gửi Zalo ZNS cho số ${formattedPhone}:`, result);
+            return { success: false, error: result.message };
+        }
+        
+        console.log(`✅ Đã gửi ZNS thành công đến ${formattedPhone}`);
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("❌ Lỗi hệ thống Zalo Service:", error);
+        return { success: false, error: error.message };
+    }
+}

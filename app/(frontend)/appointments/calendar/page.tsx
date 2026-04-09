@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format, parse, addMinutes } from "date-fns";
-import { Plus, Clock, User, DollarSign, RefreshCw, Trash2 } from "lucide-react";
+import { Plus, Clock, User, DollarSign, RefreshCw, Trash2, X } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -61,6 +61,12 @@ export default function CalendarPage() {
     const [loadingSlots, setLoadingSlots] = useState(false);
     const [taxRate, setTaxRate] = useState(0);
 
+    // THÊM STATE CHO TẠO CUSTOMER NHANH
+    const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+    const [newCustomerName, setNewCustomerName] = useState("");
+    const [newCustomerPhone, setNewCustomerPhone] = useState("");
+    const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
+
     const [formData, setFormData] = useState({
         customerId: "",
         staffId: "",
@@ -78,12 +84,12 @@ export default function CalendarPage() {
     }, []);
 
     useEffect(() => {
-        if (formData.staffId && formData.date && isModalOpen) {
+        if (formData.date && isModalOpen) {
             fetchAvailableSlots();
         } else {
             setAvailableSlots([]);
         }
-    }, [formData.staffId, formData.date, isModalOpen]);
+    }, [formData.date, isModalOpen]);
 
     const fetchResources = async () => {
         const [staffRes, serviceRes, customerRes] = await Promise.all([
@@ -113,19 +119,21 @@ export default function CalendarPage() {
     };
 
     const fetchAvailableSlots = async () => {
+        if (!formData.date) {
+            setAvailableSlots([]);
+            return;
+        }
+
         setLoadingSlots(true);
         try {
-            const excludeId = editingAppointment?._id || "";
-            const res = await fetch(`/api/staff-slots?staffId=${formData.staffId}&date=${formData.date}&excludeAppointmentId=${excludeId}`);
+            const res = await fetch(`/api/appointments/slots?date=${formData.date}`);
             const data = await res.json();
             if (data.success) {
-                const slots = data.data.availableSlotsForBooking || data.data.availableSlots || [];
-                setAvailableSlots(slots.filter((slot: any) => slot.isAvailable !== false));
-            } else {
-                setAvailableSlots([]);
+                const slots = data.data.map((time: string) => ({ startTime: time }));
+                setAvailableSlots(slots);
             }
         } catch (error) {
-            console.error("Error fetching slots:", error);
+            console.error(error);
             setAvailableSlots([]);
         } finally {
             setLoadingSlots(false);
@@ -156,6 +164,7 @@ export default function CalendarPage() {
             selectedServices.forEach(svc => {
                 const commType = svc.commissionType || 'percentage';
                 const commValue = svc.commissionValue !== undefined ? svc.commissionValue : staffRate;
+
                 if (commType === 'percentage') {
                     const shareOfTotal = subtotal > 0 ? (totalAmount * (svc.price / subtotal)) : 0;
                     commission += (shareOfTotal * commValue) / 100;
@@ -168,9 +177,8 @@ export default function CalendarPage() {
             const endDateTime = addMinutes(startDateTime, totalDuration);
             const endTime = format(endDateTime, "HH:mm");
 
-            const payload = {
+            const payload: any = {
                 customer: formData.customerId,
-                staff: formData.staffId,
                 services: selectedServices.map(s => ({
                     service: s._id,
                     name: s.name,
@@ -187,6 +195,9 @@ export default function CalendarPage() {
                 status: formData.status,
                 notes: formData.notes
             };
+            if (formData.staffId) {
+                payload.staff = formData.staffId;
+            }
 
             const url = editingAppointment ? `/api/appointments/${editingAppointment._id}` : "/api/appointments";
             const res = await fetch(url, {
@@ -264,6 +275,47 @@ export default function CalendarPage() {
         });
     };
 
+    // HÀM TẠO CUSTOMER NHANH
+    const handleCreateCustomer = async () => {
+        if (!newCustomerName.trim()) {
+            alert("Vui lòng nhập tên khách hàng");
+            return;
+        }
+
+        setIsSubmittingCustomer(true);
+        try {
+            const res = await fetch("/api/customers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: newCustomerName,
+                    phone: newCustomerPhone
+                }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // 1. Thêm khách hàng mới vào danh sách hiện tại
+                setCustomers(prev => [...prev, data.data]);
+
+                // 2. Tự động chọn khách hàng này cho appointment đang tạo
+                setFormData(prev => ({ ...prev, customerId: data.data._id }));
+
+                // 3. Đóng modal và reset form
+                setIsAddCustomerModalOpen(false);
+                setNewCustomerName("");
+                setNewCustomerPhone("");
+            } else {
+                alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Đã xảy ra lỗi khi tạo khách hàng");
+        } finally {
+            setIsSubmittingCustomer(false);
+        }
+    };
+
     const onSelectEvent = async (event: any) => {
         try {
             // Show loading state or just fetch
@@ -333,68 +385,130 @@ export default function CalendarPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <SearchableSelect label="Customer" placeholder="Select Customer" required value={formData.customerId} onChange={(v) => setFormData({ ...formData, customerId: v })} options={customers.map(c => ({ value: c._id, label: `${c.name} (${c.phone || 'No phone'})` }))} />
-                        <SearchableSelect label="Staff" placeholder="Select Staff" required value={formData.staffId} onChange={(v) => setFormData({ ...formData, staffId: v })} options={staffList.map(s => ({ value: s._id, label: s.name }))} />
+                        {/* Customer */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Customer<span className="text-red-500 ml-1">*</span>
+                            </label>
+
+                            <div className="flex items-center gap-2">
+                                <SearchableSelect
+                                    placeholder="Select Customer"
+                                    className="flex-1 min-w-0"
+                                    value={formData.customerId}
+                                    onChange={(value) => setFormData({ ...formData, customerId: value })}
+                                    options={customers.map(c => ({
+                                        value: c._id,
+                                        label: `${c.name} (${c.phone || 'No phone'})`
+                                    }))}
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddCustomerModalOpen(true)}
+                                    className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Staff */}
+                        <SearchableSelect
+                            label="Staff (Optional)"
+                            placeholder="Select Staff"
+                            value={formData.staffId}
+                            onChange={(value) => setFormData({ ...formData, staffId: value })}
+                            options={staffList.map(s => ({ value: s._id, label: s.name }))}
+                        />
                     </div>
 
-                    <MultiSearchableSelect label="Services" placeholder="Select Services" required value={formData.serviceIds} onChange={(vs) => setFormData({ ...formData, serviceIds: vs })} options={services.map(s => ({ value: s._id, label: `${s.name} (${settings.symbol}${s.price})` }))} />
+                    <MultiSearchableSelect
+                        label="Services"
+                        placeholder="Select Services"
+                        required
+                        value={formData.serviceIds}
+                        onChange={(values) => setFormData({ ...formData, serviceIds: values })}
+                        options={services.map(s => ({ value: s._id, label: `${s.name} (${settings.symbol}${s.price})` }))}
+                    />
 
                     <div className="space-y-3">
                         <label className="text-sm font-bold text-gray-700 flex items-center gap-2 px-1">
                             <Clock className="w-4 h-4 text-blue-900" />
-                            Available Time Slots
+                            Select Available Time Slot
+                            {formData.date && loadingSlots && (
+                                <span className="text-xs font-normal text-gray-400 animate-pulse ml-2">(Updating slots...)</span>
+                            )}
                         </label>
-                        {formData.staffId && formData.date ? (
+
+                        {formData.date ? (
                             availableSlots.length > 0 ? (
-                                <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl max-h-48 overflow-y-auto">
+                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
                                     {availableSlots.map((slot, idx) => (
                                         <button
                                             key={idx}
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
-                                            className={`px-2 py-3 text-[11px] font-black rounded-xl border transition-all ${formData.startTime === slot.startTime
-                                                ? "bg-blue-900 text-white border-blue-900 shadow-md transform scale-105"
-                                                : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-900 hover:bg-white shadow-sm"}`}
+                                            className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
+                                                ? "bg-blue-900 text-white border-blue-900 shadow-lg scale-105"
+                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-blue-50"
+                                                }`}
                                         >
                                             {slot.startTime}
                                         </button>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/30 text-xs text-gray-400 text-center font-bold">
-                                    {loadingSlots ? "Checking availability..." : "No free slots for this selection."}
+                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                                    <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                    {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/30 text-xs text-gray-400 text-center font-bold">
-                                Select staff and date to see free spots
+                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                                <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                Please select date to view availability
                             </div>
                         )}
                     </div>
 
-                    <div className="p-5 bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-900 rounded-2xl text-white shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                            <DollarSign className="w-24 h-24" />
-                        </div>
-                        <div className="flex justify-between items-center relative z-10">
+                    <div className="p-4 bg-gradient-to-br from-blue-900 to-indigo-900 rounded-2xl text-white shadow-xl">
+                        <div className="flex items-center justify-between">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Session Duration</p>
+                                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-wider">Estimated Duration</p>
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-4 h-4 text-blue-300" />
-                                    <p className="text-2xl font-black">{services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.duration, 0)} <span className="text-sm font-bold text-blue-300">min</span></p>
+                                    <span className="text-xl font-bold">
+                                        {services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.duration, 0)} min
+                                    </span>
                                 </div>
                             </div>
-                            <div className="w-px h-10 bg-white/20"></div>
+                            <div className="h-10 w-px bg-white/20" />
                             <div className="text-right space-y-1">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-blue-200">Total Charge</p>
-                                <p className="text-3xl font-black text-emerald-300">{settings.symbol}{((services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0) * (1 + settings.taxRate / 100)) - formData.discount).toFixed(2)}</p>
+                                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-wider">Total Amount</p>
+                                <div className="flex items-center justify-end gap-2">
+                                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                                    <span className="text-2xl font-black">
+                                        {settings.symbol}{((services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0) * (1 + settings.taxRate / 100)) - (formData.discount || 0)).toFixed(2)}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <FormSelect label="Booking Status" value={formData.status} onChange={(e: any) => setFormData({ ...formData, status: e.target.value })} options={[{ value: "pending", label: "Pending" }, { value: "confirmed", label: "Confirmed" }, { value: "completed", label: "Completed" }, { value: "cancelled", label: "Cancelled" }]} />
-                        <FormInput label="Quick Notes" value={formData.notes} onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })} placeholder="Internal notes..." />
+                        <FormSelect
+                            label="Status"
+                            value={formData.status}
+                            onChange={(e: any) => setFormData({ ...formData, status: e.target.value })}
+                            options={[
+                                { value: "pending", label: "Pending" },
+                                { value: "confirmed", label: "Confirmed" },
+                                { value: "completed", label: "Completed" },
+                                { value: "cancelled", label: "Cancelled" },
+                            ]}
+                        />
+                        <FormInput label="Notes" value={formData.notes} onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })} placeholder="Optional notes" />
                     </div>
 
                     <div className="flex items-center justify-between pt-4 gap-4">
@@ -428,6 +542,67 @@ export default function CalendarPage() {
                     </div>
                 </form>
             </Modal>
+
+            {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
+            {isAddCustomerModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900">Thêm Khách Hàng Mới</h3>
+                            <button
+                                onClick={() => setIsAddCustomerModalOpen(false)}
+                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    value={newCustomerName}
+                                    onChange={(e) => setNewCustomerName(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    placeholder="Nhập tên khách hàng"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <input
+                                    type="tel"
+                                    value={newCustomerPhone}
+                                    required
+                                    onChange={(e) => setNewCustomerPhone(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    placeholder="Nhập số điện thoại"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-3 mt-6">
+                            <button
+                                type="button"
+                                onClick={() => setIsAddCustomerModalOpen(false)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                disabled={isSubmittingCustomer}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCreateCustomer}
+                                disabled={isSubmittingCustomer}
+                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmittingCustomer ? "Đang tạo..." : "Tạo Khách Hàng"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

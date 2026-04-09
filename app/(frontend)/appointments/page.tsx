@@ -45,6 +45,7 @@ interface Appointment {
     status: string;
     notes?: string;
     source?: string;
+    cancelNote?: string;
 }
 
 export default function AppointmentsPage() {
@@ -93,6 +94,12 @@ export default function AppointmentsPage() {
     // THÊM STATE CHO MODAL CHI TIẾT APPOINTMENT
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+    // THÊM STATE CHO MODAL CANCEL APPOINTMENT
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [cancelAppointment, setCancelAppointment] = useState<Appointment | null>(null);
+    const [cancelNote, setCancelNote] = useState("");
+    const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
 
     useEffect(() => {
         fetchResources();
@@ -431,6 +438,49 @@ export default function AppointmentsPage() {
         setSelectedAppointment(null);
     };
 
+    // HÀM MỞ MODAL CANCEL APPOINTMENT
+    const openCancelModal = (apt: Appointment) => {
+        setCancelAppointment(apt);
+        setCancelNote("");
+        setIsCancelModalOpen(true);
+    };
+
+    const closeCancelModal = () => {
+        setIsCancelModalOpen(false);
+        setCancelAppointment(null);
+        setCancelNote("");
+    };
+
+    // HÀM XỬ LÝ CANCEL APPOINTMENT
+    const handleCancelAppointment = async () => {
+        if (!cancelAppointment) return;
+
+        setIsSubmittingCancel(true);
+        try {
+            const res = await fetch(`/api/appointments/${cancelAppointment._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    status: "cancelled",
+                    cancelNote: cancelNote.trim() || undefined
+                }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                fetchAppointments();
+                closeCancelModal();
+                setActiveDropdown(null);
+            } else {
+                alert(data.error || "Failed to cancel appointment");
+            }
+        } catch (error) {
+            console.error("Error cancelling appointment:", error);
+            alert("An unexpected error occurred");
+        } finally {
+            setIsSubmittingCancel(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
@@ -647,13 +697,13 @@ export default function AppointmentsPage() {
                                                                     <div className="h-px bg-gray-100 my-1" />
                                                                     <button
                                                                         onClick={() => {
-                                                                            handleDelete(apt._id);
+                                                                            openCancelModal(apt);
                                                                             setActiveDropdown(null);
                                                                         }}
                                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                                                     >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                        Cancel/Delete
+                                                                        <X className="w-4 h-4" />
+                                                                        Cancel Appointment
                                                                     </button>
                                                                 </div>
                                                             )}
@@ -1039,6 +1089,16 @@ export default function AppointmentsPage() {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Cancel Note */}
+                            {selectedAppointment.cancelNote && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Lý do hủy</label>
+                                    <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                                        <p className="text-sm text-red-800 whitespace-pre-wrap">{selectedAppointment.cancelNote}</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end mt-6">
@@ -1048,6 +1108,68 @@ export default function AppointmentsPage() {
                                 className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
                             >
                                 Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL CANCEL APPOINTMENT */}
+            {isCancelModalOpen && cancelAppointment && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900">Hủy Appointment</h3>
+                            <button
+                                onClick={closeCancelModal}
+                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-800 font-medium">Bạn có chắc chắn muốn hủy appointment này?</p>
+                            <p className="text-xs text-red-600 mt-1">
+                                Khách hàng: {cancelAppointment.customer.name}<br/>
+                                Ngày: {format(new Date(cancelAppointment.date), "dd/MM/yyyy")} - {cancelAppointment.startTime}
+                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                                    Ghi chú gửi khách hàng (tùy chọn)
+                                </label>
+                                <textarea
+                                    value={cancelNote}
+                                    onChange={(e) => setCancelNote(e.target.value)}
+                                    rows={3}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 resize-none"
+                                    placeholder="Nhập lý do hủy hoặc ghi chú gửi khách hàng..."
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Ghi chú này sẽ được lưu lại và có thể dùng để gửi thông báo Zalo cho khách hàng.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-3 mt-6">
+                            <button
+                                type="button"
+                                onClick={closeCancelModal}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                disabled={isSubmittingCancel}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCancelAppointment}
+                                disabled={isSubmittingCancel}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmittingCancel ? "Đang xử lý..." : "Xác nhận hủy"}
                             </button>
                         </div>
                     </div>
