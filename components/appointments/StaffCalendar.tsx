@@ -74,20 +74,26 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
             const data = await res.json();
 
             if (data.success) {
-                const formattedEvents = data.data.map((apt: any) => {
-                    const aptDate = moment(apt.date).format("YYYY-MM-DD");
-                    return {
-                        id: apt._id,
-                        title: `${apt.customer.name} (${apt.staff.name})`,
-                        start: moment(`${aptDate} ${apt.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
-                        end: moment(`${aptDate} ${apt.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
-                        resourceId: apt.staff._id,
-                        status: apt.status,
-                        customer: apt.customer.name,
-                        staffName: apt.staff.name,
-                        services: apt.services.map((s: any) => s.name)
-                    };
-                });
+                const formattedEvents = data.data
+                    .filter((apt: any) => apt.customer && apt.staff) // Filter out appointments without customer or staff
+                    .map((apt: any) => {
+                        const aptDate = moment(apt.date).format("YYYY-MM-DD");
+                        const customerName = typeof apt.customer === 'string' ? apt.customer : apt.customer?.name || 'Unknown Customer';
+                        const staffName = typeof apt.staff === 'string' ? apt.staff : apt.staff?.name || 'Unassigned';
+                        const staffId = typeof apt.staff === 'string' ? apt.staff : apt.staff?._id;
+                        
+                        return {
+                            id: apt._id,
+                            title: `${customerName} (${staffName})`,
+                            start: moment(`${aptDate} ${apt.startTime}`, "YYYY-MM-DD HH:mm").toDate(),
+                            end: moment(`${aptDate} ${apt.endTime}`, "YYYY-MM-DD HH:mm").toDate(),
+                            resourceId: staffId,
+                            status: apt.status,
+                            customer: customerName,
+                            staffName: staffName,
+                            services: (apt.services || []).map((s: any) => (typeof s === 'string' ? s : s?.name || 'Unknown Service')).filter(Boolean)
+                        };
+                    });
                 setEvents(formattedEvents);
             }
         } catch (error) {

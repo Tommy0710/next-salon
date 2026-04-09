@@ -40,10 +40,11 @@ export const buildTemplateData = (eventType: string, data: any) => {
         case ZALO_EVENTS.APPOINTMENT_CONFIRMED:
             // Các biến này CẦN KHỚP CHÍNH XÁC với tên biến bạn đăng ký với Zalo cho Template Đặt lịch thành công
             return {
-                name: data.customerName,
-                date: data.appointmentDate,
-                time: data.appointmentTime,
-                service: data.serviceName,
+                customer_name: data.customerName,
+                schedule_time: data.appointmentDate,
+                booking_code: data.bookingCode,
+                address: data.salonAddress || "51 Nguyễn Thị Minh Khai, phường Hải Châu , thành phố Đà Nẵng",
+                services: data.serviceName,
                 status: "Đã xác nhận"
             };
 
