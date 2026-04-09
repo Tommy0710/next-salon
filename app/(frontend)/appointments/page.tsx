@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format, addDays, subDays, isSameDay, parse, addMinutes, startOfDay, endOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, MoreVertical, Filter, FileText, DollarSign } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, MoreVertical, Filter, FileText, DollarSign, Eye } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -44,6 +44,7 @@ interface Appointment {
     commission: number;
     status: string;
     notes?: string;
+    source?: string;
 }
 
 export default function AppointmentsPage() {
@@ -88,6 +89,10 @@ export default function AppointmentsPage() {
     const [newCustomerName, setNewCustomerName] = useState("");
     const [newCustomerPhone, setNewCustomerPhone] = useState("");
     const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
+
+    // THÊM STATE CHO MODAL CHI TIẾT APPOINTMENT
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
     useEffect(() => {
         fetchResources();
@@ -415,6 +420,17 @@ export default function AppointmentsPage() {
         }
     };
 
+    // HÀM MỞ MODAL CHI TIẾT APPOINTMENT
+    const openDetailModal = (apt: Appointment) => {
+        setSelectedAppointment(apt);
+        setIsDetailModalOpen(true);
+    };
+
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedAppointment(null);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
@@ -516,9 +532,9 @@ export default function AppointmentsPage() {
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Appointment</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                            {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th> */}
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Services</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                             <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -527,12 +543,12 @@ export default function AppointmentsPage() {
                                         {loading && appointments.length === 0 ? (
                                             Array.from({ length: 5 }).map((_, i) => (
                                                 <tr key={i} className="animate-pulse">
-                                                    <td colSpan={6} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                                    <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                                 </tr>
                                             ))
                                         ) : appointments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                                     <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                     <p>No appointments found</p>
                                                 </td>
@@ -574,6 +590,9 @@ export default function AppointmentsPage() {
                                                         <span className="text-sm font-bold text-gray-900">{settings.symbol}{apt.totalAmount.toFixed(2)}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="text-sm text-gray-700 capitalize">{apt.source || 'Direct'}</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${apt.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
                                                             apt.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                                                                 apt.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
@@ -593,6 +612,16 @@ export default function AppointmentsPage() {
 
                                                             {activeDropdown === apt._id && (
                                                                 <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            openDetailModal(apt);
+                                                                            setActiveDropdown(null);
+                                                                        }}
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                    >
+                                                                        <Eye className="w-4 h-4" />
+                                                                        Xem thông tin
+                                                                    </button>
                                                                     {apt.status !== 'completed' && (
                                                                         <button
                                                                             onClick={() => {
@@ -703,25 +732,36 @@ export default function AppointmentsPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="relative flex items-center gap-2">
-                            <SearchableSelect
-                                label="Customer"
-                                placeholder="Select Customer"
-                                required
-                                className="flex-1"
-                                value={formData.customerId}
-                                onChange={(value) => setFormData({ ...formData, customerId: value })}
-                                options={customers.map(c => ({ value: c._id, label: `${c.name} (${c.phone || 'No phone'})` }))}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setIsAddCustomerModalOpen(true)}
-                                className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
-                                title="Thêm khách hàng mới"
-                            >
-                                <Plus className="w-4 h-4" />
-                            </button>
+
+                        {/* Customer */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Customer<span className="text-red-500 ml-1">*</span>
+                            </label>
+
+                            <div className="flex items-center gap-2">
+                                <SearchableSelect
+                                    placeholder="Select Customer"
+                                    className="flex-1 min-w-0"
+                                    value={formData.customerId}
+                                    onChange={(value) => setFormData({ ...formData, customerId: value })}
+                                    options={customers.map(c => ({
+                                        value: c._id,
+                                        label: `${c.name} (${c.phone || 'No phone'})`
+                                    }))}
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddCustomerModalOpen(true)}
+                                    className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
+
+                        {/* Staff */}
                         <SearchableSelect
                             label="Staff (Optional)"
                             placeholder="Select Staff"
@@ -729,6 +769,7 @@ export default function AppointmentsPage() {
                             onChange={(value) => setFormData({ ...formData, staffId: value })}
                             options={staffList.map(s => ({ value: s._id, label: s.name }))}
                         />
+
                     </div>
 
                     <MultiSearchableSelect
@@ -883,6 +924,130 @@ export default function AppointmentsPage() {
                                 className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmittingCustomer ? "Đang tạo..." : "Tạo Khách Hàng"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL CHI TIẾT APPOINTMENT */}
+            {isDetailModalOpen && selectedAppointment && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold text-gray-900">Chi tiết Appointment</h3>
+                            <button
+                                onClick={closeDetailModal}
+                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Thông tin cơ bản */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Ngày</label>
+                                    <p className="text-sm text-gray-900">{format(new Date(selectedAppointment.date), "dd/MM/yyyy")}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Thời gian</label>
+                                    <p className="text-sm text-gray-900">{selectedAppointment.startTime} - {selectedAppointment.endTime}</p>
+                                </div>
+                            </div>
+
+                            {/* Khách hàng */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Khách hàng</label>
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="font-medium text-gray-900">{selectedAppointment.customer.name}</p>
+                                    {selectedAppointment.customer.phone && <p className="text-sm text-gray-600">{selectedAppointment.customer.phone}</p>}
+                                </div>
+                            </div>
+
+                            {/* Staff (nếu có) */}
+                            {selectedAppointment.staff && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Staff</label>
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <p className="font-medium text-gray-900">{selectedAppointment.staff.name}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Dịch vụ */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Dịch vụ</label>
+                                <div className="space-y-2">
+                                    {selectedAppointment.services.map((service, idx) => (
+                                        <div key={idx} className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                                            <div>
+                                                <p className="font-medium text-gray-900">{service.name}</p>
+                                                <p className="text-sm text-gray-600">{service.duration} phút</p>
+                                            </div>
+                                            <p className="font-semibold text-gray-900">{settings.symbol}{service.price.toFixed(2)}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Thông tin tài chính */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Tổng tiền</label>
+                                    <p className="text-lg font-bold text-gray-900">{settings.symbol}{selectedAppointment.totalAmount.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Giảm giá</label>
+                                    <p className="text-sm text-gray-900">{settings.symbol}{(selectedAppointment as any).discount?.toFixed(2) || '0.00'}</p>
+                                </div>
+                            </div>
+
+                            {/* Commission */}
+                            {(selectedAppointment as any).commission > 0 && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Commission</label>
+                                    <p className="text-sm text-gray-900">{settings.symbol}{(selectedAppointment as any).commission?.toFixed(2) || '0.00'}</p>
+                                </div>
+                            )}
+
+                            {/* Status và Source */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Trạng thái</label>
+                                    <span className={`text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${selectedAppointment.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
+                                        selectedAppointment.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                            selectedAppointment.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                'bg-gray-100 text-gray-700 border-gray-200'
+                                        }`}>
+                                        {selectedAppointment.status}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Nguồn</label>
+                                    <p className="text-sm text-gray-900 capitalize">{selectedAppointment.source || 'Direct'}</p>
+                                </div>
+                            </div>
+
+                            {/* Notes */}
+                            {selectedAppointment.notes && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Ghi chú</label>
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <p className="text-sm text-gray-900 whitespace-pre-wrap">{selectedAppointment.notes}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-end mt-6">
+                            <button
+                                type="button"
+                                onClick={closeDetailModal}
+                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
+                            >
+                                Đóng
                             </button>
                         </div>
                     </div>

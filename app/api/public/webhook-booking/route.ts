@@ -44,7 +44,9 @@ export async function POST(request: Request) {
         // ==========================================
         // Dữ liệu từ web thường có kèm giờ (VD: 'Massage 60 phút: 20:00-21:00'). 
         // Ta cần cắt bỏ phần giờ phía sau dấu ':' để lấy đúng tên dịch vụ.
-        let rawServiceName = services ? services.split(':')[0].trim() : 'Dịch vụ từ Website';
+        const rawServiceName = typeof services === 'string' && services.trim().length > 0
+            ? services.split(':')[0].trim()
+            : 'Dịch vụ từ Website';
         
         // Dò tìm dịch vụ trong DB (không phân biệt hoa thường)
         let serviceDoc = await Service.findOne({ 
@@ -96,9 +98,9 @@ export async function POST(request: Request) {
             endTime: endTimeString,
             status: 'pending',     // Lịch từ web luôn là chờ xác nhận
             source: source || 'Website',
-            totalAmount: total_amount || serviceDoc.price,
+            totalAmount: total_amount ?? serviceDoc.price ?? 0,
             totalDuration: serviceDoc.duration,
-            notes: services,       // Lưu lại chuỗi gốc của web để đối chiếu nếu cần
+            notes: typeof services === 'string' ? services : '',       // Lưu lại chuỗi gốc của web để đối chiếu nếu cần
             services: [{
                 service: serviceDoc._id,
                 name: serviceDoc.name,
