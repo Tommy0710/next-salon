@@ -73,7 +73,7 @@ export async function POST(request: Request) {
                 price: total_amount || 0, // Lấy giá từ webhook làm giá gốc
                 duration: estimatedDuration,
                 description: 'Tự động tạo từ Webhook Website',
-                // category: null // Có thể để null hoặc gán vào một category mặc định
+                category: defaultCategory._id
             });
             console.log("💆‍♀️ Đã tạo Dịch vụ mới:", serviceDoc.name);
         }

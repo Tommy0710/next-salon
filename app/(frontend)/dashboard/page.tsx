@@ -12,7 +12,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import SalesChart from '@/components/dashboard/SalesChart';
 import ServiceChart from '@/components/dashboard/ServiceChart';
-import AIInsight from '@/components/dashboard/AIInsight';
+// import AIInsight from '@/components/dashboard/AIInsight';
 import { Package, DollarSign, AlertTriangle, Calendar, Users, ShoppingBag } from 'lucide-react';
 import { startOfDay, endOfDay, subDays, startOfWeek, endOfWeek, format, startOfMonth } from 'date-fns';
 
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            <AIInsight />
+            {/* <AIInsight /> */}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

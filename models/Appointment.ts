@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAppointment extends Document {
     customer: mongoose.Types.ObjectId;
-    staff: mongoose.Types.ObjectId;
+    staff?: mongoose.Types.ObjectId;
     services: {
         service: mongoose.Types.ObjectId;
         name: string;
@@ -22,6 +22,7 @@ export interface IAppointment extends Document {
     tips: number;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no-show';
     notes?: string;
+    source?: string;
     reminderSent?: boolean;
     reminderSentAt?: Date;
 }
@@ -54,6 +55,7 @@ const appointmentSchema = new Schema<IAppointment>(
             default: 'pending',
         },
         notes: { type: String },
+        source: { type: String, default: 'Direct' },
         reminderSent: { type: Boolean, default: false },
         reminderSentAt: { type: Date },
     },

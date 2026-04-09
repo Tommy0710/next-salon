@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Appointment, { IAppointment } from "@/models/Appointment";
@@ -12,25 +11,6 @@ import { checkPermission } from "@/lib/rbac";
 import { handleApiError } from "@/lib/errorHandler";
 
 export async function GET(request: NextRequest) {
-    const generateFixedSlots = () => {
-        const slots = [];
-        let current = new Date();
-        current.setHours(9, 30, 0, 0); // Bắt đầu 09:30
-
-        const end = new Date();
-        end.setHours(20, 30, 0, 0);   // Kết thúc 20:30
-
-        while (current <= end) {
-            const timeString = current.toLocaleTimeString('en-GB', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-            slots.push(timeString);
-            current.setMinutes(current.getMinutes() + 30); // Cộng thêm 30 phút
-        }
-        return slots;
-    };
     try {
         // Security Check
         const permissionError = await checkPermission(request, 'appointments', 'view');
@@ -61,9 +41,9 @@ export async function GET(request: NextRequest) {
             query.status = status;
         }
 
-        // if (staffId) {
-        //     query.staff = new mongoose.Types.ObjectId(staffId);
-        // }
+        if (staffId) {
+            query.staff = new mongoose.Types.ObjectId(staffId);
+        }
 
         // Using aggregation for advanced searching and pagination
         const pipeline: any[] = [
@@ -76,16 +56,17 @@ export async function GET(request: NextRequest) {
                     as: 'customer'
                 }
             },
-            { $unwind: '$customer' },
-            // {
-            //     $lookup: {
-            //         from: 'staffs',
-            //         localField: 'staff',
-            //         foreignField: '_id',
-            //         as: 'staff'
-            //     }
-            // },
-            // { $unwind: '$staff' }
+            { $unwind: { path: '$customer', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'staffs',
+                    localField: 'staff',
+                    foreignField: '_id',
+                    as: 'staff'
+                }
+            },
+            // 👉 ĐÃ SỬA LỖI TÀNG HÌNH: Giữ lại cả những lịch hẹn không có nhân viên
+            { $unwind: { path: '$staff', preserveNullAndEmptyArrays: true } } 
         ];
 
         // Search filter (name or phone)
@@ -95,7 +76,7 @@ export async function GET(request: NextRequest) {
                     $or: [
                         { 'customer.name': { $regex: search, $options: 'i' } },
                         { 'customer.phone': { $regex: search, $options: 'i' } },
-                        // { 'staff.name': { $regex: search, $options: 'i' } }
+                        { 'staff.name': { $regex: search, $options: 'i' } }
                     ]
                 }
             });
@@ -109,15 +90,13 @@ export async function GET(request: NextRequest) {
         const countResult = await Appointment.aggregate(countPipeline);
         const total = countResult.length > 0 ? countResult[0].total : 0;
 
-        // Apply Pagination (only if requested)
+        // Apply Pagination
         const isPaginated = searchParams.has("page");
         if (isPaginated) {
             const skip = (page - 1) * limit;
             pipeline.push({ $skip: skip });
             pipeline.push({ $limit: limit });
         } else {
-            // For calendar, we might still want a safety limit, 
-            // but usually a day doesn't have 1000s of appointments
             pipeline.push({ $limit: 1000 });
         }
 
@@ -149,17 +128,15 @@ export async function POST(request: NextRequest) {
         initModels();
         const body = await request.json();
 
-        // Basic validation
-        if (!body.customer || /* !body.staff || */ !body.startTime || !body.services || !Array.isArray(body.services) || body.services.length === 0) {
-            return NextResponse.json({ success: false, error: "Customer, /* staff, */ time slot and at least one service are required" }, { status: 400 });
+        // 👉 ĐÃ SỬA LỖI 400: Xóa bỏ điều kiện !body.staff khỏi hàm Validation
+        if (!body.customer || !body.startTime || !body.services || !Array.isArray(body.services) || body.services.length === 0) {
+            return NextResponse.json({ success: false, error: "Customer, time slot and at least one service are required" }, { status: 400 });
         }
 
-        // Robustness: Handle if status is accidentally sent as an object
         if (body.status && typeof body.status === 'object' && body.status.target) {
             body.status = body.status.target.value;
         }
 
-        // Generate totals based on settings
         const settings = await Settings.findOne();
         const taxRate = settings?.taxRate || 0;
 
@@ -169,15 +146,18 @@ export async function POST(request: NextRequest) {
         const tax = subtotal * (taxRate / 100);
         const totalAmount = (subtotal + tax) - discount;
 
-        // Calculate commission
-        // const staff = await Staff.findById(body.staff);
-        // const staffRate = staff?.commissionRate || 0;
+        // 👉 ĐÃ SỬA LỖI CRASH KHI KHÔNG CÓ STAFF: Thêm điều kiện check if (body.staff)
+        let staffRate = 0;
+        if (body.staff) {
+            const staff = await Staff.findById(body.staff);
+            staffRate = staff?.commissionRate || 0;
+        }
 
         let commission = 0;
         for (const item of body.services) {
             const service = await Service.findById(item.service);
             const commType = service?.commissionType || 'percentage';
-            const commValue = service?.commissionValue || /* staffRate */ 0;
+            const commValue = service?.commissionValue || staffRate;
 
             if (commType === 'percentage') {
                 const shareOfTotal = subtotal > 0 ? (totalAmount * (item.price / subtotal)) : 0;
@@ -197,9 +177,8 @@ export async function POST(request: NextRequest) {
             commission
         }) as unknown as IAppointment;
 
-        // Create invoice automatically for confirmed/completed appointments
+        // Create invoice automatically
         if (appointment.status === 'confirmed' || appointment.status === 'completed' || !appointment.status) {
-            // More robust invoice number generation: Find the latest invoice number and increment it
             const lastInvoice = await Invoice.findOne().sort({ createdAt: -1 });
             let nextNum = 1;
 
@@ -229,12 +208,12 @@ export async function POST(request: NextRequest) {
                 discount: discount || 0,
                 totalAmount: totalAmount || 0,
                 commission: commission || 0,
-                // staff: appointment.staff,
-                // staffAssignments: appointment.staff ? [{
-                //     staff: appointment.staff,
-                //     percentage: staffRate,
-                //     commission: commission || 0
-                // }] : [],
+                staff: appointment.staff || null, // Xử lý an toàn nếu không có staff
+                staffAssignments: appointment.staff ? [{
+                    staff: appointment.staff,
+                    percentage: staffRate,
+                    commission: commission || 0
+                }] : [],
                 status: appointment.status === 'completed' ? 'paid' : 'pending',
                 date: appointment.date || new Date()
             });

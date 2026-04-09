@@ -34,7 +34,7 @@ interface Customer {
 interface Appointment {
     _id: string;
     customer: Customer;
-    // staff: Staff;
+    staff?: Staff;
     services: { service: Service; name: string; price: number; duration: number }[];
     date: string;
     startTime: string; // "14:00"
@@ -63,7 +63,7 @@ export default function AppointmentsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         customerId: "",
-        /* staffId: "", */
+        staffId: "",
         serviceIds: [] as string[],
         startTime: "",
         date: format(new Date(), "yyyy-MM-dd"),
@@ -152,16 +152,16 @@ export default function AppointmentsPage() {
     }, [activeDropdown]);
 
     const fetchResources = async () => {
-        const [/* staffRes, */ serviceRes, customerRes] = await Promise.all([
-            // fetch("/api/staff"),
+        const [staffRes, serviceRes, customerRes] = await Promise.all([
+            fetch("/api/staff"),
             fetch("/api/services"),
             fetch("/api/customers")
         ]);
-        // const staffData = await staffRes.json();
+        const staffData = await staffRes.json();
         const serviceData = await serviceRes.json();
         const customerData = await customerRes.json();
 
-        // if (staffData.success) setStaffList(staffData.data);
+        if (staffData.success) setStaffList(staffData.data);
         if (serviceData.success) setServices(serviceData.data);
         if (customerData.success) setCustomers(customerData.data);
     };
@@ -266,9 +266,8 @@ export default function AppointmentsPage() {
             const endDateTime = addMinutes(startDateTime, totalDuration);
             const endTime = format(endDateTime, "HH:mm");
 
-            const payload = {
+            const payload: any = {
                 customer: formData.customerId,
-                // staff: formData.staffId,
                 services: selectedServices.map(s => ({
                     service: s._id,
                     name: s.name,
@@ -285,6 +284,9 @@ export default function AppointmentsPage() {
                 status: formData.status,
                 notes: formData.notes
             };
+            if (formData.staffId) {
+                payload.staff = formData.staffId;
+            }
 
             const url = editingAppointment ? `/api/appointments/${editingAppointment._id}` : "/api/appointments";
             const method = editingAppointment ? "PUT" : "POST";
@@ -344,7 +346,7 @@ export default function AppointmentsPage() {
 
         setFormData({
             customerId: apt.customer._id,
-            // staffId: apt.staff._id,
+            staffId: apt.staff?._id || "",
             serviceIds: validServiceIds,
             startTime: apt.startTime,
             date: format(new Date(apt.date), "yyyy-MM-dd"),
@@ -362,7 +364,7 @@ export default function AppointmentsPage() {
         setFormError("");
         setFormData({
             customerId: "",
-            /* staffId: "", */
+            staffId: "",
             serviceIds: [],
             startTime: "",
             date: format(new Date(), "yyyy-MM-dd"),
@@ -444,7 +446,7 @@ export default function AppointmentsPage() {
                 <button
                     onClick={() => {
                         setEditingAppointment(null);
-                        setFormData({ customerId: "", /* staffId: "", */ serviceIds: [], startTime: "", date: format(new Date(), "yyyy-MM-dd"), discount: 0, notes: "", status: "confirmed" });
+                        setFormData({ customerId: "", staffId: "", serviceIds: [], startTime: "", date: format(new Date(), "yyyy-MM-dd"), discount: 0, notes: "", status: "confirmed" });
                         setFormError("");
                         setIsModalOpen(true);
                     }}
@@ -700,7 +702,7 @@ export default function AppointmentsPage() {
                         <FormInput label={`Discount (${settings.symbol})`} type="number" min="0" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="relative flex items-center gap-2">
                             <SearchableSelect
                                 label="Customer"
@@ -720,13 +722,13 @@ export default function AppointmentsPage() {
                                 <Plus className="w-4 h-4" />
                             </button>
                         </div>
-                        {/* <SearchableSelect
-                            label="Staff"
+                        <SearchableSelect
+                            label="Staff (Optional)"
                             placeholder="Select Staff"
                             value={formData.staffId}
                             onChange={(value) => setFormData({ ...formData, staffId: value })}
                             options={staffList.map(s => ({ value: s._id, label: s.name }))}
-                        /> */}
+                        />
                     </div>
 
                     <MultiSearchableSelect
