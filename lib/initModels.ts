@@ -21,6 +21,7 @@ import Deposit from '@/models/Deposit';
 import StaffSlot from '@/models/StaffSlot';
 import PurchaseDeposit from '@/models/PurchaseDeposit';
 import ActivityLog from '@/models/ActivityLog';
+import ZaloLog from '@/models/ZaloLog';
 
 // Export all models for convenience
 export {
@@ -42,7 +43,8 @@ export {
     UsageLog,
     StaffSlot,
     PurchaseDeposit,
-    ActivityLog
+    ActivityLog,
+    ZaloLog
 };
 
 // This function can be called to ensure models are loaded

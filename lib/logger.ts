@@ -10,7 +10,7 @@ export async function logActivity({
     resourceId,
     details,
 }: {
-    req?: NextRequest;
+    req?: Request | NextRequest;
     action: string;
     resource: string;
     resourceId?: string;

@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import ServiceCategory from "@/models/ServiceCategory";
+import { logActivity } from "@/lib/logger";
 
 export async function GET(request: Request) {
     try {
@@ -17,7 +18,16 @@ export async function POST(request: Request) {
     try {
         await connectToDB();
         const body = await request.json();
-        const category = await ServiceCategory.create(body);
+        const category: any = await ServiceCategory.create(body);
+
+        await logActivity({
+            req: request,
+            action: "create",
+            resource: "service-category",
+            resourceId: category._id?.toString(),
+            details: `Created service category ${category.name || category._id}`,
+        });
+
         return NextResponse.json({ success: true, data: category });
     } catch (error) {
         return NextResponse.json({ success: false, error: "Failed to create category" }, { status: 500 });

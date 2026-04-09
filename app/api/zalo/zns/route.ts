@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getValidZaloToken } from '@/lib/zalo';
 import { buildTemplateData } from '@/lib/zalo-payloads';
 import Settings from '@/models/Settings';
+import ZaloLog from '@/models/ZaloLog';
 import dbConnect from '@/lib/mongodb';
 
 export async function POST(request: Request) {
@@ -48,10 +49,33 @@ export async function POST(request: Request) {
 
         const zaloResult = await zaloResponse.json();
 
+        // Log the Zalo message attempt
+        const logData = {
+            phone: formattedPhone,
+            templateId: templateConfig.templateId,
+            templateName: templateConfig.name || eventType,
+            eventType: eventType,
+            trackingId: payloadData.invoiceId || Date.now().toString(),
+            sentAt: new Date(),
+            responseData: zaloResult,
+        };
+
         if (zaloResult.error) {
             console.error("Zalo API Error:", zaloResult);
+            // Save failed log
+            await ZaloLog.create({
+                ...logData,
+                status: 'failed',
+                errorMessage: zaloResult.message || 'Unknown error',
+            });
             return NextResponse.json({ success: false, error: zaloResult.message }, { status: 400 });
         }
+
+        // Save success log
+        await ZaloLog.create({
+            ...logData,
+            status: 'success',
+        });
 
         return NextResponse.json({ success: true, data: zaloResult });
 

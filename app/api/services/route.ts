@@ -4,6 +4,7 @@ import { connectToDB } from "@/lib/mongodb";
 import Service from "@/models/Service";
 import ServiceCategory from "@/models/ServiceCategory"; // Ensure it's registered
 import { initModels } from "@/lib/initModels";
+import { logActivity } from "@/lib/logger";
 
 export async function GET(request: Request) {
     try {
@@ -49,7 +50,16 @@ export async function POST(request: Request) {
     try {
         await connectToDB();
         const body = await request.json();
-        const service = await Service.create(body);
+        const service: any = await Service.create(body);
+
+        await logActivity({
+            req: request,
+            action: "create",
+            resource: "service",
+            resourceId: service._id?.toString(),
+            details: `Created service ${service.name || service._id}`,
+        });
+
         return NextResponse.json({ success: true, data: service });
     } catch (error) {
         console.error(error);

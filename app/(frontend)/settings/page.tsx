@@ -53,6 +53,44 @@ interface Settings {
     zaloRefreshToken: string;
 }
 
+const defaultZaloTemplates = [
+    { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
+    { eventType: 'appointment_reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' },
+    { eventType: 'appointment_confirmed', name: 'Mẫu Cảm ơn và confirm', templateId: '' },
+    { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
+    { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
+];
+
+const normalizeStoredZaloTemplates = (templates: any[] = []) => {
+    const mapped = templates.map((template) => {
+        if (template.eventType === 'reminder') {
+            return {
+                ...template,
+                eventType: 'appointment_reminder',
+                name: 'Mẫu Nhắc lịch hẹn',
+            };
+        }
+        return template;
+    });
+
+    return mapped.filter((template, index) =>
+        mapped.findIndex((item) => item.eventType === template.eventType) === index
+    );
+};
+
+const mergeZaloTemplates = (storedTemplates: any[] = []) => {
+    const normalized = normalizeStoredZaloTemplates(storedTemplates);
+    const mergedTemplates = defaultZaloTemplates.map((defaultTemplate) => ({
+        ...defaultTemplate,
+        templateId:
+            normalized.find((t) => t.eventType === defaultTemplate.eventType)?.templateId || '',
+    }));
+    const extraTemplates = normalized.filter(
+        (t) => !defaultZaloTemplates.some((d) => d.eventType === t.eventType)
+    );
+    return [...mergedTemplates, ...extraTemplates];
+};
+
 export default function SettingsPage() {
     const { refreshSettings } = useSettings();
     const [settings, setSettings] = useState<Settings>({
@@ -94,13 +132,7 @@ export default function SettingsPage() {
         zaloEnabled: false,
         zaloAppId: '',
         zaloSecretKey: '',
-        zaloTemplates: [
-            { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
-            { eventType: 'appointment_reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' },
-            { eventType: 'appointment_confirmed', name: 'Mẫu Cảm ơn và confirm', templateId: '' },
-            { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
-            { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
-        ],
+        zaloTemplates: defaultZaloTemplates,
         zaloAccessToken: '',
         zaloRefreshToken: '',
     });
@@ -178,15 +210,7 @@ export default function SettingsPage() {
                     zaloEnabled: data.data.zaloEnabled || false,
                     zaloAppId: data.data.zaloAppId || '',
                     zaloSecretKey: data.data.zaloSecretKey || '',
-                    zaloTemplates: Array.isArray(data.data.zaloTemplates) && data.data.zaloTemplates.length > 0 
-                        ? data.data.zaloTemplates 
-                        : [
-                            { eventType: 'checkout', name: 'Mẫu Cảm ơn & Hóa đơn', templateId: '' },
-                            { eventType: 'appointment_reminder', name: 'Mẫu Nhắc lịch hẹn', templateId: '' },
-                            { eventType: 'appointment_confirmed', name: 'Mẫu Cảm ơn và confirm', templateId: '' },
-                            { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
-                            { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
-                        ],
+                    zaloTemplates: mergeZaloTemplates(Array.isArray(data.data.zaloTemplates) ? data.data.zaloTemplates : []),
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
                 });
@@ -207,11 +231,15 @@ export default function SettingsPage() {
         setMessage({ type: "", text: "" });
 
         try {
+            const normalizedSettings = {
+                ...settings,
+                zaloTemplates: mergeZaloTemplates(settings.zaloTemplates || []),
+            };
             const res = await fetch("/api/settings", {
                 method: "PUT",
                 credentials: 'include',
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(settings),
+                body: JSON.stringify(normalizedSettings),
             });
             const data = await res.json();
 

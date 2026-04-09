@@ -588,7 +588,7 @@ export default function POSPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <h3 className="font-semibold text-gray-800 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 h-8 flex items-center justify-center">{item.name}</h3>
+                                        <h3 className="font-semibold text-gray-800 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
                                         <p className="text-blue-900 font-bold text-xs md:text-sm">{settings.symbol}{item.price}</p>
                                     </div>
                                 ))}

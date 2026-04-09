@@ -5,6 +5,7 @@ import Product from "@/models/Product";
 import { initModels } from "@/lib/initModels";
 import { checkPermission } from "@/lib/rbac";
 import { validateAndSanitize, validationErrorResponse } from "@/lib/validation";
+import { logActivity } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
     try {
@@ -74,7 +75,16 @@ export async function POST(request: NextRequest) {
             return validationErrorResponse(validation.errors);
         }
         
-        const product = await Product.create(validation.sanitizedData);
+        const product: any = await Product.create(validation.sanitizedData);
+
+        await logActivity({
+            req: request,
+            action: "create",
+            resource: "product",
+            resourceId: product._id?.toString(),
+            details: `Created product ${product.name || product._id}`,
+        });
+
         return NextResponse.json({ success: true, data: product });
     } catch (error: any) {
         console.error('Error creating product:', error);
