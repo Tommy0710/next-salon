@@ -27,6 +27,28 @@ export async function POST(request: Request) {
         } = body;
 
         // ==========================================
+        // KIỂM TRA TRÙNG LẶP (Idempotency Check)
+        // ==========================================
+        // Nếu appointment với customer_phone + date + startTime đã tồn tại
+        // thì return existing appointment (tránh tạo duplicate)
+        const existingAppointment = await Appointment.findOne({
+            'customer.phone': customer_phone,
+            date: new Date(date),
+            startTime: time
+        }).populate('customer');
+
+        if (existingAppointment) {
+            console.log("⚠️ Appointment đã tồn tại:", existingAppointment._id);
+            return NextResponse.json({
+                success: true,
+                message: "Appointment already exists",
+                appointmentId: existingAppointment._id,
+                customerId: existingAppointment.customer?._id,
+                isDuplicate: true
+            }, { status: 200 });
+        }
+
+        // ==========================================
         // BƯỚC 1: XỬ LÝ KHÁCH HÀNG (Tạo mới nếu chưa có)
         // ==========================================
         let customer = await Customer.findOne({ phone: customer_phone });

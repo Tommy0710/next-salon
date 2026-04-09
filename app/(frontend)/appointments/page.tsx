@@ -45,7 +45,6 @@ interface Appointment {
     status: string;
     notes?: string;
     source?: string;
-    cancelNote?: string;
 }
 
 export default function AppointmentsPage() {
@@ -80,6 +79,7 @@ export default function AppointmentsPage() {
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [formError, setFormError] = useState("");
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // Slot system state
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
@@ -94,12 +94,6 @@ export default function AppointmentsPage() {
     // THÊM STATE CHO MODAL CHI TIẾT APPOINTMENT
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
-
-    // THÊM STATE CHO MODAL CANCEL APPOINTMENT
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-    const [cancelAppointment, setCancelAppointment] = useState<Appointment | null>(null);
-    const [cancelNote, setCancelNote] = useState("");
-    const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
 
     useEffect(() => {
         fetchResources();
@@ -142,7 +136,7 @@ export default function AppointmentsPage() {
 
     useEffect(() => {
         fetchAppointments();
-    }, [page, statusFilter]); // Re-fetch on filter change
+    }, [page, statusFilter, itemsPerPage]); // Re-fetch on filter change or items per page change
 
     // Debounce search
     useEffect(() => {
@@ -165,9 +159,9 @@ export default function AppointmentsPage() {
 
     const fetchResources = async () => {
         const [staffRes, serviceRes, customerRes] = await Promise.all([
-            fetch("/api/staff"),
-            fetch("/api/services"),
-            fetch("/api/customers")
+            fetch("/api/staff?limit=999"),
+            fetch("/api/services?limit=999"),
+            fetch("/api/customers?limit=999")
         ]);
         const staffData = await staffRes.json();
         const serviceData = await serviceRes.json();
@@ -204,7 +198,7 @@ export default function AppointmentsPage() {
 
     const fetchAppointments = async () => {
         setLoading(true);
-        const url = `/api/appointments?page=${page}&limit=10&search=${searchTerm}&status=${statusFilter}`;
+        const url = `/api/appointments?page=${page}&limit=${itemsPerPage}&search=${searchTerm}&status=${statusFilter}`;
 
         try {
             const res = await fetch(url);
@@ -438,49 +432,6 @@ export default function AppointmentsPage() {
         setSelectedAppointment(null);
     };
 
-    // HÀM MỞ MODAL CANCEL APPOINTMENT
-    const openCancelModal = (apt: Appointment) => {
-        setCancelAppointment(apt);
-        setCancelNote("");
-        setIsCancelModalOpen(true);
-    };
-
-    const closeCancelModal = () => {
-        setIsCancelModalOpen(false);
-        setCancelAppointment(null);
-        setCancelNote("");
-    };
-
-    // HÀM XỬ LÝ CANCEL APPOINTMENT
-    const handleCancelAppointment = async () => {
-        if (!cancelAppointment) return;
-
-        setIsSubmittingCancel(true);
-        try {
-            const res = await fetch(`/api/appointments/${cancelAppointment._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    status: "cancelled",
-                    cancelNote: cancelNote.trim() || undefined
-                }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                fetchAppointments();
-                closeCancelModal();
-                setActiveDropdown(null);
-            } else {
-                alert(data.error || "Failed to cancel appointment");
-            }
-        } catch (error) {
-            console.error("Error cancelling appointment:", error);
-            alert("An unexpected error occurred");
-        } finally {
-            setIsSubmittingCancel(false);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
@@ -539,7 +490,7 @@ export default function AppointmentsPage() {
                             }}
                         />
                     ) : (
-                        <div className="h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                        <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
                             {/* List View Filters */}
                             <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
                                 <div className="relative w-full md:w-96">
@@ -576,7 +527,7 @@ export default function AppointmentsPage() {
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto h-full">
+                            <div className="flex-1 overflow-auto">
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
@@ -697,13 +648,13 @@ export default function AppointmentsPage() {
                                                                     <div className="h-px bg-gray-100 my-1" />
                                                                     <button
                                                                         onClick={() => {
-                                                                            openCancelModal(apt);
+                                                                            handleDelete(apt._id);
                                                                             setActiveDropdown(null);
                                                                         }}
                                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                                                     >
-                                                                        <X className="w-4 h-4" />
-                                                                        Cancel Appointment
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                        Cancel/Delete
                                                                     </button>
                                                                 </div>
                                                             )}
@@ -717,9 +668,23 @@ export default function AppointmentsPage() {
                             </div>
 
                             {/* List View Pagination */}
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
                                 <div className="text-sm text-gray-500 font-medium">
                                     Showing <span className="text-gray-900">{appointments.length}</span> of <span className="text-gray-900">{pagination.total}</span> appointments
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <select
+                                        value={itemsPerPage}
+                                        onChange={(e) => {
+                                            setItemsPerPage(parseInt(e.target.value));
+                                            setPage(1);
+                                        }}
+                                        className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    >
+                                        <option value="10">10 per page</option>
+                                        <option value="25">25 per page</option>
+                                        <option value="50">50 per page</option>
+                                    </select>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -1089,16 +1054,6 @@ export default function AppointmentsPage() {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Cancel Note */}
-                            {selectedAppointment.cancelNote && (
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Lý do hủy</label>
-                                    <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-                                        <p className="text-sm text-red-800 whitespace-pre-wrap">{selectedAppointment.cancelNote}</p>
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
                         <div className="flex justify-end mt-6">
@@ -1108,68 +1063,6 @@ export default function AppointmentsPage() {
                                 className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
                             >
                                 Đóng
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL CANCEL APPOINTMENT */}
-            {isCancelModalOpen && cancelAppointment && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">Hủy Appointment</h3>
-                            <button
-                                onClick={closeCancelModal}
-                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-sm text-red-800 font-medium">Bạn có chắc chắn muốn hủy appointment này?</p>
-                            <p className="text-xs text-red-600 mt-1">
-                                Khách hàng: {cancelAppointment.customer.name}<br/>
-                                Ngày: {format(new Date(cancelAppointment.date), "dd/MM/yyyy")} - {cancelAppointment.startTime}
-                            </p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                    Ghi chú gửi khách hàng (tùy chọn)
-                                </label>
-                                <textarea
-                                    value={cancelNote}
-                                    onChange={(e) => setCancelNote(e.target.value)}
-                                    rows={3}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900/20 focus:border-red-900 resize-none"
-                                    placeholder="Nhập lý do hủy hoặc ghi chú gửi khách hàng..."
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Ghi chú này sẽ được lưu lại và có thể dùng để gửi thông báo Zalo cho khách hàng.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end space-x-3 mt-6">
-                            <button
-                                type="button"
-                                onClick={closeCancelModal}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                disabled={isSubmittingCancel}
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleCancelAppointment}
-                                disabled={isSubmittingCancel}
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isSubmittingCancel ? "Đang xử lý..." : "Xác nhận hủy"}
                             </button>
                         </div>
                     </div>
