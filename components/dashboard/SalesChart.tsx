@@ -21,10 +21,24 @@ interface SalesChartProps {
 
 export default function SalesChart({ data }: SalesChartProps) {
     const { settings } = useSettings();
+    const shouldRotate = data.length > 7;
+    const formatXLabel = (label: string) => {
+        if (!label) return '';
+        return label.length > 15 ? `${label.slice(0, 15)}...` : label;
+    };
+
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-80">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Sales Overview</h3>
-            <div className="h-64 w-full">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                <div>
+                    <h3 className="text-lg font-bold text-gray-900">Sales Overview</h3>
+                    <p className="text-sm text-gray-500 mt-1">Doanh thu theo thời gian, dễ đọc với nhãn gọn và tooltip rõ ràng.</p>
+                </div>
+                <div className="text-sm text-gray-500">
+                    {data.length} point{data.length > 1 ? 's' : ''}
+                </div>
+            </div>
+            <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                         data={data}
@@ -32,7 +46,7 @@ export default function SalesChart({ data }: SalesChartProps) {
                             top: 10,
                             right: 30,
                             left: 0,
-                            bottom: 0,
+                            bottom: shouldRotate ? 30 : 10,
                         }}
                     >
                         <defs>
@@ -41,19 +55,24 @@ export default function SalesChart({ data }: SalesChartProps) {
                                 <stop offset="95%" stopColor="#1e3a8a" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis
                             dataKey="name"
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: '#6b7280', fontSize: 12 }}
-                            dy={10}
+                            interval={0}
+                            tickFormatter={formatXLabel}
+                            angle={shouldRotate ? -35 : 0}
+                            textAnchor={shouldRotate ? 'end' : 'middle'}
+                            height={shouldRotate ? 50 : 30}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: '#6b7280', fontSize: 12 }}
-                            tickFormatter={(value) => `${settings.symbol}${value}`}
+                            tickFormatter={(value) => `${settings.symbol}${value.toLocaleString()}`}
+                            width={70}
                         />
                         <Tooltip
                             contentStyle={{
@@ -62,7 +81,7 @@ export default function SalesChart({ data }: SalesChartProps) {
                                 border: '1px solid #e5e7eb',
                                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                             }}
-                            formatter={(value: number) => [`${settings.symbol}${value}`, 'Sales']}
+                            formatter={(value: number) => [`${settings.symbol}${value.toLocaleString()}`, 'Sales']}
                         />
                         <Area
                             type="monotone"
@@ -71,6 +90,7 @@ export default function SalesChart({ data }: SalesChartProps) {
                             strokeWidth={2}
                             fillOpacity={1}
                             fill="url(#colorSales)"
+                            dot={{ r: 3 }}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

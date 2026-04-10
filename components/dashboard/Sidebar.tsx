@@ -183,7 +183,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                             </div>
                         </div>
                     ) : (
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 overflow-hidden">
+                        <div className="w-20 h-20 items-center justify-center overflow-hidden">
                             {logoUrl ? (
                                 <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                             ) : (
