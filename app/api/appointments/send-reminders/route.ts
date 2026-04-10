@@ -10,6 +10,9 @@ import {
     isEmailConfigured,
     isSMSConfigured,
 } from "@/lib/notifications";
+import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
+import Settings from "@/models/Settings";
+import ZaloLog from "@/models/ZaloLog";
 
 // POST /api/appointments/send-reminders - Send reminders for upcoming appointments
 export async function POST(request: Request) {
@@ -17,16 +20,18 @@ export async function POST(request: Request) {
         await connectToDB();
 
         const body = await request.json();
-        const { daysBefore = 1, method = 'both' } = body; // method: 'sms', 'email', or 'both'
+        const { daysBefore = 1, methods = ['sms', 'email'] } = body; // methods: array of ['sms', 'email', 'zalo']
 
         // Check configuration
         const emailEnabled = await isEmailConfigured();
         const smsEnabled = await isSMSConfigured();
+        const settings = await Settings.findOne();
+        const zaloEnabled = settings?.zaloEnabled && settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER)?.templateId;
 
-        if (!emailEnabled && !smsEnabled) {
+        if (!emailEnabled && !smsEnabled && !zaloEnabled) {
             return NextResponse.json({
                 success: false,
-                error: "Neither email nor SMS is configured. Please set up SMTP or Twilio credentials.",
+                error: "No notification methods are configured. Please set up SMTP, Twilio, or Zalo ZNS credentials.",
             }, { status: 500 });
         }
 
@@ -71,9 +76,10 @@ export async function POST(request: Request) {
 
             let smsSent = false;
             let emailSent = false;
+            let zaloSent = false;
 
             // Send SMS
-            if ((method === 'sms' || method === 'both') && smsEnabled && customer.phone) {
+            if (methods.includes('sms') && smsEnabled && customer.phone) {
                 const smsMessage = getAppointmentReminderSMS(
                     customer.name,
                     staff.name,
@@ -86,7 +92,7 @@ export async function POST(request: Request) {
             }
 
             // Send Email
-            if ((method === 'email' || method === 'both') && emailEnabled && customer.email) {
+            if (methods.includes('email') && emailEnabled && customer.email) {
                 const emailContent = getAppointmentReminderEmail(
                     customer.name,
                     staff.name,
@@ -106,8 +112,64 @@ export async function POST(request: Request) {
                 );
             }
 
+            // Send Zalo ZNS
+            if (methods.includes('zalo') && zaloEnabled && customer.phone) {
+                try {
+                    const baseUrl = new URL(request.url).origin;
+                    const zaloResponse = await fetch(`${baseUrl}/api/zalo/zns`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            phone: customer.phone,
+                            eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
+                            payloadData: {
+                                customerName: customer.name || "Quý khách",
+                                appointmentDate: dateStr,
+                                appointmentTime: timeStr,
+                                serviceName: services.join(', ')
+                            }
+                        })
+                    });
+
+                    const zaloResult = await zaloResponse.json();
+                    zaloSent = zaloResult.success;
+
+                    // Log Zalo reminder attempt
+                    const templateConfig = settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER);
+                    await ZaloLog.create({
+                        phone: customer.phone.replace(/^(\+?84|0)/, '84'),
+                        templateId: templateConfig?.templateId || '',
+                        templateName: templateConfig?.name || 'Appointment Reminder',
+                        eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
+                        status: zaloSent ? 'success' : 'failed',
+                        errorMessage: zaloSent ? undefined : 'Zalo reminder failed',
+                        trackingId: `reminder_${appointment._id}_${Date.now()}`,
+                        sentAt: new Date(),
+                        responseData: zaloResult,
+                    });
+
+                } catch (error) {
+                    console.error("Zalo reminder error:", error);
+                    zaloSent = false;
+
+                    // Log Zalo reminder failure
+                    const templateConfig = settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER);
+                    await ZaloLog.create({
+                        phone: customer.phone.replace(/^(\+?84|0)/, '84'),
+                        templateId: templateConfig?.templateId || '',
+                        templateName: templateConfig?.name || 'Appointment Reminder',
+                        eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
+                        status: 'failed',
+                        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+                        trackingId: `reminder_${appointment._id}_${Date.now()}`,
+                        sentAt: new Date(),
+                        responseData: { error: error },
+                    });
+                }
+            }
+
             // Mark as sent if at least one method succeeded
-            if (smsSent || emailSent) {
+            if (smsSent || emailSent || zaloSent) {
                 appointment.reminderSent = true;
                 appointment.reminderSentAt = new Date();
                 await appointment.save();
@@ -121,6 +183,7 @@ export async function POST(request: Request) {
                     time: appointment.startTime,
                     smsSent,
                     emailSent,
+                    zaloSent,
                 });
             } else {
                 errors.push({
@@ -140,6 +203,7 @@ export async function POST(request: Request) {
             config: {
                 emailEnabled,
                 smsEnabled,
+                zaloEnabled,
             }
         });
     } catch (error: any) {

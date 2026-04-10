@@ -23,6 +23,7 @@ export interface IAppointment extends Document {
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no-show';
     notes?: string;
     source?: string;
+    bookingCode?: string;
     reminderSent?: boolean;
     reminderSentAt?: Date;
 }
@@ -56,6 +57,7 @@ const appointmentSchema = new Schema<IAppointment>(
         },
         notes: { type: String },
         source: { type: String, default: 'Direct' },
+        bookingCode: { type: String },
         reminderSent: { type: Boolean, default: false },
         reminderSentAt: { type: Date },
     },

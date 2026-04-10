@@ -232,7 +232,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                 <td className="px-6 py-4 max-w-xs">
                                                     <div className="flex items-start gap-2">
                                                         <Info className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                                        <p className="text-xs text-gray-600 truncate" title={log.details}>
+                                                        <p className="text-xs text-gray-600" title={log.details}>
                                                             {log.details || "No additional information"}
                                                         </p>
                                                     </div>
@@ -308,7 +308,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                 <td className="px-6 py-4 max-w-xs">
                                                     <div className="flex items-start gap-2">
                                                         <Info className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                                        <p className="text-xs text-gray-600 truncate" title={log.errorMessage || log.trackingId}>
+                                                        <p className="text-xs text-gray-600" title={log.errorMessage || log.trackingId}>
                                                             {log.errorMessage || `Tracking: ${log.trackingId}`}
                                                         </p>
                                                     </div>

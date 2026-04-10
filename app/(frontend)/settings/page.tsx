@@ -39,7 +39,7 @@ interface Settings {
     smtpFrom: string;
     // Reminder Settings
     reminderDaysBefore: number;
-    reminderMethod: string;
+    reminderMethods: string[];
     // AI Settings
     aiEnabled: boolean;
     openaiApiKey: string;
@@ -60,36 +60,6 @@ const defaultZaloTemplates = [
     { eventType: 'appointment_cancelled', name: 'Mẫu Hủy lịch hẹn', templateId: '' },
     { eventType: 'birthday', name: 'Mẫu Sinh nhật', templateId: '' },
 ];
-
-const normalizeStoredZaloTemplates = (templates: any[] = []) => {
-    const mapped = templates.map((template) => {
-        if (template.eventType === 'reminder') {
-            return {
-                ...template,
-                eventType: 'appointment_reminder',
-                name: 'Mẫu Nhắc lịch hẹn',
-            };
-        }
-        return template;
-    });
-
-    return mapped.filter((template, index) =>
-        mapped.findIndex((item) => item.eventType === template.eventType) === index
-    );
-};
-
-const mergeZaloTemplates = (storedTemplates: any[] = []) => {
-    const normalized = normalizeStoredZaloTemplates(storedTemplates);
-    const mergedTemplates = defaultZaloTemplates.map((defaultTemplate) => ({
-        ...defaultTemplate,
-        templateId:
-            normalized.find((t) => t.eventType === defaultTemplate.eventType)?.templateId || '',
-    }));
-    const extraTemplates = normalized.filter(
-        (t) => !defaultZaloTemplates.some((d) => d.eventType === t.eventType)
-    );
-    return [...mergedTemplates, ...extraTemplates];
-};
 
 export default function SettingsPage() {
     const { refreshSettings } = useSettings();
@@ -122,7 +92,7 @@ export default function SettingsPage() {
         smtpFrom: "",
         // Reminder Settings
         reminderDaysBefore: 1,
-        reminderMethod: "both",
+        reminderMethods: ["sms", "email"],
         // AI Settings
         aiEnabled: false,
         openaiApiKey: "",
@@ -200,7 +170,15 @@ export default function SettingsPage() {
                     smtpFrom: data.data.smtpFrom || "",
                     // Reminder Settings
                     reminderDaysBefore: data.data.reminderDaysBefore || 1,
-                    reminderMethod: data.data.reminderMethod || "both",
+                    reminderMethods: (() => {
+                        // Backward compatibility: convert old reminderMethod to array
+                        if (data.data.reminderMethod) {
+                            if (data.data.reminderMethod === 'both') return ['sms', 'email'];
+                            if (data.data.reminderMethod === 'sms') return ['sms'];
+                            if (data.data.reminderMethod === 'email') return ['email'];
+                        }
+                        return data.data.reminderMethods || ['sms', 'email'];
+                    })(),
                     // AI Settings
                     aiEnabled: data.data.aiEnabled || false,
                     openaiApiKey: data.data.openaiApiKey || "",
@@ -210,7 +188,15 @@ export default function SettingsPage() {
                     zaloEnabled: data.data.zaloEnabled || false,
                     zaloAppId: data.data.zaloAppId || '',
                     zaloSecretKey: data.data.zaloSecretKey || '',
-                    zaloTemplates: mergeZaloTemplates(Array.isArray(data.data.zaloTemplates) ? data.data.zaloTemplates : []),
+                    zaloTemplates: (() => {
+                        const storedTemplates = Array.isArray(data.data.zaloTemplates) ? data.data.zaloTemplates : [];
+                        const mergedTemplates = defaultZaloTemplates.map(defaultTemplate => ({
+                            ...defaultTemplate,
+                            templateId: storedTemplates.find((t: any) => t.eventType === defaultTemplate.eventType)?.templateId || ''
+                        }));
+                        const extraTemplates = storedTemplates.filter((t: any) => !defaultZaloTemplates.some((d) => d.eventType === t.eventType));
+                        return [...mergedTemplates, ...extraTemplates];
+                    })(),
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
                 });
@@ -231,15 +217,11 @@ export default function SettingsPage() {
         setMessage({ type: "", text: "" });
 
         try {
-            const normalizedSettings = {
-                ...settings,
-                zaloTemplates: mergeZaloTemplates(settings.zaloTemplates || []),
-            };
             const res = await fetch("/api/settings", {
                 method: "PUT",
                 credentials: 'include',
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(normalizedSettings),
+                body: JSON.stringify(settings),
             });
             const data = await res.json();
 
@@ -800,22 +782,83 @@ export default function SettingsPage() {
                             max="7"
                             placeholder="1"
                         />
-                        <FormSelect
-                            label="Reminder Method"
-                            value={settings.reminderMethod}
-                            onChange={(e: any) => setSettings({ ...settings, reminderMethod: e.target.value })}
-                            options={[
-                                { value: "both", label: "SMS & Email" },
-                                { value: "sms", label: "SMS Only" },
-                                { value: "email", label: "Email Only" }
-                            ]}
-                        />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                                Reminder Methods
+                            </label>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="reminder-sms"
+                                        checked={(settings.reminderMethods || []).includes('sms')}
+                                        onChange={(e) => {
+                                            const currentMethods = settings.reminderMethods || [];
+                                            const methods = e.target.checked
+                                                ? [...currentMethods, 'sms']
+                                                : currentMethods.filter(m => m !== 'sms');
+                                            setSettings({ ...settings, reminderMethods: methods });
+                                        }}
+                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    />
+                                    <label htmlFor="reminder-sms" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                        <MessageSquare className="w-4 h-4 text-blue-600" />
+                                        SMS
+                                    </label>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="reminder-email"
+                                        checked={(settings.reminderMethods || []).includes('email')}
+                                        onChange={(e) => {
+                                            const currentMethods = settings.reminderMethods || [];
+                                            const methods = e.target.checked
+                                                ? [...currentMethods, 'email']
+                                                : currentMethods.filter(m => m !== 'email');
+                                            setSettings({ ...settings, reminderMethods: methods });
+                                        }}
+                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    />
+                                    <label htmlFor="reminder-email" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-green-600" />
+                                        Email
+                                    </label>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="reminder-zalo"
+                                        checked={(settings.reminderMethods || []).includes('zalo')}
+                                        onChange={(e) => {
+                                            const currentMethods = settings.reminderMethods || [];
+                                            const methods = e.target.checked
+                                                ? [...currentMethods, 'zalo']
+                                                : currentMethods.filter(m => m !== 'zalo');
+                                            setSettings({ ...settings, reminderMethods: methods });
+                                        }}
+                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    />
+                                    <label htmlFor="reminder-zalo" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                        <MessageSquare className="w-4 h-4 text-blue-500" />
+                                        Zalo ZNS
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
                             <strong>Note:</strong> Reminders will be sent automatically {settings.reminderDaysBefore} day(s) before appointments via {
-                                settings.reminderMethod === 'both' ? 'SMS and Email' :
-                                    settings.reminderMethod === 'sms' ? 'SMS only' : 'Email only'
+                                (settings.reminderMethods || []).length === 0 ? 'No methods selected' :
+                                (settings.reminderMethods || []).map(method => {
+                                    switch(method) {
+                                        case 'sms': return 'SMS';
+                                        case 'email': return 'Email';
+                                        case 'zalo': return 'Zalo ZNS';
+                                        default: return method;
+                                    }
+                                }).join(', ')
                             }.
                         </p>
                     </div>

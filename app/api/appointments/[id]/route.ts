@@ -65,6 +65,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const services = cleanBody.services || existingAppointment.services;
         const staffId = cleanBody.staff || existingAppointment.staff;
         const discount = cleanBody.discount !== undefined ? cleanBody.discount : (existingAppointment.discount || 0);
+        const bookingCode = cleanBody.bookingCode || existingAppointment.bookingCode || `BOOK-${new Date().getFullYear()}-${existingAppointment._id.toString().slice(-6).toUpperCase()}`;
 
         // Recalculate financial breakdown
         const subtotal = services.reduce((acc: number, s: any) => acc + s.price, 0);
@@ -95,6 +96,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         const appointment = await Appointment.findByIdAndUpdate(id, {
             ...cleanBody,
+            bookingCode,
             subtotal,
             tax,
             totalAmount,
@@ -182,7 +184,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                             customerName: appointment.customer.name || "Quý khách",
                             appointmentDate: new Date(appointment.date).toLocaleDateString('vi-VN'),
                             appointmentTime: appointment.startTime,
-                            serviceName: servicesString
+                            serviceName: servicesString,
+                            bookingCode: appointment.bookingCode || appointment._id.toString().slice(-6).toUpperCase()
                         }
                     })
                 })

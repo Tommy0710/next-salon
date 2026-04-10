@@ -5,6 +5,7 @@ import Appointment from "@/models/Appointment";
 import Customer from "@/models/Customer";
 import Service from "@/models/Service"; // 👉 Import thêm Model Service
 import ServiceCategory from "@/models/ServiceCategory";
+import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
 
 export async function POST(request: Request) {
     try {
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
         // ==========================================
         // BƯỚC 3: TẠO LỊCH HẸN (Gắn ID Customer và ID Service)
         // ==========================================
+        const bookingCode = `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
         const appointmentPayload = {
             customer: customer._id,
             date: new Date(date),
@@ -123,6 +125,7 @@ export async function POST(request: Request) {
             totalAmount: total_amount ?? serviceDoc.price ?? 0,
             totalDuration: serviceDoc.duration,
             notes: typeof services === 'string' ? services : '',       // Lưu lại chuỗi gốc của web để đối chiếu nếu cần
+            bookingCode,
             services: [{
                 service: serviceDoc._id,
                 name: serviceDoc.name,
@@ -149,6 +152,38 @@ export async function POST(request: Request) {
         const newAppointment = await Appointment.create(appointmentPayload);
 
         console.log("✅ Đã tạo Lịch hẹn tự động:", newAppointment._id);
+
+        // ==========================================
+        // TRIGGER GỬI ZALO ZNS KHI TẠO APPOINTMENT TỪ WEBHOOK (NON-BLOCKING)
+        // ==========================================
+        if (customer.phone && newAppointment.status === 'pending') {
+            // Gom tên các dịch vụ thành 1 chuỗi
+            const servicesString = newAppointment.services.map((s: any) => s.name).join(', ');
+
+            // Lấy URL gốc của server để gọi chéo API trong Next.js
+            const baseUrl = new URL(request.url).origin;
+
+            // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
+            fetch(`${baseUrl}/api/zalo/zns`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone: customer.phone,
+                    eventType: ZALO_EVENTS.APPOINTMENT_REMINDER, // Webhook tạo appointment pending, gửi reminder
+                    payloadData: {
+                        customerName: customer.name || "Quý khách",
+                        appointmentDate: new Date(newAppointment.date).toLocaleDateString('vi-VN'),
+                        appointmentTime: newAppointment.startTime,
+                        serviceName: servicesString
+                    }
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) console.log("Cảnh báo API Zalo ZNS (webhook):", data.error || data.message);
+                })
+                .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS (webhook):", err));
+        }
 
         return NextResponse.json({ 
             success: true, 
