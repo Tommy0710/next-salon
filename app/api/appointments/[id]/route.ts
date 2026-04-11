@@ -67,27 +67,39 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const discount = cleanBody.discount !== undefined ? cleanBody.discount : (existingAppointment.discount || 0);
         const bookingCode = cleanBody.bookingCode || existingAppointment.bookingCode || `BOOK-${new Date().getFullYear()}-${existingAppointment._id.toString().slice(-6).toUpperCase()}`;
 
-        // Recalculate financial breakdown
-        const subtotal = services.reduce((acc: number, s: any) => acc + s.price, 0);
-        const tax = subtotal * (taxRate / 100);
-        const totalAmount = (subtotal + tax) - discount;
+        // Only recalculate financial breakdown if services, discount, or staff changed
+        let subtotal = existingAppointment.subtotal || 0;
+        let tax = existingAppointment.tax || 0;
+        let totalAmount = existingAppointment.totalAmount || 0;
+        let totalCommission = existingAppointment.commission || 0;
 
-        // Commission logic
-        const staff = await Staff.findById(staffId);
-        const staffRate = staff?.commissionRate || 0;
+        const servicesChanged = cleanBody.services && JSON.stringify(cleanBody.services) !== JSON.stringify(existingAppointment.services);
+        const discountChanged = cleanBody.discount !== undefined && cleanBody.discount !== (existingAppointment.discount || 0);
+        const staffChanged = cleanBody.staff && cleanBody.staff !== existingAppointment.staff;
 
-        let totalCommission = 0;
-        for (const item of services) {
-            const serviceId = item.service?._id || item.service;
-            const service = await Service.findById(serviceId);
-            const commType = service?.commissionType || 'percentage';
-            const commValue = service?.commissionValue || staffRate;
+        if (servicesChanged || discountChanged || staffChanged) {
+            // Recalculate financial breakdown only when relevant fields change
+            subtotal = services.reduce((acc: number, s: any) => acc + s.price, 0);
+            tax = subtotal * (taxRate / 100);
+            totalAmount = (subtotal + tax) - discount;
 
-            if (commType === 'percentage') {
-                const shareOfTotal = subtotal > 0 ? (totalAmount * (item.price / subtotal)) : 0;
-                totalCommission += (shareOfTotal * commValue) / 100;
-            } else {
-                totalCommission += commValue;
+            // Commission logic
+            const staff = await Staff.findById(staffId);
+            const staffRate = staff?.commissionRate || 0;
+
+            totalCommission = 0;
+            for (const item of services) {
+                const serviceId = item.service?._id || item.service;
+                const service = await Service.findById(serviceId);
+                const commType = service?.commissionType || 'percentage';
+                const commValue = service?.commissionValue || staffRate;
+
+                if (commType === 'percentage') {
+                    const shareOfTotal = subtotal > 0 ? (totalAmount * (item.price / subtotal)) : 0;
+                    totalCommission += (shareOfTotal * commValue) / 100;
+                } else {
+                    totalCommission += commValue;
+                }
             }
         }
         // 1. KIỂM TRA TRẠNG THÁI CÓ THAY ĐỔI KHÔNG TRƯỚC KHI LƯU
@@ -98,10 +110,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const appointment = await Appointment.findByIdAndUpdate(id, {
             ...cleanBody,
             bookingCode,
-            subtotal,
-            tax,
-            totalAmount,
-            commission: totalCommission
+            ...(servicesChanged || discountChanged || staffChanged ? {
+                subtotal,
+                tax,
+                totalAmount,
+                commission: totalCommission
+            } : {})
         }, { new: true });
 
         // Populate customer separately to avoid issues
@@ -115,27 +129,44 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 try {
                     const settings = await Settings.findOne();
                     const taxRate = settings?.taxRate || 0;
-                    const subtotal = populatedAppointment.subtotal;
-                    const tax = populatedAppointment.tax;
-                    const totalAmount = populatedAppointment.totalAmount;
+                    // Use the appointment's already calculated values instead of recalculating
+                    const subtotal = populatedAppointment.subtotal || 0;
+                    const tax = populatedAppointment.tax || 0;
+                    const totalAmount = populatedAppointment.totalAmount || 0;
                     const discount = populatedAppointment.discount || 0;
+                    const commission = populatedAppointment.commission || 0;
+
+                    // Ensure services array exists and has proper structure
+                    const servicesArray = Array.isArray(populatedAppointment.services) ? populatedAppointment.services : [];
+                    
+                    if (servicesArray.length === 0) {
+                        console.warn('⚠️ No services found for appointment', id);
+                    }
 
                     const count = await Invoice.countDocuments();
                     const invoiceNumber = `INV-${new Date().getFullYear()}-${(count + 1).toString().padStart(5, '0')}`;
 
-                    await Invoice.create({
+                    // Get staff rate for invoice
+                    const invoiceStaff = populatedAppointment.staff ? await Staff.findById(populatedAppointment.staff._id || populatedAppointment.staff) : null;
+                    const invoiceStaffRate = invoiceStaff?.commissionRate || 0;
+
+                    const invoiceData = {
                         invoiceNumber,
-                        customer: populatedAppointment.customer._id || populatedAppointment.customer,
+                        customer: populatedAppointment.customer?._id || populatedAppointment.customer,
                         appointment: populatedAppointment._id,
-                        items: populatedAppointment.services.map((s: any) => ({
-                            item: s.service._id || s.service,
-                            itemModel: 'Service',
-                            name: s.name,
-                            price: s.price,
-                            quantity: 1,
-                            discount: 0,
-                            total: s.price
-                        })),
+                        items: servicesArray.map((s: any) => {
+                            const serviceName = s.name || 'Unknown Service';
+                            const servicePrice = s.price || 0;
+                            return {
+                                item: s.service?._id || s.service,
+                                itemModel: 'Service',
+                                name: serviceName,
+                                price: servicePrice,
+                                quantity: 1,
+                                discount: 0,
+                                total: servicePrice
+                            };
+                        }),
                         subtotal,
                         tax,
                         discount,
@@ -145,14 +176,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                         staff: populatedAppointment.staff?._id || populatedAppointment.staff,
                         staffAssignments: populatedAppointment.staff ? [{
                             staff: populatedAppointment.staff._id || populatedAppointment.staff,
-                            percentage: staffRate,
-                            commission: totalCommission
+                            percentage: invoiceStaffRate,
+                            commission: commission
                         }] : [],
-                        commission: totalCommission,
+                        commission: commission,
                         date: populatedAppointment.date
-                    });
+                    };
+
+                    console.log('📊 Creating invoice with data:', { invoiceNumber, appointmentId: id, itemsCount: servicesArray.length });
+                    await Invoice.create(invoiceData);
+                    console.log('✅ Invoice created successfully:', invoiceNumber);
                 } catch (invoiceError: any) {
-                    console.error('Error creating invoice:', invoiceError);
+                    console.error('❌ Error creating invoice:', invoiceError?.message || invoiceError);
                     // Don't fail the whole request if invoice creation fails
                 }
             } else if (populatedAppointment.status === 'completed' && existingInvoice.status !== 'paid') {

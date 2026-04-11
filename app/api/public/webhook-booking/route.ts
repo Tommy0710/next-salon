@@ -3,9 +3,14 @@ import { connectToDB } from "@/lib/mongodb";
 import { initModels } from "@/lib/initModels";
 import Appointment from "@/models/Appointment";
 import Customer from "@/models/Customer";
-import Service from "@/models/Service"; // 👉 Import thêm Model Service
+import Service from "@/models/Service";
 import ServiceCategory from "@/models/ServiceCategory";
 import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
+import crypto from 'crypto';
+
+// In-memory deduplication cache (ngăn webhook gọi multiple times cùng lúc)
+const webhookCache = new Map<string, { id: string; timestamp: number }>();
+const CACHE_TTL = 60000; // 60 seconds
 
 export async function POST(request: Request) {
     try {
@@ -28,31 +33,63 @@ export async function POST(request: Request) {
         } = body;
 
         // ==========================================
-        // KIỂM TRA TRÙNG LẶP (Idempotency Check)
+        // LAYER 1: IN-MEMORY DEDUPLICATION (Ngăn gọi song song)
         // ==========================================
-        // Nếu appointment với customer_phone + date + startTime đã tồn tại
-        // thì return existing appointment (tránh tạo duplicate)
-        const existingAppointment = await Appointment.findOne({
-            'customer.phone': customer_phone,
-            date: new Date(date),
-            startTime: time
-        }).populate('customer');
+        const webhookFingerprint = crypto
+            .createHash('sha256')
+            .update(`${customer_phone}-${date}-${time}-${total_amount}`)
+            .digest('hex');
 
-        if (existingAppointment) {
-            console.log("⚠️ Appointment đã tồn tại:", existingAppointment._id);
+        const cachedResult = webhookCache.get(webhookFingerprint);
+        if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
+            console.log("🔄 Webhook đã xử lý gần đây (in-memory cache):", cachedResult.id);
             return NextResponse.json({
                 success: true,
-                message: "Appointment already exists",
-                appointmentId: existingAppointment._id,
-                customerId: existingAppointment.customer?._id,
-                isDuplicate: true
+                message: "Webhook already processed",
+                appointmentId: cachedResult.id,
+                isDuplicate: true,
+                cached: true
             }, { status: 200 });
+        }
+
+        // ==========================================
+        // LAYER 2: DATABASE DEDUPLICATION (Kiểm tra trong 10 phút gần nhất)
+        // ==========================================
+        // Trước tiên tìm customer
+        let customer = await Customer.findOne({ phone: customer_phone });
+        
+        // Nếu customer tồn tại, kiểm tra appointment trong 10 phút gần nhất
+        if (customer) {
+            const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+            const existingAppointment = await Appointment.findOne({
+                customer: customer._id,
+                date: {
+                    $gte: new Date(`${date}T00:00:00Z`),
+                    $lt: new Date(`${date}T23:59:59Z`)
+                },
+                startTime: time,
+                createdAt: { $gte: tenMinutesAgo }
+            });
+
+            if (existingAppointment) {
+                console.log("⚠️ Appointment đã tồn tại (DB check):", existingAppointment._id);
+                webhookCache.set(webhookFingerprint, {
+                    id: existingAppointment._id.toString(),
+                    timestamp: Date.now()
+                });
+                return NextResponse.json({
+                    success: true,
+                    message: "Appointment already exists",
+                    appointmentId: existingAppointment._id,
+                    customerId: customer._id,
+                    isDuplicate: true
+                }, { status: 200 });
+            }
         }
 
         // ==========================================
         // BƯỚC 1: XỬ LÝ KHÁCH HÀNG (Tạo mới nếu chưa có)
         // ==========================================
-        let customer = await Customer.findOne({ phone: customer_phone });
         if (!customer) {
             customer = await Customer.create({
                 name: `${customer_first_name || ''} ${customer_last_name || ''}`.trim() || 'Khách Web',
@@ -60,25 +97,22 @@ export async function POST(request: Request) {
                 email: customer_email || ""
             });
             console.log("👤 Đã tạo Khách hàng mới:", customer.name);
+        } else {
+            console.log("👤 Khách hàng đã tồn tại:", customer.name);
         }
 
         // ==========================================
         // BƯỚC 2: XỬ LÝ DỊCH VỤ (Tạo mới nếu chưa có)
         // ==========================================
-        // Dữ liệu từ web thường có kèm giờ (VD: 'Massage 60 phút: 20:00-21:00'). 
-        // Ta cần cắt bỏ phần giờ phía sau dấu ':' để lấy đúng tên dịch vụ.
         const rawServiceName = typeof services === 'string' && services.trim().length > 0
             ? services.split(':')[0].trim()
             : 'Dịch vụ từ Website';
         
-        // Dò tìm dịch vụ trong DB (không phân biệt hoa thường)
         let serviceDoc = await Service.findOne({ 
             name: { $regex: new RegExp(`^${rawServiceName}$`, 'i') } 
         });
 
-        // Nếu chưa có dịch vụ này trong hệ thống -> Tự động tạo mới
         if (!serviceDoc) {
-            // Tìm danh mục mặc định cho web, nếu không có thì tạo mới
             let defaultCategory = await ServiceCategory.findOne({ name: 'Website Bookings' });
             if (!defaultCategory) {
                 defaultCategory = await ServiceCategory.create({
@@ -86,8 +120,7 @@ export async function POST(request: Request) {
                     description: 'Danh mục tự động tạo cho các dịch vụ từ Website'
                 });
             }
-            // Thử bóc tách thời gian (duration) nếu trong tên có chữ "60 phút", "90 phút"...
-            let estimatedDuration = 60; // Mặc định 60 phút
+            let estimatedDuration = 60;
             const durationMatch = rawServiceName.match(/(\d+)\s*phút/i);
             if (durationMatch) {
                 estimatedDuration = parseInt(durationMatch[1]);
@@ -95,12 +128,14 @@ export async function POST(request: Request) {
 
             serviceDoc = await Service.create({
                 name: rawServiceName,
-                price: total_amount || 0, // Lấy giá từ webhook làm giá gốc
+                price: total_amount || 0,
                 duration: estimatedDuration,
                 description: 'Tự động tạo từ Webhook Website',
                 category: defaultCategory._id
             });
             console.log("💆‍♀️ Đã tạo Dịch vụ mới:", serviceDoc.name);
+        } else {
+            console.log("💆‍♀️ Dịch vụ đã tồn tại:", serviceDoc.name);
         }
 
         // Tính toán giờ kết thúc (endTime) dựa trên duration
@@ -200,3 +235,24 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: error?.message || "Unknown error" }, { status: 500 });
     }
 }
+
+// ==========================================
+// CACHE CLEANUP HANDLER (Prevent memory leaks)
+// ==========================================
+// Automatically clean up expired entries from the in-memory cache every 5 minutes
+setInterval(() => {
+    let expiredCount = 0;
+    const now = Date.now();
+    
+    for (const [key, value] of webhookCache.entries()) {
+        if (now - value.timestamp > CACHE_TTL) {
+            webhookCache.delete(key);
+            expiredCount++;
+        }
+    }
+    
+    // Only log if there were expired entries
+    if (expiredCount > 0) {
+        console.log(`🧹 Cleared ${expiredCount} expired webhook cache entries. Current cache size: ${webhookCache.size}`);
+    }
+}, 5 * 60 * 1000); // Every 5 minutes

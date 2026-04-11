@@ -82,6 +82,7 @@ export default function AppointmentsPage() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [formError, setFormError] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    // Default sort: by appointment date, descending (newest first)
     const [sortBy, setSortBy] = useState<'appointment' | 'createdAt'>('appointment');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -550,7 +551,7 @@ export default function AppointmentsPage() {
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('createdAt'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('createdAt'); setSortOrder(sortOrder === 'desc' ? 'desc' : 'asc'); }}>
                                                 <div className="flex items-center gap-2">
                                                     <span>Created</span>
                                                     <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'createdAt' ? 'text-blue-900' : 'text-gray-400'}`} />

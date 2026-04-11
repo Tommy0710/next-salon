@@ -69,7 +69,32 @@ export async function GET(request: NextRequest) {
                 }
             },
             // 👉 ĐÃ SỬA LỖI TÀNG HÌNH: Giữ lại cả những lịch hẹn không có nhân viên
-            { $unwind: { path: '$staff', preserveNullAndEmptyArrays: true } } 
+            { $unwind: { path: '$staff', preserveNullAndEmptyArrays: true } },
+            // Add default values for customer and staff to prevent undefined errors
+            {
+                $project: {
+                    ...Object.fromEntries([
+                        '_id', 'customer', 'staff', 'services', 'date', 'startTime', 'endTime',
+                        'totalDuration', 'subtotal', 'tax', 'totalAmount', 'discount', 'commission',
+                        'tips', 'status', 'notes', 'source', 'bookingCode', 'reminderSent',
+                        'reminderSentAt', 'createdAt', 'updatedAt'
+                    ].map(field => [field, 1])),
+                    customer: {
+                        $cond: {
+                            if: { $and: [{ $ne: ['$customer', null] }, { $ne: ['$customer', {}] }] },
+                            then: '$customer',
+                            else: { name: 'Unknown Customer', phone: '', _id: null }
+                        }
+                    },
+                    staff: {
+                        $cond: {
+                            if: { $and: [{ $ne: ['$staff', null] }, { $ne: ['$staff', {}] }] },
+                            then: '$staff',
+                            else: { name: 'No Staff Assigned', _id: null }
+                        }
+                    }
+                }
+            }
         ];
 
         // Search filter (name, phone, booking code, services)
@@ -194,44 +219,66 @@ export async function POST(request: NextRequest) {
 
         // Create invoice automatically
         if (appointment.status === 'confirmed' || appointment.status === 'completed' || !appointment.status) {
-            const lastInvoice = await Invoice.findOne().sort({ createdAt: -1 });
-            let nextNum = 1;
+            try {
+                const lastInvoice = await Invoice.findOne().sort({ createdAt: -1 });
+                let nextNum = 1;
 
-            if (lastInvoice && lastInvoice.invoiceNumber) {
-                const lastNum = parseInt(lastInvoice.invoiceNumber.split('-').pop() || "0");
-                if (!isNaN(lastNum)) {
-                    nextNum = lastNum + 1;
+                if (lastInvoice && lastInvoice.invoiceNumber) {
+                    const lastNum = parseInt(lastInvoice.invoiceNumber.split('-').pop() || "0");
+                    if (!isNaN(lastNum)) {
+                        nextNum = lastNum + 1;
+                    }
                 }
+
+                const invoiceNumber = `INV-${new Date().getFullYear()}-${nextNum.toString().padStart(5, '0')}`;
+                
+                // Ensure services array exists and has proper structure
+                const servicesArray = Array.isArray(appointment.services) ? appointment.services : [];
+                
+                if (servicesArray.length === 0) {
+                    console.warn('⚠️ No services found for appointment', appointment._id);
+                }
+
+                const invoiceData = {
+                    invoiceNumber,
+                    customer: appointment.customer,
+                    appointment: appointment._id,
+                    items: servicesArray.map((s: any) => {
+                        const serviceName = s.name || 'Unknown Service';
+                        const servicePrice = s.price || 0;
+                        return {
+                            item: s.service,
+                            itemModel: 'Service',
+                            name: serviceName,
+                            price: servicePrice,
+                            quantity: 1,
+                            discount: 0,
+                            total: servicePrice
+                        };
+                    }),
+                    subtotal: subtotal || 0,
+                    tax: tax || 0,
+                    discount: discount || 0,
+                    totalAmount: totalAmount || 0,
+                    amountPaid: 0,
+                    commission: commission || 0,
+                    staff: appointment.staff || null,
+                    staffAssignments: appointment.staff ? [{
+                        staff: appointment.staff,
+                        percentage: staffRate,
+                        commission: commission || 0
+                    }] : [],
+                    status: appointment.status === 'completed' ? 'paid' : 'pending',
+                    date: appointment.date || new Date()
+                };
+
+                console.log('📊 Creating invoice with data:', { invoiceNumber, appointmentId: appointment._id, itemsCount: servicesArray.length });
+                await Invoice.create(invoiceData);
+                console.log('✅ Invoice created successfully:', invoiceNumber);
+            } catch (invoiceError: any) {
+                console.error('❌ Error creating invoice:', invoiceError?.message || invoiceError);
+                // Don't fail the whole request if invoice creation fails
             }
-
-            const invoiceNumber = `INV-${new Date().getFullYear()}-${nextNum.toString().padStart(5, '0')}`;
-
-            await Invoice.create({
-                invoiceNumber,
-                customer: appointment.customer,
-                appointment: appointment._id,
-                items: (appointment.services || []).map((s: any) => ({
-                    item: s.service,
-                    itemModel: 'Service',
-                    name: s.name,
-                    price: s.price || 0,
-                    quantity: 1,
-                    total: s.price || 0
-                })),
-                subtotal: subtotal || 0,
-                tax: tax || 0,
-                discount: discount || 0,
-                totalAmount: totalAmount || 0,
-                commission: commission || 0,
-                staff: appointment.staff || null, // Xử lý an toàn nếu không có staff
-                staffAssignments: appointment.staff ? [{
-                    staff: appointment.staff,
-                    percentage: staffRate,
-                    commission: commission || 0
-                }] : [],
-                status: appointment.status === 'completed' ? 'paid' : 'pending',
-                date: appointment.date || new Date()
-            });
         }
 
         // ==========================================
