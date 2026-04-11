@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format, addDays, subDays, isSameDay, parse, addMinutes, startOfDay, endOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, MoreVertical, Filter, FileText, DollarSign, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, MoreVertical, Filter, FileText, DollarSign, Eye, ArrowUpDown } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -45,6 +45,8 @@ interface Appointment {
     status: string;
     notes?: string;
     source?: string;
+    bookingCode?: string;
+    createdAt?: string;
 }
 
 export default function AppointmentsPage() {
@@ -80,6 +82,8 @@ export default function AppointmentsPage() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [formError, setFormError] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [sortBy, setSortBy] = useState<'appointment' | 'createdAt'>('appointment');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     // Slot system state
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
@@ -136,7 +140,7 @@ export default function AppointmentsPage() {
 
     useEffect(() => {
         fetchAppointments();
-    }, [page, statusFilter, itemsPerPage]); // Re-fetch on filter change or items per page change
+    }, [page, statusFilter, itemsPerPage, sortBy, sortOrder]); // Re-fetch on filter change or items per page change
 
     // Debounce search
     useEffect(() => {
@@ -198,7 +202,7 @@ export default function AppointmentsPage() {
 
     const fetchAppointments = async () => {
         setLoading(true);
-        const url = `/api/appointments?page=${page}&limit=${itemsPerPage}&search=${searchTerm}&status=${statusFilter}`;
+        const url = `/api/appointments?page=${page}&limit=${itemsPerPage}&search=${searchTerm}&status=${statusFilter}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
 
         try {
             const res = await fetch(url);
@@ -214,19 +218,22 @@ export default function AppointmentsPage() {
         }
     };
 
-    const handleStatusUpdate = async (id: string, newStatus: string) => {
+    const handleStatusUpdate = async (id: string, newStatus: string, sendZalo: boolean = false) => {
         try {
             const res = await fetch(`/api/appointments/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({ status: newStatus, sendZalo }),
             });
             const data = await res.json();
             if (data.success) {
                 fetchAppointments();
+            } else {
+                alert(data.error || "Failed to update status");
             }
         } catch (error) {
             console.error("Error updating status:", error);
+            alert("An unexpected error occurred");
         }
     };
 
@@ -497,7 +504,7 @@ export default function AppointmentsPage() {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input
                                         type="text"
-                                        placeholder="Search by customer or staff name..."
+                                        placeholder="Search by customer, staff, booking code, or services..."
                                         className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -531,12 +538,24 @@ export default function AppointmentsPage() {
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Appointment</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('appointment'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                                                <div className="flex items-center gap-2">
+                                                    <span>Appointment</span>
+                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'appointment' ? 'text-blue-900' : 'text-gray-400'}`} />
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Booking Code</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Services</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('createdAt'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                                                <div className="flex items-center gap-2">
+                                                    <span>Created</span>
+                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'createdAt' ? 'text-blue-900' : 'text-gray-400'}`} />
+                                                </div>
+                                            </th>
                                             <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
@@ -544,12 +563,12 @@ export default function AppointmentsPage() {
                                         {loading && appointments.length === 0 ? (
                                             Array.from({ length: 5 }).map((_, i) => (
                                                 <tr key={i} className="animate-pulse">
-                                                    <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                                    <td colSpan={9} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                                 </tr>
                                             ))
                                         ) : appointments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                                <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
                                                     <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                     <p>No appointments found</p>
                                                 </td>
@@ -567,6 +586,11 @@ export default function AppointmentsPage() {
                                                                 <div className="text-[10px] text-gray-400 font-medium uppercase">{apt.startTime} - {apt.endTime}</div>
                                                             </div>
                                                         </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className="text-sm font-mono font-bold text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                                                            {apt.bookingCode || 'N/A'}
+                                                        </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-semibold text-gray-900">{apt.customer.name}</div>
@@ -602,6 +626,9 @@ export default function AppointmentsPage() {
                                                             {apt.status}
                                                         </span>
                                                     </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                                        {format(new Date(apt.createdAt || apt.date), "dd MMM yyyy HH:mm")}
+                                                    </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                                         <div className="relative flex justify-end dropdown-trigger">
                                                             <button
@@ -635,6 +662,30 @@ export default function AppointmentsPage() {
                                                                             Complete
                                                                         </button>
                                                                     )}
+                                                                    {apt.status === 'pending' && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                handleStatusUpdate(apt._id, 'confirmed', true);
+                                                                                setActiveDropdown(null);
+                                                                            }}
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                        >
+                                                                            <CheckCircle className="w-4 h-4" />
+                                                                            Confirm
+                                                                        </button>
+                                                                    )}
+                                                                    {apt.status !== 'cancelled' && apt.status !== 'completed' && (
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                handleStatusUpdate(apt._id, 'cancelled', true);
+                                                                                setActiveDropdown(null);
+                                                                            }}
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                                                                        >
+                                                                            <X className="w-4 h-4" />
+                                                                            Cancel
+                                                                        </button>
+                                                                    )}
                                                                     <button
                                                                         onClick={() => {
                                                                             openEditModal(apt);
@@ -654,7 +705,7 @@ export default function AppointmentsPage() {
                                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                                                     >
                                                                         <Trash2 className="w-4 h-4" />
-                                                                        Cancel/Delete
+                                                                        Delete
                                                                     </button>
                                                                 </div>
                                                             )}
@@ -969,6 +1020,14 @@ export default function AppointmentsPage() {
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1">Thời gian</label>
                                     <p className="text-sm text-gray-900">{selectedAppointment.startTime} - {selectedAppointment.endTime}</p>
+                                </div>
+                            </div>
+
+                            {/* Booking Code */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Booking Code</label>
+                                <div className="bg-blue-50 p-3 rounded-lg">
+                                    <p className="text-lg font-mono font-bold text-blue-900">{selectedAppointment.bookingCode || 'N/A'}</p>
                                 </div>
                             </div>
 

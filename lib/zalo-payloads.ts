@@ -16,7 +16,10 @@ export const buildTemplateData = (eventType: string, data: any) => {
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 
     switch (eventType) {
         case ZALO_EVENTS.CHECKOUT:

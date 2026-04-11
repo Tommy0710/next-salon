@@ -93,6 +93,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         // 1. KIỂM TRA TRẠNG THÁI CÓ THAY ĐỔI KHÔNG TRƯỚC KHI LƯU
         const isStatusChanged = cleanBody.status && cleanBody.status !== existingAppointment.status;
         const newStatus = cleanBody.status;
+        const sendZalo = cleanBody.sendZalo || false;
 
         const appointment = await Appointment.findByIdAndUpdate(id, {
             ...cleanBody,
@@ -101,62 +102,69 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             tax,
             totalAmount,
             commission: totalCommission
-        }, { new: true }).populate('customer');
+        }, { new: true });
+
+        // Populate customer separately to avoid issues
+        const populatedAppointment = await Appointment.findById(appointment._id).populate('customer').populate('staff');
 
         // If updated to confirmed or completed, check if invoice exists, if not create one
-        if (appointment && (appointment.status === 'confirmed' || appointment.status === 'completed')) {
+        if (populatedAppointment && (populatedAppointment.status === 'confirmed' || populatedAppointment.status === 'completed')) {
             initModels();
             const existingInvoice = await Invoice.findOne({ appointment: id });
             if (!existingInvoice) {
-                const settings = await Settings.findOne();
-                const taxRate = settings?.taxRate || 0;
-                const subtotal = appointment.subtotal;
-                const tax = appointment.tax;
-                const totalAmount = appointment.totalAmount;
-                const discount = appointment.discount || 0;
+                try {
+                    const settings = await Settings.findOne();
+                    const taxRate = settings?.taxRate || 0;
+                    const subtotal = populatedAppointment.subtotal;
+                    const tax = populatedAppointment.tax;
+                    const totalAmount = populatedAppointment.totalAmount;
+                    const discount = populatedAppointment.discount || 0;
 
-                const count = await Invoice.countDocuments();
-                const invoiceNumber = `INV-${new Date().getFullYear()}-${(count + 1).toString().padStart(5, '0')}`;
+                    const count = await Invoice.countDocuments();
+                    const invoiceNumber = `INV-${new Date().getFullYear()}-${(count + 1).toString().padStart(5, '0')}`;
 
-                await Invoice.create({
-                    invoiceNumber,
-                    customer: appointment.customer,
-                    appointment: appointment._id,
-                    items: appointment.services.map((s: any) => ({
-                        item: s.service,
-                        itemModel: 'Service',
-                        name: s.name,
-                        price: s.price,
-                        quantity: 1,
-                        total: s.price
-                    })),
-                    subtotal,
-                    tax,
-                    discount,
-                    totalAmount,
-                    commission: totalCommission,
-                    staff: appointment.staff,
-                    staffAssignments: appointment.staff ? [{
-                        staff: appointment.staff,
-                        percentage: staffRate,
-                        commission: totalCommission
-                    }] : [],
-                    status: appointment.status === 'completed' ? 'paid' : 'pending',
-                    date: appointment.date
-                });
-            } else if (appointment.status === 'completed' && existingInvoice.status !== 'paid') {
+                    await Invoice.create({
+                        invoiceNumber,
+                        customer: populatedAppointment.customer._id || populatedAppointment.customer,
+                        appointment: populatedAppointment._id,
+                        items: populatedAppointment.services.map((s: any) => ({
+                            item: s.service._id || s.service,
+                            itemModel: 'Service',
+                            name: s.name,
+                            price: s.price,
+                            quantity: 1,
+                            discount: 0,
+                            total: s.price
+                        })),
+                        subtotal,
+                        tax,
+                        discount,
+                        totalAmount,
+                        amountPaid: 0,
+                        status: populatedAppointment.status === 'completed' ? 'paid' : 'pending',
+                        staff: populatedAppointment.staff?._id || populatedAppointment.staff,
+                        staffAssignments: populatedAppointment.staff ? [{
+                            staff: populatedAppointment.staff._id || populatedAppointment.staff,
+                            percentage: staffRate,
+                            commission: totalCommission
+                        }] : [],
+                        commission: totalCommission,
+                        date: populatedAppointment.date
+                    });
+                } catch (invoiceError: any) {
+                    console.error('Error creating invoice:', invoiceError);
+                    // Don't fail the whole request if invoice creation fails
+                }
+            } else if (populatedAppointment.status === 'completed' && existingInvoice.status !== 'paid') {
                 // Update existing invoice status to paid if appointment is completed
                 existingInvoice.status = 'paid';
                 await existingInvoice.save();
             }
         }
         // ==========================================
-        // 2. TRIGGER GỬI ZALO ZNS (SMART & NON-BLOCKING)
-        // ==========================================
-        // ==========================================
         // 2. TRIGGER GỬI ZALO ZNS (GỌI QUA API TRUNG TÂM - NON-BLOCKING)
         // ==========================================
-        if (isStatusChanged && appointment.customer?.phone) {
+        if (sendZalo && isStatusChanged && populatedAppointment.customer?.phone) {
             let eventType = '';
 
             // Xác định loại sự kiện dựa trên trạng thái mới
@@ -168,7 +176,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
             if (eventType) {
                 // Gom tên các dịch vụ thành 1 chuỗi (VD: "Massage 60p, Gội đầu")
-                const servicesString = appointment.services.map((s: any) => s.name).join(', ');
+                const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
 
                 // 👉 Lấy URL gốc của server để gọi chéo API trong Next.js
                 const baseUrl = new URL(request.url).origin;
@@ -178,14 +186,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        phone: appointment.customer.phone,
+                        phone: populatedAppointment.customer.phone,
                         eventType: eventType,
                         payloadData: {
-                            customerName: appointment.customer.name || "Quý khách",
-                            appointmentDate: new Date(appointment.date).toLocaleDateString('vi-VN'),
-                            appointmentTime: appointment.startTime,
+                            customerName: populatedAppointment.customer.name || "Quý khách",
+                            appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
+                            appointmentTime: populatedAppointment.startTime,
                             serviceName: servicesString,
-                            bookingCode: appointment.bookingCode || appointment._id.toString().slice(-6).toUpperCase()
+                            bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
                         }
                     })
                 })
@@ -197,8 +205,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             }
         }
 
-        return NextResponse.json({ success: true, data: appointment });
+        return NextResponse.json({ success: true, data: populatedAppointment });
     } catch (error: any) {
+        console.error('PUT appointment error:', error);
         return handleApiError('UPDATE_APPOINTMENT', error);
     }
 }

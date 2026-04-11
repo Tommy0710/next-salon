@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Deposit from "@/models/Deposit";
 import Invoice from "@/models/Invoice";
+import Settings from "@/models/Settings";
 import { initModels } from "@/lib/initModels";
 
 export async function GET(request: Request) {
@@ -33,9 +34,19 @@ export async function POST(request: Request) {
         // 2. Update the invoice paidAmount and status
         const invoice = await Invoice.findById(body.invoice);
         if (invoice) {
-            // const newPaidAmount = (invoice.amountPaid || 0) + body.amount;
-            const newPaidAmount = (invoice.amountPaid || 0);
+            const newPaidAmount = (invoice.amountPaid || 0) + (body.amount || 0);
             invoice.amountPaid = newPaidAmount;
+            invoice.paymentMethod = body.paymentMethod || invoice.paymentMethod;
+            invoice.paymentQrId = body.paymentQrId || invoice.paymentQrId;
+
+            if (body.paymentMethod === 'Mã QR' && body.paymentQrId) {
+                const settings = await Settings.findOne();
+                const selectedQr = settings?.qrCodes?.find((qr: any) => qr.qrId === body.paymentQrId);
+                if (selectedQr) {
+                    invoice.qrCodeImage = selectedQr.image || invoice.qrCodeImage;
+                    invoice.bankDetails = `${selectedQr.bankName} | ${selectedQr.accountNumber} | ${selectedQr.name}`;
+                }
+            }
 
             if (newPaidAmount >= invoice.totalAmount) {
                 invoice.status = 'paid';

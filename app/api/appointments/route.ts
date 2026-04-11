@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
         const start = searchParams.get("start");
         const end = searchParams.get("end");
         const staffId = searchParams.get("staff");
+        const sortBy = searchParams.get("sortBy") || "appointment";
+        const sortOrder = searchParams.get("sortOrder") || "desc";
 
         const query: any = {};
         if (start && end) {
@@ -70,21 +72,31 @@ export async function GET(request: NextRequest) {
             { $unwind: { path: '$staff', preserveNullAndEmptyArrays: true } } 
         ];
 
-        // Search filter (name or phone)
+        // Search filter (name, phone, booking code, services)
         if (search) {
             pipeline.push({
                 $match: {
                     $or: [
                         { 'customer.name': { $regex: search, $options: 'i' } },
                         { 'customer.phone': { $regex: search, $options: 'i' } },
-                        { 'staff.name': { $regex: search, $options: 'i' } }
+                        { 'staff.name': { $regex: search, $options: 'i' } },
+                        { bookingCode: { $regex: search, $options: 'i' } },
+                        { 'services.name': { $regex: search, $options: 'i' } }
                     ]
                 }
             });
         }
 
-        // Sorting (by date and time)
-        pipeline.push({ $sort: { date: -1, startTime: -1 } });
+        // Sorting based on query params
+        let sortObject: any = {};
+        if (sortBy === 'createdAt') {
+            sortObject.createdAt = sortOrder === 'asc' ? 1 : -1;
+        } else {
+            // Default: sort by appointment date
+            sortObject.date = sortOrder === 'asc' ? 1 : -1;
+            sortObject.startTime = sortOrder === 'asc' ? 1 : -1;
+        }
+        pipeline.push({ $sort: sortObject });
 
         // Total count before pagination
         const countPipeline = [...pipeline, { $count: 'total' }];
