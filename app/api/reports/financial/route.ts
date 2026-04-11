@@ -25,6 +25,9 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
+        // 2. Xác định xem có phải Super Admin không
+        const isSuperAdmin = userRole?.name?.toLowerCase() === 'super admin' || userRole?.name?.toLowerCase() === 'super-admin';
+
         const { searchParams } = new URL(request.url);
         const startDateParam = searchParams.get("startDate");
         const endDateParam = searchParams.get("endDate");
@@ -44,17 +47,25 @@ export async function GET(request: Request) {
             status: { $ne: 'cancelled' }
         };
 
-        // 3. LOGIC LỌC THEO MÃ QR (Dành cho nhân viên)
-        const allowedQrCodes = reportPermission.allowedQrCodes || [];
+        // 3. LOGIC LỌC PAYMENT METHOD
+        // Super Admin: được xem tất cả payment methods bao gồm Cash
+        // Các role khác: chỉ được xem QR codes được phép, KHÔNG bao gồm Cash
+        if (!isSuperAdmin) {
+            const allowedQrCodes = reportPermission.allowedQrCodes || [];
+            
+            if (allowedQrCodes.length > 0) {
+                const allowedBankNames = settings.qrCodes
+                    .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
+                    .map((qr: any) => `QR Code - ${qr.bankName}`);
 
-        if (reportPermission.view === 'own' && allowedQrCodes.length > 0) {
-            const allowedBankNames = settings.qrCodes
-                .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
-                .map((qr: any) => `QR Code - ${qr.bankName}`);
-
-            // Chỉ cho phép xem Tiền mặt và các QR được chỉ định
-            invoiceQuery.paymentMethod = { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] };
+                // Chỉ cho phép xem các QR được chỉ định (KHÔNG bao gồm Cash/Tiền mặt)
+                invoiceQuery.paymentMethod = { $in: allowedBankNames };
+            } else {
+                // Nếu không có QR nào được phép, không cho xem invoice nào
+                invoiceQuery.paymentMethod = { $in: [] };
+            }
         }
+        // Super Admin không cần filter paymentMethod - được xem tất cả
 
         // 4. Bắt đầu tính toán
         const invoiceStats = await Invoice.aggregate([

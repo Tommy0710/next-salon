@@ -31,6 +31,9 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
+        // 2. Xác định xem có phải Super Admin không
+        const isSuperAdmin = userRole?.name?.toLowerCase() === 'super admin' || userRole?.name?.toLowerCase() === 'super-admin';
+
         const { searchParams } = new URL(request.url);
         const type = searchParams.get("type");
         const startDate = searchParams.get("startDate");
@@ -45,26 +48,30 @@ export async function GET(request: Request) {
             timezone
         );
 
-        // 2. CHUẨN BỊ QUERY LỌC THEO QR (GIỐNG FINANCIAL REPORT)
+        // 2. CHUẨN BỊ QUERY LỌC THEO QR
+        // Super Admin: được xem tất cả payment methods bao gồm Cash
+        // Các role khác: chỉ được xem QR codes được phép, KHÔNG bao gồm Cash
         const invoiceQuery: any = {
             date: { $gte: start, $lte: end }
         };
 
-        // Lấy mảng QR ra một biến riêng để chiều lòng TypeScript
-        const allowedQrCodes = reportPermission.allowedQrCodes || [];
-
-        if (reportPermission.view === 'own') {
-            // 1. DỰ PHÒNG CHO HÓA ĐƠN CŨ: Vẫn lấy tên ngân hàng để khớp với các hóa đơn tạo trước đây
-            const allowedBankNames = (settings.qrCodes || [])
-                .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
-                .map((qr: any) => `QR Code - ${qr.bankName}`);
-
-            invoiceQuery.$or = [
-                { paymentMethod: { $in: ['Cash', 'Tiền mặt', ...allowedBankNames] } },
-                
-                { paymentQrId: { $in: allowedQrCodes } }
-            ];
+        if (!isSuperAdmin && reportPermission.view === 'own') {
+            const allowedQrCodes = reportPermission.allowedQrCodes || [];
+            
+            if (allowedQrCodes.length > 0) {
+                // Chỉ cho phép xem các QR được chỉ định (KHÔNG bao gồm Cash/Tiền mặt)
+                invoiceQuery.$or = [
+                    { paymentMethod: { $in: (settings.qrCodes || [])
+                        .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
+                        .map((qr: any) => `QR Code - ${qr.bankName}`) } },
+                    { paymentQrId: { $in: allowedQrCodes } }
+                ];
+            } else {
+                // Nếu không có QR nào được phép, không cho xem invoice nào
+                invoiceQuery._id = null; // Query không thể match
+            }
         }
+        // Super Admin không cần filter - được xem tất cả
 
         let data: any = null;
 

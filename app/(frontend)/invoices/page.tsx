@@ -289,7 +289,7 @@ export default function InvoicesPage() {
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Paid</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Due</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff (Comm)</th>
+                                {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff (Comm)</th> */}
                                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -297,12 +297,12 @@ export default function InvoicesPage() {
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan={8} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                        <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                     </tr>
                                 ))
                             ) : invoices.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         <FileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                         <p>No invoices found</p>
                                     </td>
@@ -351,7 +351,7 @@ export default function InvoicesPage() {
                                                 {inv.status?.replace('_', ' ') || 'N/A'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        {/* <td className="px-6 py-4 whitespace-nowrap">
                                             {inv.staffAssignments && inv.staffAssignments.length > 0 ? (
                                                 <div className="space-y-1">
                                                     {inv.staffAssignments.map((assignment: any, idx: number) => (
@@ -367,7 +367,7 @@ export default function InvoicesPage() {
                                                     <div className="text-xs text-green-600 font-bold">{settings.symbol}{(inv.commission || 0).toFixed(2)}</div>
                                                 </>
                                             )}
-                                        </td>
+                                        </td> */}
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <div className="relative flex justify-end dropdown-trigger">
                                                 <button
