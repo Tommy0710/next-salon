@@ -18,11 +18,11 @@ export async function POST(request: Request) {
         initModels();
 
         const body = await request.json();
-        
+
         // 1. Map dữ liệu từ Webhook
         const {
-            date,
-            time,
+            booking_date,
+            booking_time,
             customer_first_name,
             customer_last_name,
             customer_phone,
@@ -35,14 +35,14 @@ export async function POST(request: Request) {
         // ==========================================
         // SỬA LỖI INVALID DATE: Bóc tách ngày an toàn
         // ==========================================
-        if (!date || typeof date !== 'string' || !date.includes('-')) {
-            throw new Error(`Định dạng ngày không hợp lệ: ${date}`);
+        if (!booking_date || typeof booking_date !== 'string' || !booking_date.includes('-')) {
+            throw new Error(`Định dạng ngày không hợp lệ: ${booking_date}`);
         }
-        const [year, month, day] = date.split('-').map(Number);
+        const [year, month, day] = booking_date.split('-').map(Number);
         const appointmentDate = new Date(year, month - 1, day);
-        
+
         if (Number.isNaN(appointmentDate.getTime())) {
-            throw new Error(`Không thể khởi tạo ngày từ giá trị: ${date}`);
+            throw new Error(`Không thể khởi tạo ngày từ giá trị: ${booking_date}`);
         }
 
         const appointmentDayStart = new Date(appointmentDate);
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         // ==========================================
         const webhookFingerprint = crypto
             .createHash('sha256')
-            .update(`${customer_phone}-${date}-${time}-${total_amount}`)
+            .update(`${customer_phone}-${booking_date}-${booking_time}-${total_amount}`)
             .digest('hex');
 
         const cachedResult = webhookCache.get(webhookFingerprint);
@@ -68,13 +68,13 @@ export async function POST(request: Request) {
         // LAYER 2: DATABASE DEDUPLICATION
         // ==========================================
         let customer = await Customer.findOne({ phone: customer_phone });
-        
+
         if (customer) {
             const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
             const existingAppointment = await Appointment.findOne({
                 customer: customer._id,
                 date: { $gte: appointmentDayStart, $lt: appointmentDayEnd },
-                startTime: time,
+                startTime: booking_time,
                 createdAt: { $gte: tenMinutesAgo }
             });
 
@@ -157,8 +157,8 @@ export async function POST(request: Request) {
         }
 
         // Tính toán giờ kết thúc
-        const [hours, minutes] = time.split(':').map(Number);
-        const startDate = new Date(appointmentDate);
+        const [hours, minutes] = booking_time.split(':').map(Number);
+        const startDate = new Date(appointmentDate); // Dùng biến đã parse thay vì chuỗi gốc
         startDate.setHours(hours, minutes, 0, 0);
         const endDate = new Date(startDate.getTime() + totalDuration * 60000);
         const endTimeString = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
         const appointmentPayload = {
             customer: customer._id,
             date: appointmentDate,
-            startTime: time,
+            startTime: booking_time,
             endTime: endTimeString,
             status: 'pending',
             source: source || 'Website',
