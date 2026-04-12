@@ -19,6 +19,8 @@ export async function POST(request: Request) {
 
         const body = await request.json();
 
+        console.log("📥 [WEBHOOK] Received payload:", JSON.stringify(body, null, 2));
+
         // 1. Map dữ liệu từ Webhook
         const {
             booking_date,
@@ -67,7 +69,10 @@ export async function POST(request: Request) {
         // ==========================================
         // LAYER 2: DATABASE DEDUPLICATION
         // ==========================================
-        let customer = await Customer.findOne({ phone: customer_phone });
+        let customer = null;
+        if (customer_phone && customer_phone.trim() !== '') {
+            customer = await Customer.findOne({ phone: customer_phone.trim() });
+        }
 
         if (customer) {
             const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -91,7 +96,7 @@ export async function POST(request: Request) {
         if (!customer) {
             customer = await Customer.create({
                 name: `${customer_first_name || ''} ${customer_last_name || ''}`.trim() || 'Khách Web',
-                phone: customer_phone,
+                phone: customer_phone?.trim() || '0000000000',
                 email: customer_email || ""
             });
             console.log("👤 Đã tạo Khách hàng mới:", customer.name);
@@ -100,7 +105,23 @@ export async function POST(request: Request) {
         // ==========================================
         // BƯỚC 2: XỬ LÝ MẢNG DỊCH VỤ VÀ GIÁ TIỀN
         // ==========================================
-        let parsedServices = Array.isArray(services) ? services : [];
+        const incomingServices = services || body.service;
+        let parsedServices: any[] = [];
+        
+        if (Array.isArray(incomingServices)) {
+            parsedServices = incomingServices;
+        } else if (typeof incomingServices === 'string' && incomingServices.trim() !== '') {
+            parsedServices = [{ name: incomingServices, price: Number(total_amount) || 0, duration: 60 }];
+        } else if (typeof incomingServices === 'object' && incomingServices !== null) {
+            parsedServices = [incomingServices];
+        }
+        
+        if (parsedServices.length === 0) {
+            parsedServices = [{ name: 'Dịch vụ Website', price: Number(total_amount) || 0, duration: 60 }];
+        }
+        
+        console.log("🛠️ [WEBHOOK] Parsed Services:", JSON.stringify(parsedServices, null, 2));
+
         const serviceEntries: any[] = [];
         let totalDuration = 0;
         let calculatedTotalAmount = 0;
@@ -135,7 +156,7 @@ export async function POST(request: Request) {
             }
 
             serviceEntries.push({
-                service: serviceDoc._id,
+                service: serviceDoc._id.toString(),
                 name: serviceDoc.name,
                 price: itemPrice,
                 duration: durationMinutes,
@@ -145,6 +166,8 @@ export async function POST(request: Request) {
             totalDuration += durationMinutes;
             calculatedTotalAmount += itemPrice;
         }
+        
+        console.log("📝 [WEBHOOK] Service Entries mapped:", JSON.stringify(serviceEntries, null, 2));
 
         // Xử lý Delta (Khớp tổng tiền)
         const finalAmount = Number(total_amount) || calculatedTotalAmount;
@@ -170,18 +193,24 @@ export async function POST(request: Request) {
         const servicesNotes = serviceEntries.map(s => `${s.name} (${s.price.toLocaleString()}đ)`).join(' + ');
 
         const appointmentPayload = {
-            customer: customer._id,
+            customer: customer._id.toString(),
             date: appointmentDate,
             startTime: booking_time,
             endTime: endTimeString,
             status: 'pending',
             source: source || 'Website',
             totalAmount: finalAmount,
+            subtotal: finalAmount,
+            tax: 0,
+            discount: 0,
+            commission: 0,
             totalDuration: totalDuration,
             notes: servicesNotes,
             bookingCode,
             services: serviceEntries
         };
+        
+        console.log("📅 [WEBHOOK] Appointment Payload before save:", JSON.stringify(appointmentPayload, null, 2));
 
         const newAppointment = await Appointment.create(appointmentPayload);
         webhookCache.set(webhookFingerprint, { id: newAppointment._id.toString(), timestamp: Date.now() });
@@ -214,7 +243,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, appointmentId: newAppointment._id }, { status: 201 });
 
     } catch (error: any) {
-        console.error("❌ Lỗi xử lý Webhook:", error.message);
+        console.error("❌ [WEBHOOK] Lỗi xử lý Webhook:", error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
