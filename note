@@ -1,0 +1,7 @@
+<name>	Tên khách hàng (30)	string
+<booking_code>    Mã đặt lịch (20)	string
+<schedule_time>	Thời gian (20)	13:00:00 21/03/2026
+<services>	Tên sản phẩm / Thương hiệu (200)	
+<invoice>
+<address>
+<note>

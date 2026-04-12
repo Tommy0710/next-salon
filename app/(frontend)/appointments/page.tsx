@@ -551,7 +551,10 @@ export default function AppointmentsPage() {
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('createdAt'); setSortOrder(sortOrder === 'desc' ? 'desc' : 'asc'); }}>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => {
+                                                setSortBy('createdAt');
+                                                setSortOrder(prev => sortBy === 'createdAt' ? (prev === 'asc' ? 'desc' : 'asc') : 'desc');
+                                            }}>
                                                 <div className="flex items-center gap-2">
                                                     <span>Created</span>
                                                     <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'createdAt' ? 'text-blue-900' : 'text-gray-400'}`} />
@@ -604,12 +607,22 @@ export default function AppointmentsPage() {
                                                         </div>
                                                     </td> */}
                                                     <td className="px-6 py-4">
-                                                        <div className="flex flex-wrap gap-1 max-w-xs">
-                                                            {apt.services.map((s, idx) => (
-                                                                <span key={idx} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                                                    {s.name}
-                                                                </span>
-                                                            ))}
+                                                        <div className="flex flex-col gap-2 max-w-xs">
+                                                            <div className="flex flex-wrap gap-1 overflow-hidden">
+                                                                {apt.services.slice(0, 2).map((s, idx) => (
+                                                                    <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-100 truncate max-w-[160px]" title={s.name}>
+                                                                        {s.name}
+                                                                    </span>
+                                                                ))}
+                                                                {apt.services.length > 2 && (
+                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                                        +{apt.services.length - 2} more
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-[10px] text-gray-500">
+                                                                {apt.services.length} service{apt.services.length > 1 ? 's' : ''}, {apt.services.reduce((sum, s) => sum + s.duration, 0)} min
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">

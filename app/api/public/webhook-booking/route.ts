@@ -22,15 +22,25 @@ export async function POST(request: Request) {
         // 1. Map dữ liệu từ Webhook
         const {
             date,
-            time, // Ví dụ: '20:00'
+            time,
             customer_first_name,
             customer_last_name,
             customer_phone,
             customer_email,
-            services, // Ví dụ: 'Massage toàn thân 60 phút: 20:00-21:00 '
+            services, // Có thể là string (format cũ) hoặc array objects (format mới với attendant)
             total_amount,
             source
         } = body;
+
+        const [year, month, day] = (typeof date === 'string' ? date.split('-') : []).map(Number);
+        const appointmentDate = new Date(year, month - 1, day);
+        if (Number.isNaN(appointmentDate.getTime())) {
+            throw new Error(`Invalid appointment date: ${date}`);
+        }
+        const appointmentDayStart = new Date(appointmentDate);
+        appointmentDayStart.setHours(0, 0, 0, 0);
+        const appointmentDayEnd = new Date(appointmentDate);
+        appointmentDayEnd.setHours(23, 59, 59, 999);
 
         // ==========================================
         // LAYER 1: IN-MEMORY DEDUPLICATION (Ngăn gọi song song)
@@ -64,8 +74,8 @@ export async function POST(request: Request) {
             const existingAppointment = await Appointment.findOne({
                 customer: customer._id,
                 date: {
-                    $gte: new Date(`${date}T00:00:00Z`),
-                    $lt: new Date(`${date}T23:59:59Z`)
+                    $gte: appointmentDayStart,
+                    $lt: appointmentDayEnd
                 },
                 startTime: time,
                 createdAt: { $gte: tenMinutesAgo }
@@ -102,71 +112,134 @@ export async function POST(request: Request) {
         }
 
         // ==========================================
-        // BƯỚC 2: XỬ LÝ DỊCH VỤ (Tạo mới nếu chưa có)
+        // BƯỚC 2: XỬ LÝ DỊCH VỤ (Tạo nhiều dịch vụ nếu có)
         // ==========================================
-        const rawServiceName = typeof services === 'string' && services.trim().length > 0
-            ? services.split(':')[0].trim()
-            : 'Dịch vụ từ Website';
-        
-        let serviceDoc = await Service.findOne({ 
-            name: { $regex: new RegExp(`^${rawServiceName}$`, 'i') } 
-        });
-
-        if (!serviceDoc) {
-            let defaultCategory = await ServiceCategory.findOne({ name: 'Website Bookings' });
-            if (!defaultCategory) {
-                defaultCategory = await ServiceCategory.create({
-                    name: 'Website Bookings',
-                    description: 'Danh mục tự động tạo cho các dịch vụ từ Website'
-                });
+        const parseWebhookServices = (servicesData: any) => {
+            // Kiểm tra xem services có phải là array hay string
+            if (Array.isArray(servicesData)) {
+                return servicesData
+                    .filter(item => item && item.name)
+                    .map(item => {
+                        // Parse duration từ chuỗi "HH:MM" hoặc số phút
+                        let durationMinutes = 60; // Default 60 phút
+                        if (item.duration) {
+                            if (typeof item.duration === 'string') {
+                                const [hours, minutes] = item.duration.split(':').map(Number);
+                                durationMinutes = (hours || 0) * 60 + (minutes || 0);
+                            } else if (typeof item.duration === 'number') {
+                                durationMinutes = item.duration;
+                            }
+                        }
+                        return {
+                            rawServiceName: item.name.trim(),
+                            duration: durationMinutes,
+                            price: Number(item.price) || 0,
+                            attendant: item.attendant || null,
+                            startTime: item.start_time || null,
+                            endTime: item.end_time || null
+                        };
+                    });
             }
-            let estimatedDuration = 60;
-            const durationMatch = rawServiceName.match(/(\d+)\s*phút/i);
-            if (durationMatch) {
-                estimatedDuration = parseInt(durationMatch[1]);
-            }
+            return [];
+        };
 
-            serviceDoc = await Service.create({
-                name: rawServiceName,
-                price: total_amount || 0,
-                duration: estimatedDuration,
-                description: 'Tự động tạo từ Webhook Website',
-                category: defaultCategory._id
+        const parsedServices = parseWebhookServices(services);
+        const serviceEntries: Array<{ serviceDoc: any; name: string; duration: number; price: number; attendant: string | null }> = [];
+
+        for (const parsed of parsedServices) {
+            let serviceDoc = await Service.findOne({
+                name: { $regex: new RegExp(`^${parsed.rawServiceName}$`, 'i') }
             });
-            console.log("💆‍♀️ Đã tạo Dịch vụ mới:", serviceDoc.name);
-        } else {
-            console.log("💆‍♀️ Dịch vụ đã tồn tại:", serviceDoc.name);
+
+            if (!serviceDoc) {
+                let defaultCategory = await ServiceCategory.findOne({ name: 'Website Bookings' });
+                if (!defaultCategory) {
+                    defaultCategory = await ServiceCategory.create({
+                        name: 'Website Bookings',
+                        description: 'Danh mục tự động tạo cho các dịch vụ từ Website'
+                    });
+                }
+
+                serviceDoc = await Service.create({
+                    name: parsed.rawServiceName,
+                    price: parsed.price || 0, 
+                    duration: parsed.duration,
+                    description: 'Tự động tạo từ Webhook Website',
+                    category: defaultCategory._id
+                });
+                console.log("💆‍♀️ Đã tạo Dịch vụ mới:", serviceDoc.name);
+            } else {
+                console.log("💆‍♀️ Dịch vụ đã tồn tại:", serviceDoc.name);
+            }
+
+            serviceEntries.push({
+                serviceDoc,
+                price: parsed.price || serviceDoc.price || 0,
+                name: serviceDoc.name,
+                duration: parsed.duration,
+                attendant: parsed.attendant || null
+            });
         }
 
-        // Tính toán giờ kết thúc (endTime) dựa trên duration
+        const totalDuration = serviceEntries.reduce((sum, item) => sum + item.duration, 0);
+        const amount = Number(total_amount) || 0;
+        const servicesPayload = serviceEntries.map((item, index) => {
+            const rawPrice = totalDuration > 0
+                ? Math.round((item.duration / totalDuration) * amount)
+                : item.serviceDoc.price || 0;
+
+            const servicePayload: any = {
+                service: item.serviceDoc._id,
+                name: item.name,
+                price: rawPrice,
+                duration: item.duration
+            };
+
+            // Thêm attendant nếu có
+            if (item.attendant) {
+                servicePayload.attendant = item.attendant;
+            }
+
+            return servicePayload;
+        });
+
+        if (amount > 0 && servicesPayload.length > 0) {
+            const allocated = servicesPayload.reduce((sum, item) => sum + item.price, 0);
+            const delta = amount - allocated;
+            if (delta !== 0) {
+                servicesPayload[servicesPayload.length - 1].price += delta;
+            }
+        }
+
         const [hours, minutes] = time.split(':').map(Number);
-        const startDate = new Date(date);
+        const startDate = new Date(appointmentDate);
         startDate.setHours(hours, minutes, 0, 0);
         
-        const endDate = new Date(startDate.getTime() + serviceDoc.duration * 60000);
+        const endDate = new Date(startDate.getTime() + totalDuration * 60000);
         const endTimeString = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
 
         // ==========================================
         // BƯỚC 3: TẠO LỊCH HẸN (Gắn ID Customer và ID Service)
         // ==========================================
         const bookingCode = `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+        
+        // Tạo notes từ các services được parse
+        const servicesNotes = serviceEntries
+            .map(s => `${s.name} (${s.duration} phút${s.attendant ? `, ${s.attendant}` : ''})`)
+            .join(' + ');
+        
         const appointmentPayload = {
             customer: customer._id,
-            date: new Date(date),
+            date: appointmentDate,
             startTime: time,       // Chuẩn hóa theo trường của Appointment model
             endTime: endTimeString,
             status: 'pending',     // Lịch từ web luôn là chờ xác nhận
             source: source || 'Website',
-            totalAmount: total_amount ?? serviceDoc.price ?? 0,
-            totalDuration: serviceDoc.duration,
-            notes: typeof services === 'string' ? services : '',       // Lưu lại chuỗi gốc của web để đối chiếu nếu cần
+            totalAmount: amount,
+            totalDuration,
+            notes: servicesNotes,  // Lưu lại description của các services
             bookingCode,
-            services: [{
-                service: serviceDoc._id,
-                name: serviceDoc.name,
-                price: serviceDoc.price,
-                duration: serviceDoc.duration
-            }]
+            services: servicesPayload
         };
 
         console.log("[WebhookBooking] request body:", {
@@ -176,12 +249,14 @@ export async function POST(request: Request) {
             customer_last_name,
             customer_phone,
             customer_email,
-            services,
+            services: Array.isArray(services) 
+                ? services.map(s => ({ name: s.name, duration: s.duration, attendant: s.attendant }))
+                : services,
             total_amount,
             source
         });
         console.log("[WebhookBooking] customer:", customer ? { _id: customer._id, name: customer.name, phone: customer.phone, email: customer.email } : null);
-        console.log("[WebhookBooking] serviceDoc:", serviceDoc ? { _id: serviceDoc._id, name: serviceDoc.name, duration: serviceDoc.duration, price: serviceDoc.price } : null);
+        console.log("[WebhookBooking] servicesPayload:", servicesPayload);
         console.log("[WebhookBooking] appointmentPayload:", appointmentPayload);
 
         const newAppointment = await Appointment.create(appointmentPayload);
@@ -224,7 +299,7 @@ export async function POST(request: Request) {
             success: true, 
             appointmentId: newAppointment._id,
             customerId: customer._id,
-            serviceId: serviceDoc._id
+            serviceIds: servicesPayload.map(s => s.service)
         }, { status: 201 });
 
     } catch (error: any) {
