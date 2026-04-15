@@ -21,15 +21,15 @@ export async function POST(request: Request) {
 
         console.log("📥 [WEBHOOK] Received payload:", JSON.stringify(body, null, 2));
 
-        // 1. Map dữ liệu từ Webhook
+        // 1. Map dữ liệu CHÍNH XÁC từ Payload của WordPress
         const {
             booking_date,
             booking_time,
-            customer_first_name,
-            customer_last_name,
-            customer_phone,
-            customer_email,
-            services, // Mảng các object từ WordPress
+            full_name, // Đổi từ customer_first/last_name
+            phone,     // Đổi từ customer_phone
+            email,     // Đổi từ customer_email
+            note,      // Lấy note của khách từ web
+            services,  // Mảng gốc từ WP
             total_amount,
             source
         } = body;
@@ -53,11 +53,11 @@ export async function POST(request: Request) {
         appointmentDayEnd.setHours(23, 59, 59, 999);
 
         // ==========================================
-        // LAYER 1: IN-MEMORY DEDUPLICATION
+        // LAYER 1: IN-MEMORY DEDUPLICATION (Chống trùng lặp)
         // ==========================================
         const webhookFingerprint = crypto
             .createHash('sha256')
-            .update(`${customer_phone}-${booking_date}-${booking_time}-${total_amount}`)
+            .update(`${phone}-${booking_date}-${booking_time}-${total_amount}`)
             .digest('hex');
 
         const cachedResult = webhookCache.get(webhookFingerprint);
@@ -70,8 +70,8 @@ export async function POST(request: Request) {
         // LAYER 2: DATABASE DEDUPLICATION
         // ==========================================
         let customer = null;
-        if (customer_phone && customer_phone.trim() !== '') {
-            customer = await Customer.findOne({ phone: customer_phone.trim() });
+        if (phone && phone.trim() !== '') {
+            customer = await Customer.findOne({ phone: phone.trim() });
         }
 
         if (customer) {
@@ -95,49 +95,64 @@ export async function POST(request: Request) {
         // ==========================================
         if (!customer) {
             customer = await Customer.create({
-                name: `${customer_first_name || ''} ${customer_last_name || ''}`.trim() || 'Khách Web',
-                phone: customer_phone?.trim() || '0000000000',
-                email: customer_email || ""
+                name: full_name?.trim() || 'Khách Web',
+                phone: phone?.trim() || '0000000000',
+                email: email || ""
             });
             console.log("👤 Đã tạo Khách hàng mới:", customer.name);
         }
 
         // ==========================================
-        // BƯỚC 2: XỬ LÝ MẢNG DỊCH VỤ VÀ GIÁ TIỀN
+        // BƯỚC 2: XỬ LÝ MẢNG DỊCH VỤ THÔNG MINH
         // ==========================================
-        const incomingServices = services || body.service;
         let parsedServices: any[] = [];
-        
-        if (Array.isArray(incomingServices)) {
-            parsedServices = incomingServices;
-        } else if (typeof incomingServices === 'string' && incomingServices.trim() !== '') {
-            parsedServices = [{ name: incomingServices, price: Number(total_amount) || 0, duration: 60 }];
-        } else if (typeof incomingServices === 'object' && incomingServices !== null) {
-            parsedServices = [incomingServices];
+
+        // WP Gửi sang dạng Array (Vì bạn không dùng implode)
+        if (Array.isArray(services)) {
+            parsedServices = services;
+        } else if (typeof services === 'string' && services.trim() !== '') {
+            // Dự phòng nếu lỗi plugin tự nối thành chuỗi phẩy
+            parsedServices = services.split(',').map(s => s.trim());
         }
-        
+
         if (parsedServices.length === 0) {
             parsedServices = [{ name: 'Dịch vụ Website', price: Number(total_amount) || 0, duration: 60 }];
         }
-        
-        console.log("🛠️ [WEBHOOK] Parsed Services:", JSON.stringify(parsedServices, null, 2));
 
         const serviceEntries: any[] = [];
         let totalDuration = 0;
         let calculatedTotalAmount = 0;
 
         for (const item of parsedServices) {
-            if (!item.name) continue;
-
-            const serviceName = item.name.trim();
+            let serviceName = 'Dịch vụ Web';
             let durationMinutes = 60;
-            if (item.duration && typeof item.duration === 'string') {
-                const [h, m] = item.duration.split(':').map(Number);
-                durationMinutes = (h || 0) * 60 + (m || 0);
+            let itemPrice = 0;
+
+            // Xử lý linh hoạt 2 trường hợp: Item là chuỗi HOẶC Item là Object (do WP plugin định nghĩa)
+            if (typeof item === 'string') {
+                serviceName = item.split(':')[0].trim();
+                const durationMatch = serviceName.match(/(\d+)\s*phút/i);
+                if (durationMatch) durationMinutes = parseInt(durationMatch[1]);
+            } else if (typeof item === 'object' && item !== null) {
+                serviceName = (item.name || item.title || 'Dịch vụ Web').trim();
+                itemPrice = Number(item.price) || 0;
+
+                // Xử lý duration nếu WP trả về '01:00' hoặc 60
+                if (item.duration) {
+                    if (typeof item.duration === 'number') durationMinutes = item.duration;
+                    else if (typeof item.duration === 'string' && item.duration.includes(':')) {
+                        const [h, m] = item.duration.split(':').map(Number);
+                        durationMinutes = (h || 0) * 60 + (m || 0);
+                    } else durationMinutes = parseInt(item.duration) || 60;
+                } else {
+                    const durationMatch = serviceName.match(/(\d+)\s*phút/i);
+                    if (durationMatch) durationMinutes = parseInt(durationMatch[1]);
+                }
             }
 
-            const itemPrice = Number(item.price) || 0;
+            if (!serviceName) continue;
 
+            // Tìm hoặc tạo dịch vụ trong DB
             let serviceDoc = await Service.findOne({
                 name: { $regex: new RegExp(`^${serviceName}$`, 'i') }
             });
@@ -158,39 +173,38 @@ export async function POST(request: Request) {
             serviceEntries.push({
                 service: serviceDoc._id.toString(),
                 name: serviceDoc.name,
-                price: itemPrice,
-                duration: durationMinutes,
-                attendant: item.attendant || null
+                price: itemPrice > 0 ? itemPrice : serviceDoc.price,
+                duration: durationMinutes
             });
 
             totalDuration += durationMinutes;
-            calculatedTotalAmount += itemPrice;
+            calculatedTotalAmount += (itemPrice > 0 ? itemPrice : serviceDoc.price);
         }
-        
-        console.log("📝 [WEBHOOK] Service Entries mapped:", JSON.stringify(serviceEntries, null, 2));
 
-        // Xử lý Delta (Khớp tổng tiền)
+        // Khớp Delta (Nếu giá trị WP gửi sang cao hơn/thấp hơn tính toán, nhét phần dư vào dịch vụ cuối)
         const finalAmount = Number(total_amount) || calculatedTotalAmount;
         if (finalAmount > 0 && serviceEntries.length > 0) {
             const sumOfServices = serviceEntries.reduce((sum, s) => sum + s.price, 0);
             const delta = finalAmount - sumOfServices;
-            if (delta !== 0) {
+            // Chỉ bù trừ delta nếu việc trừ tiền không làm dịch vụ cuối bị giá trị âm vô lý
+            if (delta !== 0 && serviceEntries[serviceEntries.length - 1].price + delta >= 0) {
                 serviceEntries[serviceEntries.length - 1].price += delta;
             }
         }
 
-        // Tính toán giờ kết thúc
+        // ==========================================
+        // BƯỚC 3: TÍNH THỜI GIAN & TẠO LỊCH
+        // ==========================================
         const [hours, minutes] = booking_time.split(':').map(Number);
-        const startDate = new Date(appointmentDate); // Dùng biến đã parse thay vì chuỗi gốc
+        const startDate = new Date(appointmentDate);
         startDate.setHours(hours, minutes, 0, 0);
         const endDate = new Date(startDate.getTime() + totalDuration * 60000);
         const endTimeString = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
 
-        // ==========================================
-        // BƯỚC 3: TẠO LỊCH HẸN
-        // ==========================================
         const bookingCode = `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-        const servicesNotes = serviceEntries.map(s => `${s.name} (${s.price.toLocaleString()}đ)`).join(' + ');
+        const servicesNotes = serviceEntries.map(s => `${s.name}`).join(' + ');
+        // Gom Note khách tự viết với Note dịch vụ
+        const finalNotes = note ? `Khách ghi: ${note}\n(Dịch vụ: ${servicesNotes})` : servicesNotes;
 
         const appointmentPayload = {
             customer: customer._id.toString(),
@@ -205,12 +219,10 @@ export async function POST(request: Request) {
             discount: 0,
             commission: 0,
             totalDuration: totalDuration,
-            notes: servicesNotes,
+            notes: finalNotes,
             bookingCode,
             services: serviceEntries
         };
-        
-        console.log("📅 [WEBHOOK] Appointment Payload before save:", JSON.stringify(appointmentPayload, null, 2));
 
         const newAppointment = await Appointment.create(appointmentPayload);
         webhookCache.set(webhookFingerprint, { id: newAppointment._id.toString(), timestamp: Date.now() });
@@ -229,7 +241,7 @@ export async function POST(request: Request) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     phone: customer.phone,
-                    eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
+                    eventType: 'appointment_confirmed', // Hoặc có thể là APPOINTMENT_REMINDER tùy file payload của bạn
                     payloadData: {
                         customerName: customer.name || "Quý khách",
                         appointmentDate: new Date(newAppointment.date).toLocaleDateString('vi-VN'),
@@ -243,7 +255,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, appointmentId: newAppointment._id }, { status: 201 });
 
     } catch (error: any) {
-        console.error("❌ [WEBHOOK] Lỗi xử lý Webhook:", error);
+        console.error("❌ [WEBHOOK] Lỗi xử lý:", error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
