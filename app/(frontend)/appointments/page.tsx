@@ -8,6 +8,7 @@ import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormIn
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect";
 import StaffCalendar from "@/components/appointments/StaffCalendar";
+import { formatAppointmentDateTime } from '@/lib/zaloDate';
 import { useSettings } from "@/components/providers/SettingsProvider";
 
 interface Service {
@@ -99,7 +100,51 @@ export default function AppointmentsPage() {
     // THÊM STATE CHO MODAL CHI TIẾT APPOINTMENT
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+    // 👉 HÀM GỌI API ZALO TỪ FRONTEND
+    const triggerZaloZNS = async (apt: Appointment | any, newStatus: string) => {
+        // Chỉ gửi nếu khách hàng có số điện thoại
+        if (!apt.customer?.phone) return;
 
+        // Xác định đúng eventType để Backend map với Template ID
+        let eventType = '';
+        if (newStatus === 'confirmed') eventType = 'appointment_confirmed';
+        else if (newStatus === 'cancelled') eventType = 'appointment_cancelled';
+
+        if (!eventType) return;
+
+        try {
+            // Chuẩn bị payloadData khớp chính xác với cấu trúc ở lib/zalo-payloads.ts
+            const payload = {
+                phone: apt.customer.phone,
+                eventType: eventType,
+                payloadData: {
+                    customerName: apt.customer?.name || "Quý khách",
+                    appointmentDate: formatAppointmentDateTime(apt.date, apt.startTime),
+                    bookingCode: apt.bookingCode || apt._id.substring(0, 8).toUpperCase(),
+                    serviceName: apt.services?.map((s: any) => s.name).join(', ') || "Dịch vụ Spa",
+                    status: newStatus === 'confirmed' ? "Đã xác nhận" : "Đã bị hủy",
+                    invoiceId: apt._id
+                }
+            };
+
+            // Bắn API
+            const response = await fetch("/api/zalo/zns", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                console.error("❌ Lỗi gửi Zalo:", result.error);
+            } else {
+                console.log(`✅ Đã yêu cầu gửi Zalo ZNS thành công cho trạng thái: ${newStatus}`);
+            }
+        } catch (error) {
+            console.error("❌ Lỗi hệ thống khi gọi API Zalo:", error);
+        }
+    };
     useEffect(() => {
         fetchResources();
     }, []);
@@ -228,6 +273,12 @@ export default function AppointmentsPage() {
             });
             const data = await res.json();
             if (data.success) {
+                // 👉 TÌM LẠI THÔNG TIN LỊCH HẸN VÀ GỬI ZALO
+                const aptToUpdate = appointments.find(a => a._id === id);
+                if (aptToUpdate && (newStatus === 'confirmed' || newStatus === 'cancelled')) {
+                    // Chạy ngầm không cần await để UI không bị đơ
+                    triggerZaloZNS(aptToUpdate, newStatus);
+                }
                 fetchAppointments();
             } else {
                 alert(data.error || "Failed to update status");
@@ -313,6 +364,21 @@ export default function AppointmentsPage() {
 
             const data = await res.json();
             if (data.success) {
+                const updatedApt = data.data; // Lấy dữ liệu trả về từ Backend
+
+                // 👉 GỬI ZALO NẾU TRẠNG THÁI LÀ CONFIRMED HOẶC CANCELLED
+                if (updatedApt.status === 'confirmed' || updatedApt.status === 'cancelled') {
+                    // Vì updatedApt trả về có thể chỉ chứa customer._id, ta cần lấy thông tin full từ state customers
+                    const fullCustomer = customers.find(c => c._id === formData.customerId);
+
+                    // Ghép thông tin khách hàng vào lịch hẹn để gửi Zalo
+                    const aptForZalo = {
+                        ...updatedApt,
+                        customer: fullCustomer || { phone: '', name: 'Quý khách' }
+                    };
+
+                    triggerZaloZNS(aptForZalo, updatedApt.status);
+                }
                 fetchAppointments();
                 setRefreshTrigger(prev => prev + 1);
                 closeModal();

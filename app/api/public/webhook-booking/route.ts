@@ -25,11 +25,11 @@ export async function POST(request: Request) {
         const {
             booking_date,
             booking_time,
-            full_name, // Đổi từ customer_first/last_name
-            phone,     // Đổi từ customer_phone
-            email,     // Đổi từ customer_email
-            note,      // Lấy note của khách từ web
-            services,  // Mảng gốc từ WP
+            full_name,
+            phone,
+            email,
+            note,
+            services,
             total_amount,
             source
         } = body;
@@ -211,7 +211,7 @@ export async function POST(request: Request) {
             date: appointmentDate,
             startTime: booking_time,
             endTime: endTimeString,
-            status: 'pending',
+            status: 'confirmed',
             source: source || 'Website',
             totalAmount: finalAmount,
             subtotal: finalAmount,
@@ -232,7 +232,7 @@ export async function POST(request: Request) {
         // ==========================================
         // GỬI ZALO (NON-BLOCKING)
         // ==========================================
-        if (customer.phone && newAppointment.status === 'confirm') {
+        if (customer.phone && newAppointment.status === 'confirmed') {
             const servicesString = newAppointment.services.map((s: any) => s.name).join(', ');
             const baseUrl = new URL(request.url).origin;
 

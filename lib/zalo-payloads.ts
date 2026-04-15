@@ -12,14 +12,18 @@ export const ZALO_EVENTS = {
 
 // 2. Hàm tự động lắp ráp dữ liệu (Payload) tùy theo Sự kiện
 export const buildTemplateData = (eventType: string, data: any) => {
+    const formatDateTime = (dateInput?: string | Date) => {
+        const d = dateInput ? new Date(dateInput) : new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+
+        return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+    };
     const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 
     switch (eventType) {
         case ZALO_EVENTS.CHECKOUT:
@@ -27,7 +31,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
             return {
                 customer_name: data.customerName || "Quý khách",
                 invoice_number: data.invoiceId || "HD123456",
-                date: formattedDate,
+                date: formatDateTime(now),
                 services: data.itemsName || "Dịch vụ tại Spa",
             };
 
@@ -35,7 +39,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
             // Mẫu (Ví dụ): Nhắc lịch hẹn
             return {
                 customer_name: data.customerName || "Quý khách",
-                date: data.appointmentDate || "",
+                date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
                 services: data.serviceName || "",
                 status: data.status || "Đang chờ xác nhận",
@@ -44,7 +48,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
             // Các biến này CẦN KHỚP CHÍNH XÁC với tên biến bạn đăng ký với Zalo cho Template Đặt lịch thành công
             return {
                 customer_name: data.customerName || "Quý khách",
-                date: data.appointmentDate || "",
+                date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
                 services: data.serviceName || "",
                 status: data.status || "Đã xác nhận"
@@ -54,7 +58,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
             // Các biến này CẦN KHỚP CHÍNH XÁC với tên biến bạn đăng ký với Zalo cho Template Hủy lịch
             return {
                 customer_name: data.customerName || "Quý khách",
-                date: data.appointmentDate || "",
+                date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
                 services: data.serviceName || "",
                 status: data.status || "Đã bị hủy",
