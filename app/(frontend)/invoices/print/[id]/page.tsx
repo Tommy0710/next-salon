@@ -181,9 +181,9 @@ export default function PrintInvoicePage() {
                     </FormButton>
                 </div>
             </div>
-                {statusMessage && (
-                    <div className="max-w-[400px] mx-auto text-sm text-blue-700 mb-4 print:hidden">{statusMessage}</div>
-                )}
+            {statusMessage && (
+                <div className="max-w-[400px] mx-auto text-sm text-blue-700 mb-4 print:hidden">{statusMessage}</div>
+            )}
 
             {/* Thermal Receipt Content */}
             <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-blue-900 print:border-t-0">
@@ -194,12 +194,12 @@ export default function PrintInvoicePage() {
                             <img src={settings.logoUrl} alt="Store Logo" className="w-20 h-20 mx-auto object-contain" />
                         </div>
                     )}
-                    <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1>
+                    {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1>
                     <p className="text-[11px] text-gray-500 uppercase">{settings?.address || "123 Beauty Lane, Salon City"}</p>
-                    <p className="text-[11px] text-gray-500">TEL: {settings?.phone || "000-000-0000"}</p>
-                    <div className="mt-4 border-y border-dashed border-gray-300 py-2">
+                    <p className="text-[11px] text-gray-500">TEL: {settings?.phone || "000-000-0000"}</p> */}
+                    {/* <div className="mt-4 border-y border-dashed border-gray-300 py-2">
                         <p className="font-bold text-lg">BIÊN LAI THUẾ</p>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Info Block */}
@@ -216,12 +216,12 @@ export default function PrintInvoicePage() {
                         <span className="text-gray-500">Khách hàng:</span>
                         <span className="font-bold">{invoice.customer?.name || "Khách vãng lai"}</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    {/* <div className="flex justify-between items-center">
                         <span className="text-gray-500">Trạng thái:</span>
                         <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-blue-50 text-blue-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
                             {invoice.status?.replace('_', ' ') || 'N/A'}
                         </span>
-                    </div>
+                    </div> */}
                     {invoice.appointment && (
                         <div className="flex justify-between">
                             <span className="text-gray-500">Loại:</span>
@@ -310,20 +310,20 @@ export default function PrintInvoicePage() {
                         </div>
                     )}
 
-                    <div className="pt-6 relative">
+                    <div className="pt-2 relative">
                         <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div>
                         <Scissors className="w-4 h-4 text-gray-300 absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-1" />
                         <p className="text-[11px] font-bold text-gray-900 mt-4 leading-relaxed">
                             CẢM ƠN BẠN ĐÃ CHỌN {settings?.storeName || "CHÚNG TÔI"}!<br />
                             HẸN GẶP LẠI.
                         </p>
-                        <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p>
+                        {/* <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p> */}
                     </div>
 
                     {/* <div className="pt-4 flex justify-center opacity-20">
                         <div className="flex gap-px h-8 bg-gray-900 w-full max-w-[200px]"></div>
                     </div> */}
-                    <p className="text-[8px] text-gray-300 tracking-[4px] uppercase">{invoice.invoiceNumber}</p>
+                    {/* <p className="text-[8px] text-gray-300 tracking-[4px] uppercase">{invoice.invoiceNumber}</p> */}
                 </div>
             </div>
 
