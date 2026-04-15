@@ -597,8 +597,8 @@ export default function AppointmentsPage() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-semibold text-gray-900">{apt.customer.name}</div>
-                                                        {apt.customer.phone && <div className="text-[10px] text-gray-500">{apt.customer.phone}</div>}
+                                                        <div className="text-sm font-semibold text-gray-900">{apt.customer?.name}</div>
+                                                        {apt.customer?.phone && <div className="text-[10px] text-gray-500">{apt.customer.phone}</div>}
                                                     </td>
                                                     {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2 text-sm text-gray-700">

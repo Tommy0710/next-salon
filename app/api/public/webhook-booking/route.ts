@@ -232,7 +232,7 @@ export async function POST(request: Request) {
         // ==========================================
         // GỬI ZALO (NON-BLOCKING)
         // ==========================================
-        if (customer.phone && newAppointment.status === 'pending') {
+        if (customer.phone && newAppointment.status === 'confirm') {
             const servicesString = newAppointment.services.map((s: any) => s.name).join(', ');
             const baseUrl = new URL(request.url).origin;
 
