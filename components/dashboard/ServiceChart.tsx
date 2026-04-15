@@ -38,8 +38,8 @@ export default function ServiceChart({ data }: ServiceChartProps) {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
             <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">Service Revenue Distribution</h3>
-                    <p className="text-sm text-gray-500 mt-1">Top services by revenue with easy-to-read labels.</p>
+                    <h3 className="text-lg font-bold text-gray-900">Phân bổ doanh thu dịch vụ</h3>
+                    <p className="text-sm text-gray-500 mt-1">Top dịch vụ theo doanh thu với nhãn dễ đọc.</p>
                 </div>
                 {remainingCount > 0 && (
                     <div className="text-right text-sm text-gray-500">

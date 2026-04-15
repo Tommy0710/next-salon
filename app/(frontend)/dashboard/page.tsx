@@ -6,14 +6,15 @@ import Product from '@/models/Product';
 import Invoice from '@/models/Invoice';
 import Appointment from '@/models/Appointment';
 import Settings from '@/models/Settings';
-import Role from '@/models/Role'; // 👉 Import thêm Model Role
+import Role from '@/models/Role';
 import { getCurrencySymbol } from '@/lib/currency';
 import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import SalesChart from '@/components/dashboard/SalesChart';
 import ServiceChart from '@/components/dashboard/ServiceChart';
-import { Package, DollarSign, AlertTriangle, Calendar, Users, ShoppingBag } from 'lucide-react';
-import { startOfDay, endOfDay, subDays, startOfWeek, endOfWeek, format, startOfMonth } from 'date-fns';
+import CustomerChart from '@/components/dashboard/CustomerChart'; // 👉 Import Biểu đồ khách hàng
+import { Package, DollarSign, AlertTriangle, Calendar, Users, ShoppingBag, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -25,81 +26,120 @@ export default async function DashboardPage() {
     await connectToDB();
     initModels();
 
-    // 1. KIỂM TRA QUYỀN TRUY CẬP (ROLE-BASED ACCESS CONTROL)
     const userRole = await Role.findById((session.user as any).roleId).lean();
     const reportPermission = userRole?.permissions?.reports;
-
-    // Nếu không có quyền xem báo cáo, có thể đẩy ra trang khác hoặc trả về UI rỗng
-    // Tạm thời ở đây vẫn cho vào nhưng số liệu sẽ bị lọc
-    if (!reportPermission || reportPermission.view === 'none') {
-        // Bạn có thể redirect('/unauthorized') nếu muốn làm gắt
-    }
 
     const storeSettings = await Settings.findOne() || { currency: 'USD', qrCodes: [] };
     const currencySymbol = getCurrencySymbol(storeSettings.currency);
 
-    // Date Ranges
     const todayStart = startOfDay(new Date());
     const todayEnd = endOfDay(new Date());
     const last30Days = startOfDay(subDays(new Date(), 30));
 
-    // =========================================================
-    // 2. CHUẨN BỊ BỘ LỌC DỮ LIỆU TÀI CHÍNH THEO QR CODE (LỌC KÉP)
-    // =========================================================
+    // Lọc Kép QR Code
     const allowedQrCodes = reportPermission?.allowedQrCodes || [];
-
-    // Mặc định Query là rỗng (Admin xem tất cả)
     let financialFilter: any = {};
 
-    // Nếu là nhân viên chỉ được xem "own"
     if (reportPermission?.view === 'own') {
-        // 2a. Lấy tên ngân hàng dự phòng cho hóa đơn cũ
         const allowedBankNames = (storeSettings.qrCodes || [])
             .filter((qr: any) => allowedQrCodes.includes(qr.qrId))
             .map((qr: any) => `QR Code - ${qr.bankName}`);
 
-        // 2b. Điều kiện lọc kép: Hoặc là Tiền mặt/Tên cũ, Hoặc là QR ID mới
         financialFilter = {
             $or: [
-                { paymentMethod: { $in: allowedBankNames } }, // Vớt lại hóa đơn cũ
-                { paymentQrId: { $in: allowedQrCodes } }      // Lọc hóa đơn mới
+                { paymentMethod: { $in: allowedBankNames } },
+                { paymentQrId: { $in: allowedQrCodes } }
             ]
         };
     }
 
     // =========================================================
-    // 3. FETCH STATS (ÁP DỤNG BỘ LỌC)
+    // 1. DỮ LIỆU SẢN PHẨM & TÀI CHÍNH
     // =========================================================
-
-    // -- PRODUCTS -- (Sản phẩm thường dùng chung, ít khi phân quyền theo QR, nhưng nếu cần có thể lọc)
-    const productsCount = await Product.countDocuments({ status: "active" });
     const lowStockCount = await Product.countDocuments({
         $expr: { $lte: ["$stock", "$alertQuantity"] },
         status: "active"
     });
 
-    // -- FINANCIALS (Hóa đơn hôm nay) --
-    const todaysInvoices = await Invoice.find({
+    // Lấy TẤT CẢ hóa đơn hôm nay để phân tích khách hàng
+    const allTodaysInvoices = await Invoice.find({
         date: { $gte: todayStart, $lte: todayEnd },
-        status: "paid",
-        ...financialFilter // 👉 Áp dụng bộ lọc tại đây
-    });
-    const todaysSales = todaysInvoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
-    const ordersToday = todaysInvoices.length;
+        ...financialFilter
+    }).populate('customer').lean();
 
-    // -- APPOINTMENTS -- (Lịch hẹn cũng có thể lọc theo QR nếu muốn, ở đây tạm lọc theo Staff nếu cần, hiện tại giữ chung)
-    // Nếu bạn muốn Lịch hẹn cũng bị giới hạn, hãy lọc theo staffId của session.user
-    const appointmentsToday = await Appointment.countDocuments({
-        date: { $gte: todayStart, $lte: todayEnd },
-        status: { $in: ['confirmed', 'completed'] }
+    const todaysSales = allTodaysInvoices
+        .filter(inv => inv.status === 'paid')
+        .reduce((sum, inv) => sum + inv.totalAmount, 0);
+
+    const ordersToday = allTodaysInvoices.filter(inv => inv.status === 'paid').length;
+
+    // =========================================================
+    // 2. PHÂN TÍCH KHÁCH HÀNG HÔM NAY (MỚI - CŨ - VÃNG LAI)
+    // =========================================================
+    let newCust = 0;
+    let returnCust = 0;
+    let walkIn = 0;
+    const uniqueCustomers = new Set();
+
+    allTodaysInvoices.forEach(inv => {
+        if (!inv.customer) {
+            // Hóa đơn không gắn tài khoản khách -> Vãng lai
+            walkIn++;
+        } else {
+            const cust = inv.customer as any;
+            const custId = cust._id.toString();
+
+            // Chống trùng lặp (1 khách làm 2 dịch vụ vẫn đếm là 1)
+            if (!uniqueCustomers.has(custId)) {
+                uniqueCustomers.add(custId);
+                const custCreatedAt = new Date(cust.createdAt);
+
+                // Trùng ngày tạo tài khoản với hôm nay -> Khách mới
+                if (custCreatedAt >= todayStart && custCreatedAt <= todayEnd) {
+                    newCust++;
+                } else {
+                    returnCust++; // Tạo từ trước -> Khách cũ quay lại
+                }
+            }
+        }
     });
 
-    // -- SERVICE STATS (Top dịch vụ 30 ngày) --
+    const customerChartData = [
+        { name: 'Khách mới', value: newCust },
+        { name: 'Khách cũ', value: returnCust },
+        { name: 'Vãng lai', value: walkIn }
+    ];
+
+    // =========================================================
+    // 3. PHÂN TÍCH TRẠNG THÁI LỊCH HẸN
+    // =========================================================
+    const todaysAppointments = await Appointment.find({
+        date: { $gte: todayStart, $lte: todayEnd }
+    }).lean();
+
+    const apptStats = {
+        total: todaysAppointments.length,
+        pending: 0,
+        confirmed: 0,
+        completed: 0,
+        cancelled: 0,
+    };
+
+    todaysAppointments.forEach(app => {
+        if (app.status === 'pending') apptStats.pending++;
+        else if (app.status === 'confirmed') apptStats.confirmed++;
+        else if (app.status === 'completed') apptStats.completed++;
+        else if (app.status === 'cancelled') apptStats.cancelled++;
+    });
+
+    // =========================================================
+    // 4. CHARTS & RECENT ACTIVITY
+    // =========================================================
     const monthInvoices = await Invoice.find({
         date: { $gte: last30Days, $lte: todayEnd },
         status: "paid",
-        ...financialFilter // 👉 Áp dụng bộ lọc tại đây
-    }).lean(); // Thêm .lean() cho nhẹ
+        ...financialFilter
+    }).lean();
 
     const serviceStats: Record<string, number> = {};
     monthInvoices.forEach(inv => {
@@ -115,16 +155,11 @@ export default async function DashboardPage() {
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 6);
 
-    // -- SALES CHART DATA (Doanh thu 7 ngày qua) --
     const chartData = [];
     for (let i = 6; i >= 0; i--) {
         const d = subDays(new Date(), i);
-        const s = startOfDay(d);
-        const e = endOfDay(d);
-
-        // 👉 Áp dụng bộ lọc tại đây
         const dailyInvoices = await Invoice.find({
-            date: { $gte: s, $lte: e },
+            date: { $gte: startOfDay(d), $lte: endOfDay(d) },
             status: "paid",
             ...financialFilter
         }).select('totalAmount');
@@ -133,18 +168,16 @@ export default async function DashboardPage() {
         chartData.push({ name: format(d, 'EEE'), sales: dailyTotal });
     }
 
-    // -- RECENT ACTIVITY --
-    // Lấy hóa đơn gần nhất NHƯNG phải thuộc về quyền hạn của nhân viên
     const recentInvoices = await Invoice.find({
-        ...financialFilter // 👉 Áp dụng bộ lọc tại đây
+        ...financialFilter
     }).sort({ createdAt: -1 }).limit(5).populate('customer', 'name').lean();
 
     const formattedActivity = recentInvoices.map(inv => ({
         id: inv._id.toString(),
         type: "sale" as const,
-        product: `Invoice #${inv.invoiceNumber}`,
+        product: `Hóa đơn #${inv.invoiceNumber}`,
         quantity: 1,
-        time: format(inv.createdAt, 'hh:mm a')
+        time: format(inv.createdAt, 'HH:mm')
     }));
 
     return (
@@ -154,43 +187,26 @@ export default async function DashboardPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
                     <p className="text-gray-500">
-                        Welcome back, <span className="font-semibold text-blue-800">{session.user?.name || 'User'}</span>!
-                        {reportPermission?.view === 'own' ? " Here are your assigned metrics." : " Here is what's happening today."}
+                        Xin chào, <span className="font-semibold text-blue-800">{session.user?.name || 'User'}</span>!
+                        {reportPermission?.view === 'own' ? " Dưới đây là số liệu của bạn." : " Tổng quan hoạt động Spa hôm nay."}
                     </p>
                 </div>
                 <div className="mt-4 md:mt-0">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-900 text-white">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-900 text-white shadow-sm">
                         {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                 </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* <StatCard
-                    title="Hôm nay thu về"
+            {/* DÒNG 1: CHỈ SỐ CƠ BẢN */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard
+                    title="Doanh thu hôm nay"
                     value={`${currencySymbol}${todaysSales.toLocaleString()}`}
                     icon={DollarSign}
                     color="green"
                     trendUp={true}
-                /> */}
-                <StatCard
-                    title="Lịch hẹn hôm nay"
-                    value={appointmentsToday.toString()}
-                    icon={Calendar}
-                    color="blue"
-                    trend="Tổng đài"
-                    trendUp={true}
                 />
-                {/* Chỉ Admin hoặc người có quyền xem kho mới nên quan tâm Low Stock, nhưng tạm để chung */}
-                {/* <StatCard
-                    title="Sản phẩm sắp hết"
-                    value={lowStockCount.toString()}
-                    icon={AlertTriangle}
-                    color="red"
-                    trend={lowStockCount > 0 ? "Cần nhập hàng" : "Ổn định"}
-                    trendUp={lowStockCount === 0}
-                /> */}
                 <StatCard
                     title="Đơn hàng hoàn tất"
                     value={ordersToday.toString()}
@@ -199,15 +215,73 @@ export default async function DashboardPage() {
                     trend="Hôm nay"
                     trendUp={true}
                 />
+                <StatCard
+                    title="Sản phẩm sắp hết"
+                    value={lowStockCount.toString()}
+                    icon={AlertTriangle}
+                    color="red"
+                    trend={lowStockCount > 0 ? "Cần nhập hàng" : "Ổn định"}
+                    trendUp={lowStockCount === 0}
+                />
             </div>
 
-            {/* Charts Section */}
+            {/* DÒNG 2: CHI TIẾT KHÁCH HÀNG & LỊCH HẸN */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Block 1: Biểu đồ khách hàng */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-600" />
+                        Khách hàng hôm nay <span className="ml-auto bg-blue-50 text-blue-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
+                    </h3>
+                    <CustomerChart data={customerChartData} />
+                </div>
+
+                {/* Block 2: Trạng thái Lịch hẹn */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-indigo-600" />
+                        Tình trạng lịch hẹn <span className="ml-auto bg-indigo-50 text-indigo-700 py-1 px-3 rounded-full text-sm">{apptStats.total} lịch</span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-100 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                                <Clock className="w-4 h-4" />
+                                <span className="text-sm font-semibold">Chờ xác nhận</span>
+                            </div>
+                            <p className="text-3xl font-black text-yellow-900">{apptStats.pending}</p>
+                        </div>
+                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-blue-800 mb-2">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-semibold">Đã xác nhận</span>
+                            </div>
+                            <p className="text-3xl font-black text-blue-900">{apptStats.confirmed}</p>
+                        </div>
+                        <div className="p-4 bg-green-50 rounded-xl border border-green-100 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-green-800 mb-2">
+                                <CheckCircle className="w-4 h-4" />
+                                <span className="text-sm font-semibold">Đã hoàn tất</span>
+                            </div>
+                            <p className="text-3xl font-black text-green-900">{apptStats.completed}</p>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-gray-600 mb-2">
+                                <XCircle className="w-4 h-4" />
+                                <span className="text-sm font-semibold">Đã hủy</span>
+                            </div>
+                            <p className="text-3xl font-black text-gray-800">{apptStats.cancelled}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* DÒNG 3: BIỂU ĐỒ DOANH THU & DỊCH VỤ */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SalesChart data={chartData} />
                 <ServiceChart data={serviceChartData} />
             </div>
 
-            {/* Recent Activity Section */}
+            {/* DÒNG 4: HOẠT ĐỘNG GẦN ĐÂY */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Giao dịch gần đây</h3>
                 <RecentActivity activities={formattedActivity} />
