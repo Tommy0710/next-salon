@@ -231,10 +231,10 @@ export async function POST(request: NextRequest) {
                 }
 
                 const invoiceNumber = `INV-${new Date().getFullYear()}-${nextNum.toString().padStart(5, '0')}`;
-                
+
                 // Ensure services array exists and has proper structure
                 const servicesArray = Array.isArray(appointment.services) ? appointment.services : [];
-                
+
                 if (servicesArray.length === 0) {
                     console.warn('⚠️ No services found for appointment', appointment._id);
                 }
@@ -243,6 +243,7 @@ export async function POST(request: NextRequest) {
                     invoiceNumber,
                     customer: appointment.customer,
                     appointment: appointment._id,
+                    bookingCode: appointment.bookingCode,
                     items: servicesArray.map((s: any) => {
                         const serviceName = s.name || 'Unknown Service';
                         const servicePrice = s.price || 0;

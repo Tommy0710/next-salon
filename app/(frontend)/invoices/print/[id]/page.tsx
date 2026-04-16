@@ -169,7 +169,7 @@ export default function PrintInvoicePage() {
                         onClick={handleMarkAsPaid}
                         loading={actionLoading}
                         disabled={currentStatus === 'paid' || actionLoading}
-                        className={`gap-2 ${currentStatus === 'paid' ? 'bg-green-600 hover:bg-green-600' : 'bg-blue-900 hover:bg-blue-800'}`}
+                        className={`gap-2 ${currentStatus === 'paid' ? 'bg-green-600 hover:bg-green-600' : 'bg-primary-900 hover:bg-primary-800'}`}
                     >
                         {currentStatus === 'paid' ? 'Đã thanh toán' : 'Hoàn thành'}
                     </FormButton>
@@ -218,7 +218,7 @@ export default function PrintInvoicePage() {
                     </div>
                     {/* <div className="flex justify-between items-center">
                         <span className="text-gray-500">Trạng thái:</span>
-                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-blue-50 text-blue-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
+                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-primary-50 text-blue-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
                             {invoice.status?.replace('_', ' ') || 'N/A'}
                         </span>
                     </div> */}
@@ -246,7 +246,7 @@ export default function PrintInvoicePage() {
                                 <td className="py-2 align-top">
                                     <span className="font-medium">{item.name}</span>
                                     {item.discount > 0 && <p className="text-[9px] text-red-500">Giảm: -{currencySymbol}{item.discount.toFixed(2)}</p>}
-                                    {item.itemModel === 'Service' && <p className="text-[9px] text-gray-400">Dịch vụ chuyên nghiệp</p>}
+                                    {/* {item.itemModel === 'Service' && <p className="text-[9px] text-gray-400">Dịch vụ chuyên nghiệp</p>} */}
                                 </td>
                                 <td className="py-2 text-center align-top">{item.quantity}</td>
                                 <td className="py-2 text-right align-top">{currencySymbol}{item.price.toFixed(2)}</td>
@@ -276,12 +276,12 @@ export default function PrintInvoicePage() {
                         <span>Tổng cộng</span>
                         <span>{currencySymbol}{invoice.totalAmount.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-green-700 font-bold">
+                    <div className="flex justify-between font-bold">
                         <span>Đã thanh toán</span>
                         <span>{currencySymbol}{invoice.amountPaid.toFixed(2)}</span>
                     </div>
                     {invoice.totalAmount - invoice.amountPaid > 0 && (
-                        <div className="flex justify-between text-red-600 font-bold border-t border-dashed border-red-100 mt-1 pt-1">
+                        <div className="flex justify-between font-bold border-t border-dashed border-red-100 mt-1 pt-1">
                             <span>Số dư còn lại</span>
                             <span>{currencySymbol}{(invoice.totalAmount - invoice.amountPaid).toFixed(2)}</span>
                         </div>
@@ -297,7 +297,7 @@ export default function PrintInvoicePage() {
 
                     {/* THÊM KHỐI NÀY ĐỂ HIỂN THỊ MÃ QR */}
                     {showQr && qrSource && (
-                        <div className="mt-6 flex flex-col items-center border-t border-dashed border-gray-300 pt-6">
+                        <div className="mt-4 flex flex-col items-center">
                             <p className="text-[12px] font-black uppercase mb-2">Quét mã để thanh toán</p>
                             <img src={qrSource} alt="QR Code Payment" className="w-40 h-40 object-contain p-1 border border-gray-200 rounded-lg" />
                             {bankDetailsSource && (

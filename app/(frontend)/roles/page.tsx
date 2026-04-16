@@ -96,7 +96,7 @@ export default function RolesPage() {
                         <PermissionGate resource="roles" action="create">
                             <Link
                                 href="/roles/new"
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                             >
                                 <Plus className="w-4 h-4" />
                                 Create Role
@@ -159,7 +159,7 @@ export default function RolesPage() {
                                         <tr key={role._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${role.isSystem ? 'bg-purple-100' : 'bg-blue-100'}`}>
+                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${role.isSystem ? 'bg-purple-100' : 'bg-primary-100'}`}>
                                                         <Shield className={`w-4 h-4 ${role.isSystem ? 'text-purple-600' : 'text-blue-600'}`} />
                                                     </div>
                                                     <div>
@@ -194,7 +194,7 @@ export default function RolesPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === role._id ? null : role._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -204,7 +204,7 @@ export default function RolesPage() {
                                                             <PermissionGate resource="roles" action="edit">
                                                                 <Link
                                                                     href={`/roles/${role._id}`}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
                                                                     <Edit className="w-4 h-4 text-blue-600" />
                                                                     Edit Role
@@ -268,7 +268,7 @@ export default function RolesPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-blue-900 text-white"
+                                                ? "bg-primary-900 text-white"
                                                 : "text-gray-600 hover:bg-gray-100"
                                                 }`}
                                         >

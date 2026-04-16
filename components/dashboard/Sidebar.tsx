@@ -225,7 +225,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                                             title={isSidebarCollapsed ? item.name : ""}
                                             className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
                                                 ${isActive
-                                                    ? "bg-blue-900 text-white shadow-lg shadow-blue-900/20"
+                                                    ? "bg-primary-900 text-white shadow-lg shadow-blue-900/20"
                                                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                                 } ${isSidebarCollapsed ? "justify-center" : ""}`}
                                         >

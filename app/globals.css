@@ -3,6 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,18 +23,53 @@
   }
 }
 
+/* 
+@layer base {
+  :root {
+    --color-primary: hsl(0, 0%, 0%);
+    --color-secondary: hsl(0, 0%, 50%);
+    --color-text-base: hsl(0, 0%, 100%);
+    --color-bg-primary: hsl(0, 0%, 100%);
+  }
+}
+
+theme-black {
+  --color-primary: □hsl(0, 0%, 0%);
+  --color-secondary: hsl(0, 0%, 50%);
+}
+
+theme-orange {
+  --color-primary: hsl(25, 100%, 50%);
+  --color-secondary: hsl(25, 100%, 65%);
+}
+
+theme-purple {
+  --color-primary: hsl(270, 100%, 50%);
+  --color-secondary: hsl(270, 100%, 75%);
+}
+
+theme-green {
+  --color-primary: hsl(120, 100%, 35%);
+  --color-secondary: hsl(120, 100%, 45%);
+}
+
+theme-blue {
+  --color-primary: hsl(220, 100%, 50%);
+  --color-secondary: hsl(220, 100%, 75%);
+} */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 
-               'Segoe UI', Roboto, 'Helvetica Neue', Arial, 
-               'Noto Sans', 'Liberation Sans', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', 'Liberation Sans', sans-serif;
 }
 
 button {
   cursor: pointer;
 }
+
 .nowrap {
   white-space: nowrap;
 }
@@ -60,6 +96,6 @@ button {
 /* 3. Custom Utilities (Các class tiện ích nhỏ) */
 @layer utilities {
   .nowrap {
-  white-space: nowrap;
-}
+    white-space: nowrap;
+  }
 }

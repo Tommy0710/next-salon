@@ -204,7 +204,7 @@ export default function PayrollPage() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "paid": return "bg-green-100 text-green-700 border-green-200";
-            case "approved": return "bg-blue-100 text-blue-700 border-blue-200";
+            case "approved": return "bg-primary-100 text-blue-700 border-blue-200";
             default: return "bg-gray-100 text-gray-700 border-gray-200";
         }
     };
@@ -221,7 +221,7 @@ export default function PayrollPage() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsGenerateModalOpen(true)}
-                            className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                            className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                         >
                             <Plus className="w-4 h-4" />
                             Generate Payroll
@@ -286,7 +286,7 @@ export default function PayrollPage() {
                                         <tr key={payroll._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
+                                                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-blue-700 font-bold text-xs">
                                                         {payroll.staff.name.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900">{payroll.staff.name}</span>
@@ -326,7 +326,7 @@ export default function PayrollPage() {
                                                     </button>
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === payroll._id ? null : payroll._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -338,7 +338,7 @@ export default function PayrollPage() {
                                                                     viewDetails(payroll);
                                                                     setActiveDropdown(null);
                                                                 }}
-                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                             >
                                                                 <FileText className="w-4 h-4 text-blue-600" />
                                                                 View Details
@@ -419,7 +419,7 @@ export default function PayrollPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-blue-900 text-white"
+                                                ? "bg-primary-900 text-white"
                                                 : "text-gray-600 hover:bg-gray-100"
                                                 }`}
                                         >
@@ -536,7 +536,7 @@ export default function PayrollPage() {
                                 />
                             </div>
 
-                            <div className="flex justify-between py-3 bg-blue-50 px-3 rounded-lg mt-2">
+                            <div className="flex justify-between py-3 bg-primary-50 px-3 rounded-lg mt-2">
                                 <span className="font-bold text-gray-900">Final Total</span>
                                 <span className="font-bold text-blue-900 text-lg">
                                     {settings.symbol}{(selectedPayroll.baseSalary + selectedPayroll.totalCommission + selectedPayroll.totalTips + editPayrollData.bonuses - editPayrollData.deductions).toLocaleString()}

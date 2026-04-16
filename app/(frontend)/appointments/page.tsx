@@ -541,7 +541,7 @@ export default function AppointmentsPage() {
                         setFormError("");
                         setIsModalOpen(true);
                     }}
-                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors flex items-center gap-2 font-medium"
+                    className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors flex items-center gap-2 font-medium"
                 >
                     <Plus className="w-4 h-4" />
                     New Appointment
@@ -648,7 +648,7 @@ export default function AppointmentsPage() {
                                                 <tr key={apt._id} className="hover:bg-gray-50/50 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="p-2 bg-blue-50 rounded-lg">
+                                                            <div className="p-2 bg-primary-50 rounded-lg">
                                                                 <Clock className="w-4 h-4 text-blue-900" />
                                                             </div>
                                                             <div>
@@ -658,7 +658,7 @@ export default function AppointmentsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="text-sm font-mono font-bold text-blue-900 bg-blue-50 px-2 py-1 rounded">
+                                                        <span className="text-sm font-mono font-bold text-blue-900 bg-primary-50 px-2 py-1 rounded">
                                                             {apt.bookingCode || 'N/A'}
                                                         </span>
                                                     </td>
@@ -676,7 +676,7 @@ export default function AppointmentsPage() {
                                                         <div className="flex flex-col gap-2 max-w-xs">
                                                             <div className="flex flex-wrap gap-1 overflow-hidden">
                                                                 {apt.services.slice(0, 2).map((s, idx) => (
-                                                                    <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-100 truncate max-w-[160px]" title={s.name}>
+                                                                    <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-50 text-blue-800 border border-blue-100 truncate max-w-[160px]" title={s.name}>
                                                                         {s.name}
                                                                     </span>
                                                                 ))}
@@ -699,7 +699,7 @@ export default function AppointmentsPage() {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${apt.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                            apt.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                            apt.status === 'completed' ? 'bg-primary-50 text-blue-700 border-blue-200' :
                                                                 apt.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                                                     'bg-gray-100 text-gray-700 border-gray-200'
                                                             }`}>
@@ -713,7 +713,7 @@ export default function AppointmentsPage() {
                                                         <div className="relative flex justify-end dropdown-trigger">
                                                             <button
                                                                 onClick={() => setActiveDropdown(activeDropdown === apt._id ? null : apt._id)}
-                                                                className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                                className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                             >
                                                                 <MoreVertical className="w-5 h-5" />
                                                             </button>
@@ -725,7 +725,7 @@ export default function AppointmentsPage() {
                                                                             openDetailModal(apt);
                                                                             setActiveDropdown(null);
                                                                         }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-primary-50 transition-colors"
                                                                     >
                                                                         <Eye className="w-4 h-4" />
                                                                         Xem thông tin
@@ -748,7 +748,7 @@ export default function AppointmentsPage() {
                                                                                 handleStatusUpdate(apt._id, 'confirmed', true);
                                                                                 setActiveDropdown(null);
                                                                             }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-primary-50 transition-colors"
                                                                         >
                                                                             <CheckCircle className="w-4 h-4" />
                                                                             Confirm
@@ -771,7 +771,7 @@ export default function AppointmentsPage() {
                                                                             openEditModal(apt);
                                                                             setActiveDropdown(null);
                                                                         }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                     >
                                                                         <Edit className="w-4 h-4 text-blue-600" />
                                                                         Edit Details
@@ -842,7 +842,7 @@ export default function AppointmentsPage() {
                                                     key={pageNum}
                                                     onClick={() => setPage(pageNum)}
                                                     className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                        ? "bg-blue-900 text-white"
+                                                        ? "bg-primary-900 text-white"
                                                         : "text-gray-600 hover:bg-gray-100"
                                                         }`}
                                                 >
@@ -900,7 +900,7 @@ export default function AppointmentsPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsAddCustomerModalOpen(true)}
-                                    className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                    className="p-3 bg-primary-100 text-blue-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
@@ -946,8 +946,8 @@ export default function AppointmentsPage() {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
                                             className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
-                                                ? "bg-blue-900 text-white border-blue-900 shadow-lg scale-105"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-blue-50"
+                                                ? "bg-primary-900 text-white border-blue-900 shadow-lg scale-105"
+                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-primary-50"
                                                 }`}
                                         >
                                             {slot.startTime}
@@ -1067,7 +1067,7 @@ export default function AppointmentsPage() {
                                 type="button"
                                 onClick={handleCreateCustomer}
                                 disabled={isSubmittingCustomer}
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmittingCustomer ? "Đang tạo..." : "Tạo Khách Hàng"}
                             </button>
@@ -1106,7 +1106,7 @@ export default function AppointmentsPage() {
                             {/* Booking Code */}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">Booking Code</label>
-                                <div className="bg-blue-50 p-3 rounded-lg">
+                                <div className="bg-primary-50 p-3 rounded-lg">
                                     <p className="text-lg font-mono font-bold text-blue-900">{selectedAppointment.bookingCode || 'N/A'}</p>
                                 </div>
                             </div>
@@ -1171,7 +1171,7 @@ export default function AppointmentsPage() {
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-1">Trạng thái</label>
                                     <span className={`text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${selectedAppointment.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
-                                        selectedAppointment.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                        selectedAppointment.status === 'completed' ? 'bg-primary-50 text-blue-700 border-blue-200' :
                                             selectedAppointment.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                                 'bg-gray-100 text-gray-700 border-gray-200'
                                         }`}>
@@ -1199,7 +1199,7 @@ export default function AppointmentsPage() {
                             <button
                                 type="button"
                                 onClick={closeDetailModal}
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors"
                             >
                                 Đóng
                             </button>

@@ -136,7 +136,7 @@ export default function AIReportsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-3">
+                        <div className="p-4 bg-primary-50 border border-blue-100 rounded-xl flex items-center gap-3">
                             <TrendingUp className="w-5 h-5 text-blue-600" />
                             <span className="text-xs font-medium text-blue-800">Growth Analysis Included</span>
                         </div>
@@ -179,20 +179,20 @@ export default function AIReportsPage() {
                                             <p className="text-gray-500 text-sm mt-1">Prepared by AI-Powered Business Analytics</p>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Report Content */}
                                     <div className="px-12 py-10">
                                         <div className="space-y-10">
                                             {analysis.split('\n\n').map((paragraph, paraIndex) => {
                                                 const trimmedParagraph = paragraph.trim();
                                                 if (!trimmedParagraph) return null;
-                                                
+
                                                 // Check if it's a numbered section (e.g., "1. Executive Summary")
                                                 if (trimmedParagraph.match(/^\d+\./)) {
                                                     const [titleLine, ...contentLines] = trimmedParagraph.split('\n');
                                                     const title = titleLine.replace(/^\d+\.\s*/, '');
                                                     const content = contentLines.join('\n');
-                                                    
+
                                                     return (
                                                         <div key={paraIndex} className="mb-10">
                                                             <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-300 pb-2">{title}</h2>
@@ -200,7 +200,7 @@ export default function AIReportsPage() {
                                                                 {content.split('\n').map((line, lineIndex) => {
                                                                     const cleanLine = line.trim();
                                                                     if (!cleanLine) return null;
-                                                                    
+
                                                                     // Handle asterisk bullet points
                                                                     if (cleanLine.startsWith('* ')) {
                                                                         return (
@@ -210,7 +210,7 @@ export default function AIReportsPage() {
                                                                             </div>
                                                                         );
                                                                     }
-                                                                    
+
                                                                     // Regular text
                                                                     return (
                                                                         <p key={lineIndex} className="text-gray-700 mb-2">{cleanLine}</p>
@@ -220,7 +220,7 @@ export default function AIReportsPage() {
                                                         </div>
                                                     );
                                                 }
-                                                
+
                                                 // Handle double-dash separators
                                                 if (trimmedParagraph === '--') {
                                                     return (
@@ -229,7 +229,7 @@ export default function AIReportsPage() {
                                                         </div>
                                                     );
                                                 }
-                                                
+
                                                 // Regular paragraph
                                                 return (
                                                     <div key={paraIndex} className="mb-6">
@@ -239,7 +239,7 @@ export default function AIReportsPage() {
                                             })}
                                         </div>
                                     </div>
-                                    
+
                                     {/* Report Footer */}
                                     <div className="bg-gray-50 border-t border-gray-300 px-12 py-6">
                                         <div className="text-center text-sm text-gray-500">

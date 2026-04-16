@@ -321,7 +321,7 @@ export default function StaffSlotsPage() {
                         </div>
 
                         {selectedStaffData && (
-                            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-blue-100">
                                 <div className="flex items-center gap-2 text-sm text-blue-900">
                                     <User className="w-4 h-4" />
                                     <span className="font-semibold">{selectedStaffData.name}</span>
@@ -348,7 +348,7 @@ export default function StaffSlotsPage() {
                                 <PermissionGate resource="staffSlots" action="create">
                                     <button
                                         onClick={openModal}
-                                        className="px-4 py-2 text-sm bg-blue-900 text-white rounded-lg hover:bg-blue-800 flex items-center gap-2"
+                                        className="px-4 py-2 text-sm bg-primary-900 text-white rounded-lg hover:bg-primary-800 flex items-center gap-2"
                                     >
                                         <Plus className="w-4 h-4" />
                                         Create New Slot
@@ -419,7 +419,7 @@ export default function StaffSlotsPage() {
                                             <FormButton
                                                 onClick={handleSave}
                                                 loading={saving}
-                                                className="bg-blue-900 hover:bg-blue-800"
+                                                className="bg-primary-900 hover:bg-primary-800"
                                             >
                                                 <Save className="w-4 h-4 mr-2" />
                                                 Save All Slots
@@ -442,7 +442,7 @@ export default function StaffSlotsPage() {
 
                     <Modal isOpen={isModalOpen} onClose={closeModal} title="Create Time Slots">
                         <div className="space-y-4">
-                            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="p-3 bg-primary-50 border border-blue-200 rounded-lg">
                                 <p className="text-sm text-blue-800">
                                     <strong>Template:</strong> Multiple slots will be created for <strong>{creationType === 'date' ? selectedDate : selectedDay}</strong>.
                                 </p>
@@ -497,7 +497,7 @@ export default function StaffSlotsPage() {
                                 </button>
                                 <FormButton
                                     onClick={handleAddSlot}
-                                    className="bg-blue-900 hover:bg-blue-800"
+                                    className="bg-primary-900 hover:bg-primary-800"
                                 >
                                     Create Slots
                                 </FormButton>

@@ -17,7 +17,11 @@ interface Invoice {
         name: string;
         phone: string;
     };
-    appointment?: string;
+    appointment?: {
+        _id: string;
+        // bookingCode?: string;
+    };
+    bookingCode?: string;
     items: any[];
     subtotal: number;
     tax: number;
@@ -225,7 +229,7 @@ export default function InvoicesPage() {
                 <div className="flex items-center gap-3">
                     <Link
                         href="/pos"
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors shadow-sm font-medium"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors shadow-sm font-medium"
                     >
                         <Plus className="w-4 h-4" />
                         Create Invoice (POS)
@@ -312,7 +316,7 @@ export default function InvoicesPage() {
                                     <tr key={inv._id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
-                                                <div className="p-2 bg-blue-50 rounded-lg">
+                                                <div className="p-2 bg-primary-50 rounded-lg">
                                                     <FileText className="w-4 h-4 text-blue-900" />
                                                 </div>
                                                 <div>
@@ -330,6 +334,12 @@ export default function InvoicesPage() {
                                                 }`}>
                                                 {inv.appointment ? 'Appointment' : 'POS'}
                                             </span>
+                                            {/* 👉 HIỂN THỊ BOOKING CODE NẾU CÓ */}
+                                            {inv.bookingCode && (
+                                                <span className="text-[10px] text-gray-400 font-mono mt-1 font-medium">
+                                                    #{inv.bookingCode}
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="text-sm font-bold text-gray-900">{settings.symbol}{(inv.totalAmount || 0).toFixed(2)}</span>
@@ -344,7 +354,7 @@ export default function InvoicesPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${inv.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                inv.status === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                inv.status === 'partially_paid' ? 'bg-primary-50 text-blue-700 border-blue-200' :
                                                     inv.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                                         'bg-red-50 text-red-700 border-red-200'
                                                 }`}>
@@ -372,7 +382,7 @@ export default function InvoicesPage() {
                                             <div className="relative flex justify-end dropdown-trigger">
                                                 <button
                                                     onClick={() => setActiveDropdown(activeDropdown === inv._id ? null : inv._id)}
-                                                    className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                    className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                 >
                                                     <MoreVertical className="w-5 h-5" />
                                                 </button>
@@ -393,7 +403,7 @@ export default function InvoicesPage() {
                                                         )}
                                                         <Link
                                                             href={`/invoices/print/${inv._id}`}
-                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                             onClick={() => setActiveDropdown(null)}
                                                         >
                                                             <Eye className="w-4 h-4 text-blue-600" />
@@ -462,7 +472,7 @@ export default function InvoicesPage() {
                                         key={pageNum}
                                         onClick={() => handlePageChange(pageNum)}
                                         className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${pagination.page === pageNum
-                                            ? "bg-blue-900 text-white"
+                                            ? "bg-primary-900 text-white"
                                             : "text-gray-600 hover:bg-gray-100"
                                             }`}
                                     >
@@ -489,7 +499,7 @@ export default function InvoicesPage() {
                 title={`Record Payment for ${payingInvoice?.invoiceNumber}`}
             >
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg mb-4 flex justify-between items-center text-blue-900">
+                    <div className="bg-primary-50 p-4 rounded-lg mb-4 flex justify-between items-center text-blue-900">
                         <span className="text-sm font-medium">Total Balance Due</span>
                         <span className="text-xl font-bold">{settings.symbol}{(payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0).toFixed(2)}</span>
                     </div>
@@ -513,7 +523,7 @@ export default function InvoicesPage() {
                                         key={method}
                                         type="button"
                                         onClick={() => setPaymentData({ ...paymentData, method: method })}
-                                        className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${paymentData.method === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${paymentData.method === method ? 'bg-primary-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
                                     >
                                         {method}
                                     </button>
@@ -527,7 +537,7 @@ export default function InvoicesPage() {
                                     <select
                                         value={paymentData.selectedQrIndex}
                                         onChange={(e) => setPaymentData({ ...paymentData, selectedQrIndex: parseInt(e.target.value) })}
-                                        className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium text-black"
+                                        className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-primary-50/50 outline-none font-medium text-black"
                                     >
                                         {settings.qrCodes.map((qr: any, idx: number) => (
                                             <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>

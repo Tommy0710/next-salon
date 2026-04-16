@@ -223,7 +223,7 @@ export default function ReportsPage() {
                         </span>
                         <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-blue-600"
+                                className="h-full bg-primary-600"
                                 style={{ width: `${Math.min(Math.max((reportData?.netProfit / reportData?.totalRevenue) * 100 || 0, 0), 100)}%` }}
                             />
                         </div>
@@ -398,7 +398,7 @@ export default function ReportsPage() {
                                     <span className="text-2xl font-black text-amber-600">-{formatCurrency(reportData?.totalPurchases)}</span>
                                 </div>
                                 <div className="pt-8 mt-8 border-t-2 border-dashed border-gray-100">
-                                    <div className="flex justify-between items-center p-6 bg-blue-900 rounded-2xl text-white shadow-xl">
+                                    <div className="flex justify-between items-center p-6 bg-primary-900 rounded-2xl text-white shadow-xl">
                                         <div>
                                             <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-80">Final Net Profit</span>
                                             <p className="text-4xl font-black mt-1">{formatCurrency(reportData?.netProfit)}</p>
@@ -421,7 +421,7 @@ export default function ReportsPage() {
                 return (
                     <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-2xl p-10">
                         <div className="text-center mb-10 pb-8 border-b border-gray-50">
-                            <div className="inline-flex p-3 bg-blue-50 rounded-2xl mb-4">
+                            <div className="inline-flex p-3 bg-primary-50 rounded-2xl mb-4">
                                 <PieChart className="w-8 h-8 text-blue-900" />
                             </div>
                             <h3 className="text-3xl font-black text-gray-900">Daily Reconciliation</h3>
@@ -472,7 +472,7 @@ export default function ReportsPage() {
                         </p>
                         <a
                             href="/reports/activity-log"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-900 text-white rounded-xl font-bold shadow-lg hover:bg-blue-800 transition-all"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-900 text-white rounded-xl font-bold shadow-lg hover:bg-primary-800 transition-all"
                         >
                             <FileText className="w-5 h-5" />
                             Access Security Logs

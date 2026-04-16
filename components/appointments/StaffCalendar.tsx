@@ -81,7 +81,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                         const customerName = typeof apt.customer === 'string' ? apt.customer : apt.customer?.name || 'Unknown Customer';
                         const staffName = typeof apt.staff === 'string' ? apt.staff : apt.staff?.name || 'Unassigned';
                         const staffId = typeof apt.staff === 'string' ? apt.staff : apt.staff?._id;
-                        
+
                         return {
                             id: apt._id,
                             title: `${customerName} (${staffName})`,
@@ -193,7 +193,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     <span className="text-gray-600">Pending</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span className="w-3 h-3 rounded-full bg-primary-500"></span>
                     <span className="text-gray-600">Confirmed</span>
                 </div>
                 <div className="flex items-center gap-2">

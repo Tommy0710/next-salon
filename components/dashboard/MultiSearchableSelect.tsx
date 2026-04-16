@@ -80,7 +80,7 @@ export default function MultiSearchableSelect({
                         selectedOptions.map((opt) => (
                             <span
                                 key={opt.value}
-                                className="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-blue-100"
+                                className="bg-primary-50 text-blue-700 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-blue-100"
                             >
                                 {opt.label}
                                 <X
@@ -122,7 +122,7 @@ export default function MultiSearchableSelect({
                                     return (
                                         <div
                                             key={option.value}
-                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-blue-50 transition-colors ${isSelected ? "bg-blue-50 text-blue-900 font-semibold" : "text-gray-700"
+                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-primary-50 transition-colors ${isSelected ? "bg-primary-50 text-blue-900 font-semibold" : "text-gray-700"
                                                 }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();

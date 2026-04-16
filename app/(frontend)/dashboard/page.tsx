@@ -192,7 +192,7 @@ export default async function DashboardPage() {
                     </p>
                 </div>
                 <div className="mt-4 md:mt-0">
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-900 text-white shadow-sm">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-primary-900 text-white shadow-sm">
                         {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                 </div>
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
                     <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                         <Users className="w-5 h-5 text-blue-600" />
-                        Khách hàng hôm nay <span className="ml-auto bg-blue-50 text-blue-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
+                        Khách hàng hôm nay <span className="ml-auto bg-primary-50 text-blue-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
                     </h3>
                     <CustomerChart data={customerChartData} />
                 </div>
@@ -250,7 +250,7 @@ export default async function DashboardPage() {
                             </div>
                             <p className="text-3xl font-black text-yellow-900">{apptStats.pending}</p>
                         </div>
-                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
+                        <div className="p-4 bg-primary-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
                             <div className="flex items-center gap-2 text-blue-800 mb-2">
                                 <Calendar className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã xác nhận</span>

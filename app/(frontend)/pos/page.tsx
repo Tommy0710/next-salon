@@ -436,9 +436,9 @@ export default function POSPage() {
             // Handle walking customer by setting customer to undefined
             const customerId = activeBill.selectedCustomer === 'walking-customer' ? undefined : activeBill.selectedCustomer;
             const selectedQr = settings?.qrCodes?.[activeBill.selectedQrIndex || 0];
-            const paymentQrIdString = activeBill.paymentMethod === 'Mã QR' 
-            ? selectedQr?.qrId 
-            : null;
+            const paymentQrIdString = activeBill.paymentMethod === 'Mã QR'
+                ? selectedQr?.qrId
+                : null;
             const payload = {
                 customer: customerId,
                 items: activeBill.cart.map(item => ({
@@ -467,7 +467,7 @@ export default function POSPage() {
                 qrCodeImage: qrCodeImage,
                 bankDetails: bankDetails
             };
-            
+
 
             const res = await fetch("/api/invoices", {
                 method: "POST",
@@ -552,13 +552,13 @@ export default function POSPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setActiveTab('services')}
-                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'services' ? 'bg-blue-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'services' ? 'bg-primary-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                             >
                                 Dịch vụ
                             </button>
                             <button
                                 onClick={() => setActiveTab('products')}
-                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'products' ? 'bg-blue-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'products' ? 'bg-primary-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                             >
                                 Sản phẩm
                             </button>
@@ -615,7 +615,7 @@ export default function POSPage() {
                     </div>
                     <button
                         onClick={addNewBill}
-                        className="flex items-center justify-center p-1.5 bg-blue-900 text-white hover:bg-blue-800 rounded-md shadow-sm transition-colors"
+                        className="flex items-center justify-center p-1.5 bg-primary-900 text-white hover:bg-primary-800 rounded-md shadow-sm transition-colors"
                         title="Tạo Bill Mới"
                     >
                         <Plus className="w-4 h-4" />
@@ -676,7 +676,7 @@ export default function POSPage() {
                                     />
                                     <button
                                         onClick={() => setIsAddCustomerModalOpen(true)}
-                                        className="p-2 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                        className="p-2 bg-primary-100 text-blue-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
                                         title="Thêm khách hàng mới"
                                     >
                                         <Plus className="w-4 h-4 md:w-5 md:h-5" />
@@ -734,7 +734,7 @@ export default function POSPage() {
                                                         {(activeBill.serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).map(assignment => {
                                                             const staff = staffList.find(s => s._id === assignment.staffId);
                                                             return (
-                                                                <div key={assignment.staffId} className="flex items-center gap-1.5 bg-blue-50 p-1 rounded border border-blue-100">
+                                                                <div key={assignment.staffId} className="flex items-center gap-1.5 bg-primary-50 p-1 rounded border border-blue-100">
                                                                     <p className="text-[9px] font-bold text-gray-800 flex-1 truncate">{staff?.name}</p>
                                                                     <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-blue-200">
                                                                         <input
@@ -828,7 +828,7 @@ export default function POSPage() {
                                             <button
                                                 key={method}
                                                 onClick={() => updateActiveBill({ paymentMethod: method })}
-                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-blue-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-primary-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
                                             >
                                                 {method}
                                             </button>
@@ -842,7 +842,7 @@ export default function POSPage() {
                                             <select
                                                 value={activeBill.selectedQrIndex}
                                                 onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
-                                                className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-blue-50/50 outline-none font-medium"
+                                                className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-primary-50/50 outline-none font-medium"
                                             >
                                                 {settings.qrCodes.map((qr: any, idx: number) => (
                                                     <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
@@ -875,7 +875,7 @@ export default function POSPage() {
                 >
                     <LayoutDashboard className="w-5 h-5 mb-1" />
                     <span className="text-[10px] font-bold">Danh mục</span>
-                    {mobileTab === 'catalog' && <div className="absolute top-0 w-8 h-1 bg-blue-900 rounded-b-full"></div>}
+                    {mobileTab === 'catalog' && <div className="absolute top-0 w-8 h-1 bg-primary-900 rounded-b-full"></div>}
                 </button>
                 <div className="w-px h-8 bg-gray-100"></div>
                 <button
@@ -891,7 +891,7 @@ export default function POSPage() {
                         )}
                     </div>
                     <span className="text-[10px] font-bold">Giỏ hàng</span>
-                    {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-blue-900 rounded-b-full"></div>}
+                    {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-primary-900 rounded-b-full"></div>}
                 </button>
             </div>
             {/* THÊM VÀO ĐÂY: Modal Xác nhận xóa Bill */}
@@ -977,7 +977,7 @@ export default function POSPage() {
                             <button
                                 onClick={handleCreateCustomer}
                                 disabled={isSubmittingCustomer || !newCustomerName.trim()}
-                                className="px-5 py-2.5 bg-blue-900 text-white rounded-lg hover:bg-blue-800 text-sm font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="px-5 py-2.5 bg-primary-900 text-white rounded-lg hover:bg-primary-800 text-sm font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                                 {isSubmittingCustomer ? (
                                     <>

@@ -156,7 +156,7 @@ export default function EditUserPage() {
                             min="6"
                         />
                         <p className="text-xs text-gray-500 -mt-3">Only enter if you want to change the password.</p>
-                        <div className="text-xs text-blue-600 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100/50 flex flex-col gap-1 shadow-sm mt-1 mb-2">
+                        <div className="text-xs text-blue-600 bg-primary-50/50 p-2.5 rounded-lg border border-blue-100/50 flex flex-col gap-1 shadow-sm mt-1 mb-2">
                             <p className="font-bold flex items-center gap-2">
                                 Password Requirements:
                             </p>

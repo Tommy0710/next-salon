@@ -333,7 +333,7 @@ export default function CalendarPage() {
         <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden text-black">
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
+                    <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
                         <Clock className="w-6 h-6" />
                     </div>
                     <div>
@@ -348,14 +348,14 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setRefreshTrigger(prev => prev + 1)}
-                        className="p-3 text-gray-500 hover:text-blue-900 hover:bg-blue-50 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm group"
+                        className="p-3 text-gray-500 hover:text-blue-900 hover:bg-primary-50 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm group"
                         title="Refresh"
                     >
                         <RefreshCw className={`w-5 h-5 transition-transform duration-500 group-hover:rotate-180 ${loadingSlots ? "animate-spin" : ""}`} />
                     </button>
                     <button
                         onClick={() => { closeModal(); setIsModalOpen(true); }}
-                        className="px-6 py-3 bg-blue-900 text-white rounded-2xl hover:bg-blue-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-blue-900/30 hover:-translate-y-0.5"
+                        className="px-6 py-3 bg-primary-900 text-white rounded-2xl hover:bg-primary-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-blue-900/30 hover:-translate-y-0.5"
                     >
                         <Plus className="w-5 h-5" />
                         Book Appointment
@@ -406,7 +406,7 @@ export default function CalendarPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsAddCustomerModalOpen(true)}
-                                    className="p-3 bg-blue-100 text-blue-900 rounded-lg hover:bg-blue-200 transition-colors flex-shrink-0"
+                                    className="p-3 bg-primary-100 text-blue-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
@@ -450,8 +450,8 @@ export default function CalendarPage() {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
                                             className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
-                                                ? "bg-blue-900 text-white border-blue-900 shadow-lg scale-105"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-blue-50"
+                                                ? "bg-primary-900 text-white border-blue-900 shadow-lg scale-105"
+                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-primary-50"
                                                 }`}
                                         >
                                             {slot.startTime}
@@ -594,7 +594,7 @@ export default function CalendarPage() {
                                 type="button"
                                 onClick={handleCreateCustomer}
                                 disabled={isSubmittingCustomer}
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmittingCustomer ? "Đang tạo..." : "Tạo Khách Hàng"}
                             </button>

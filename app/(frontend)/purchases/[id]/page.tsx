@@ -135,7 +135,7 @@ export default function PurchaseDetailsPage() {
                 {/* Supplier Info */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-primary-50 text-blue-600 rounded-xl flex items-center justify-center">
                             <User className="w-5 h-5" />
                         </div>
                         <h2 className="text-lg font-bold text-gray-900">Supplier Information</h2>
@@ -197,7 +197,7 @@ export default function PurchaseDetailsPage() {
                             <div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Payment Status</p>
                                 <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${purchase.paymentStatus === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
-                                    purchase.paymentStatus === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                    purchase.paymentStatus === 'partially_paid' ? 'bg-primary-50 text-blue-700 border-blue-200' :
                                         'bg-orange-50 text-orange-700 border-orange-200'
                                     }`}>
                                     {purchase.paymentStatus?.replace('_', ' ') || 'Pending'}
@@ -257,7 +257,7 @@ export default function PurchaseDetailsPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-50 text-blue-700 border border-blue-100">
                                             {item.quantity} units
                                         </span>
                                     </td>

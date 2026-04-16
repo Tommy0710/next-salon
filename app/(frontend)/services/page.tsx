@@ -225,7 +225,7 @@ export default function ServicesPage() {
                             </button>
                             <button
                                 onClick={() => openServiceModal()}
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                             >
                                 <Plus className="w-4 h-4" />
                                 New Service
@@ -303,7 +303,7 @@ export default function ServicesPage() {
                                         <tr key={service._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-blue-50 rounded-lg">
+                                                    <div className="p-2 bg-primary-50 rounded-lg">
                                                         <Scissors className="w-4 h-4 text-blue-900" />
                                                     </div>
                                                     <div>
@@ -338,7 +338,7 @@ export default function ServicesPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === service._id ? null : service._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -351,7 +351,7 @@ export default function ServicesPage() {
                                                                         openServiceModal(service);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
                                                                     <Edit className="w-4 h-4 text-blue-600" />
                                                                     Edit Details
@@ -411,7 +411,7 @@ export default function ServicesPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-blue-900 text-white"
+                                                ? "bg-primary-900 text-white"
                                                 : "text-gray-600 hover:bg-gray-100"
                                                 }`}
                                         >

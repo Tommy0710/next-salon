@@ -135,7 +135,7 @@ export default function NewRolePage() {
 
                     {/* Special Modules: Dashboard & Settings */}
                     <div className="p-6 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <div className="bg-primary-50 p-4 rounded-lg border border-blue-100">
                             <h3 className="font-semibold text-blue-900 mb-2">Dashboard</h3>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input

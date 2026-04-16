@@ -92,7 +92,7 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
 
             <div className="flex items-center gap-6">
                 {/* Time and Timezone Display */}
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-lg border border-blue-100">
                     <Clock className="w-4 h-4 text-blue-900" />
                     <div className="flex flex-col">
                         <span className="text-sm font-semibold text-blue-900">{currentTime}</span>
@@ -106,7 +106,7 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className="flex items-center space-x-2 focus:outline-none"
                     >
-                        <div className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold">
+                        <div className="w-8 h-8 rounded-full bg-primary-900 flex items-center justify-center text-white font-bold">
                             <User className="w-5 h-5" />
                         </div>
                         {user?.name ? (

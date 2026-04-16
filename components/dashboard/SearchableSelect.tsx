@@ -92,7 +92,7 @@ export default function SearchableSelect({
                                 filteredOptions.map((option) => (
                                     <div
                                         key={option.value}
-                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-blue-50 ${option.value === value ? "bg-blue-50 text-blue-900 font-medium" : "text-gray-700"
+                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 ${option.value === value ? "bg-primary-50 text-blue-900 font-medium" : "text-gray-700"
                                             }`}
                                         onClick={() => {
                                             onChange(option.value);

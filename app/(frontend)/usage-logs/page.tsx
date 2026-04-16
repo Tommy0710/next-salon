@@ -119,7 +119,7 @@ export default function UsageLogsPage() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                    className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                 >
                     <Plus className="w-4 h-4" />
                     Record Usage
@@ -255,7 +255,7 @@ export default function UsageLogsPage() {
                                         key={pageNum}
                                         onClick={() => setPage(pageNum)}
                                         className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                            ? "bg-blue-900 text-white"
+                                            ? "bg-primary-900 text-white"
                                             : "text-gray-600 hover:bg-gray-100"
                                             }`}
                                     >

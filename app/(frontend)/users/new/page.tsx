@@ -124,7 +124,7 @@ export default function NewUserPage() {
                             required
                             min="6"
                         />
-                        <div className="text-xs text-blue-600 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100/50 flex flex-col gap-1 shadow-sm -mt-2 mb-2">
+                        <div className="text-xs text-blue-600 bg-primary-50/50 p-2.5 rounded-lg border border-blue-100/50 flex flex-col gap-1 shadow-sm -mt-2 mb-2">
                             <p className="font-bold flex items-center gap-2">
                                 Password Requirements:
                             </p>

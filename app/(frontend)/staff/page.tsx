@@ -151,7 +151,7 @@ export default function StaffPage() {
                         <PermissionGate resource="staff" action="create">
                             <button
                                 onClick={() => openModal()}
-                                className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                                className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Staff
@@ -243,7 +243,7 @@ export default function StaffPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                                                     {staff.skills?.slice(0, 3).map((skill, i) => (
-                                                        <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                        <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-blue-700 border border-blue-100">
                                                             {skill}
                                                         </span>
                                                     ))}
@@ -262,7 +262,7 @@ export default function StaffPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === staff._id ? null : staff._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -275,7 +275,7 @@ export default function StaffPage() {
                                                                         openModal(staff);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
                                                                     <Edit className="w-4 h-4 text-blue-600" />
                                                                     Edit Details
@@ -335,7 +335,7 @@ export default function StaffPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-blue-900 text-white"
+                                                ? "bg-primary-900 text-white"
                                                 : "text-gray-600 hover:bg-gray-100"
                                                 }`}
                                         >

@@ -21,7 +21,7 @@ export default function FormButton({
     ...props
 }: FormButtonProps) {
     const variants = {
-        primary: "bg-blue-900 text-white hover:bg-blue-800 disabled:bg-blue-300",
+        primary: "bg-primary-900 text-white hover:bg-primary-800 disabled:bg-primary-300",
         secondary: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400",
         danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
         ghost: "bg-transparent hover:bg-gray-100 text-gray-600 disabled:text-gray-300",

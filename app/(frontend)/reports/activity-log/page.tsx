@@ -116,7 +116,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
             case 'update': return base + "bg-amber-50 text-amber-700 border-amber-200";
             case 'login': return base + "bg-indigo-50 text-indigo-700 border-indigo-200";
             case 'logout': return base + "bg-slate-50 text-slate-700 border-slate-200";
-            default: return base + "bg-blue-50 text-blue-700 border-blue-200";
+            default: return base + "bg-primary-50 text-blue-700 border-blue-200";
         }
     };
 
@@ -144,22 +144,20 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                     <nav className="-mb-px flex space-x-8">
                         <Link
                             href={{ query: { ...sParams, tab: "action", page: "1" } }}
-                            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                                tab === "action"
+                            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${tab === "action"
                                     ? "border-blue-500 text-blue-600"
                                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                            }`}
+                                }`}
                         >
                             <Activity className="w-4 h-4 inline mr-2" />
                             Action Logs
                         </Link>
                         <Link
                             href={{ query: { ...sParams, tab: "zalo", page: "1" } }}
-                            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                                tab === "zalo"
+                            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${tab === "zalo"
                                     ? "border-blue-500 text-blue-600"
                                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                            }`}
+                                }`}
                         >
                             <MessageSquare className="w-4 h-4 inline mr-2" />
                             Zalo Events
@@ -199,7 +197,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                             <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="p-2 bg-blue-50 rounded-lg text-blue-900">
+                                                        <div className="p-2 bg-primary-50 rounded-lg text-blue-900">
                                                             <Clock className="w-4 h-4" />
                                                         </div>
                                                         <div>
@@ -210,7 +208,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center text-white text-xs font-bold">
+                                                        <div className="w-8 h-8 rounded-full bg-primary-900 flex items-center justify-center text-white text-xs font-bold">
                                                             {log.user?.name?.[0] || <UserIcon className="w-4 h-4" />}
                                                         </div>
                                                         <div>
@@ -225,7 +223,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="text-xs font-bold text-blue-900 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100 uppercase tracking-wider">
+                                                    <span className="text-xs font-bold text-blue-900 px-2 py-0.5 rounded-md bg-primary-50 border border-blue-100 uppercase tracking-wider">
                                                         {log.resource}
                                                     </span>
                                                 </td>
@@ -281,7 +279,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="p-2 bg-blue-50 rounded-lg text-blue-900">
+                                                        <div className="p-2 bg-primary-50 rounded-lg text-blue-900">
                                                             <Clock className="w-4 h-4" />
                                                         </div>
                                                         <div>
@@ -291,11 +289,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${
-                                                        log.status === 'success'
+                                                    <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${log.status === 'success'
                                                             ? "bg-green-50 text-green-700 border-green-200"
                                                             : "bg-red-50 text-red-700 border-red-200"
-                                                    }`}>
+                                                        }`}>
                                                         {log.status === 'success' ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                                         {log.status}
                                                     </span>
@@ -346,7 +343,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         key={pageNum}
                                         href={{ query: { ...sParams, page: pageNum.toString(), limit: limit.toString(), tab } }}
                                         className={`w-8 h-8 rounded-lg text-sm font-semibold flex items-center justify-center transition-all ${page === pageNum
-                                            ? "bg-blue-900 text-white"
+                                            ? "bg-primary-900 text-white"
                                             : "text-gray-600 hover:bg-gray-100 bg-white border border-gray-200"
                                             }`}
                                     >
@@ -363,8 +360,8 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                             <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
-                    </div>
                 </div>
             </div>
+        </div>
     );
 }

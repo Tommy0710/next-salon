@@ -31,7 +31,7 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
                 {activities.map((activity) => (
                     <div key={activity.id} className="flex items-start space-x-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
                         <div className={`p-2 rounded-full shrink-0 ${activity.type === "sale" ? "bg-green-100 text-green-600" :
-                            activity.type === "restock" ? "bg-blue-900 text-white" :
+                            activity.type === "restock" ? "bg-primary-900 text-white" :
                                 "bg-orange-100 text-orange-600"
                             }`}>
                             {activity.type === "sale" && <ShoppingCart className="w-4 h-4" />}

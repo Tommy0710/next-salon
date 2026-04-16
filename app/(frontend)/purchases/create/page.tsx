@@ -165,7 +165,7 @@ export default function CreatePurchasePage() {
                     {/* General Info */}
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <span className="w-1 h-6 bg-blue-900 rounded-full"></span>
+                            <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                             General Information
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -201,13 +201,13 @@ export default function CreatePurchasePage() {
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                <span className="w-1 h-6 bg-blue-900 rounded-full"></span>
+                                <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Order Items
                             </h2>
                             <button
                                 type="button"
                                 onClick={addItem}
-                                className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium flex items-center gap-2 transition-colors"
+                                className="px-3 py-1.5 text-sm bg-primary-50 text-blue-700 rounded-lg hover:bg-primary-100 font-medium flex items-center gap-2 transition-colors"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Item
@@ -292,7 +292,7 @@ export default function CreatePurchasePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <span className="w-1 h-6 bg-blue-900 rounded-full"></span>
+                                <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Payment Details
                             </h2>
                             <div className="space-y-4">
@@ -331,7 +331,7 @@ export default function CreatePurchasePage() {
 
                         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-fit">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <span className="w-1 h-6 bg-blue-900 rounded-full"></span>
+                                <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Order Summary
                             </h2>
                             <div className="space-y-3">

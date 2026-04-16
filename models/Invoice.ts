@@ -5,6 +5,7 @@ export interface IInvoice extends Document {
     invoiceNumber: string;
     customer: mongoose.Types.ObjectId;
     appointment?: mongoose.Types.ObjectId;
+    bookingCode?: string;
     items: {
         item: mongoose.Types.ObjectId; // Service or Product ID
         itemModel: 'Service' | 'Product';
@@ -40,6 +41,7 @@ const invoiceSchema = new Schema<IInvoice>(
         invoiceNumber: { type: String, required: true, unique: true },
         customer: { type: Schema.Types.ObjectId, ref: 'Customer' },
         appointment: { type: Schema.Types.ObjectId, ref: 'Appointment' },
+        bookingCode: { type: String },
         items: [
             {
                 item: { type: Schema.Types.ObjectId, required: true, refPath: 'items.itemModel' },
@@ -76,7 +78,7 @@ const invoiceSchema = new Schema<IInvoice>(
         commission: { type: Number, default: 0 },
         notes: String,
         date: { type: Date, default: Date.now },
-        
+
     },
     { timestamps: true }
 );
