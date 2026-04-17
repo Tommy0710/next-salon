@@ -8,6 +8,7 @@ import Appointment from '@/models/Appointment';
 import Settings from '@/models/Settings';
 import Role from '@/models/Role';
 import { getCurrencySymbol } from '@/lib/currency';
+import { formatCurrency } from '@/lib/currency';
 import StatCard from '@/components/dashboard/StatCard';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import SalesChart from '@/components/dashboard/SalesChart';
@@ -202,14 +203,14 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
                     title="Doanh thu hôm nay"
-                    value={`${currencySymbol}${todaysSales.toLocaleString()}`}
+                    value={formatCurrency(todaysSales)}
                     icon={DollarSign}
                     color="green"
                     trendUp={true}
                 />
                 <StatCard
                     title="Đơn hàng hoàn tất"
-                    value={ordersToday.toString()}
+                    value={formatCurrency(ordersToday)}
                     icon={ShoppingBag}
                     color="purple"
                     trend="Hôm nay"

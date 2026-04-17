@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit, X } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
+import { formatCurrency } from "@/lib/currency";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { useSettings } from "@/components/providers/SettingsProvider";
 
@@ -589,7 +590,7 @@ export default function POSPage() {
                                             )}
                                         </div>
                                         <h3 className="font-semibold text-gray-800 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
-                                        <p className="text-primary-900 font-bold text-xs md:text-sm">{settings.symbol}{item.price}</p>
+                                        <p className="text-primary-900 font-bold text-xs md:text-sm">{formatCurrency(item.price)}</p>
                                     </div>
                                 ))}
                             </div>
@@ -770,17 +771,17 @@ export default function POSPage() {
                             <div className="space-y-1 mb-3 text-[10px] md:text-xs">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Tổng phụ</span>
-                                    <span>{settings.symbol}{subtotal.toFixed(2)}</span>
+                                    <span>{formatCurrency(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Thuế ({settings.taxRate}%)</span>
-                                    <span>{settings.symbol}{tax.toFixed(2)}</span>
+                                    <span>{formatCurrency(tax)}</span>
                                 </div>
                                 {commission > 0 && (
                                     <div className="space-y-1 bg-indigo-50 px-2 py-1.5 rounded border border-indigo-100/50">
                                         <div className="flex justify-between text-indigo-600 font-bold mb-1 border-b border-indigo-200/50 pb-0.5">
                                             <span>Tổng hoa hồng</span>
-                                            <span>{settings.symbol}{commission.toFixed(2)}</span>
+                                            <span>{formatCurrency(commission)}</span>
                                         </div>
                                         {assignments.map((assignment, idx) => {
                                             const staff = staffList.find(s => s._id === assignment.staffId);
@@ -816,7 +817,7 @@ export default function POSPage() {
                                 <div className="flex justify-between text-sm md:text-base font-black text-gray-900 pt-1 border-t border-gray-200">
                                     <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Còn nợ' : 'Tổng cộng'}</span>
                                     <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600' : 'text-primary-900'}>
-                                        {settings.symbol}{((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total).toFixed(2)}
+                                        {formatCurrency(((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total))}
                                     </span>
                                 </div>
                             </div>

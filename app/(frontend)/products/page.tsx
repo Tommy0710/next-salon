@@ -7,6 +7,7 @@ import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatCurrency } from "@/lib/currency";
 
 interface Product {
     _id: string;
@@ -250,7 +251,7 @@ export default function ProductsPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="text-sm font-bold text-gray-900">{settings.symbol}{product.price.toFixed(2)}</span>
+                                                    <span className="text-sm font-bold text-gray-900">{formatCurrency(product.price, settings.currency)}</span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${product.type === 'retail' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-primary-50 text-primary-700 border-primary-200'}`}>

@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 import { useSettings } from "@/components/providers/SettingsProvider";
-
+import { formatCurrency } from "@/lib/currency";
 interface ServiceChartProps {
     data: {
         name: string;
@@ -72,7 +72,7 @@ export default function ServiceChart({ data }: ServiceChartProps) {
                                     border: '1px solid #e5e7eb',
                                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                                 }}
-                                formatter={(value: number) => [`${settings.symbol}${value.toLocaleString()}`, 'Revenue']}
+                                formatter={(value: number) => [formatCurrency(value, settings.currency), 'Revenue']}
                                 labelFormatter={(label: string) => label}
                             />
                         </PieChart>
@@ -92,7 +92,7 @@ export default function ServiceChart({ data }: ServiceChartProps) {
                                         {entry.name}
                                     </div>
                                     <div className="text-xs text-slate-500">
-                                        {settings.symbol}{entry.revenue.toLocaleString()}
+                                        {formatCurrency(entry.revenue, settings.currency)}
                                     </div>
                                 </div>
                             </div>

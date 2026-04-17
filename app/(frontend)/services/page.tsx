@@ -8,6 +8,7 @@ import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormIn
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatCurrency } from "@/lib/currency";
 
 interface Category {
     _id: string;
@@ -324,7 +325,7 @@ export default function ServicesPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-bold text-gray-900">{settings.symbol}{service.price.toFixed(2)}</span>
+                                                <span className="text-sm font-bold text-gray-900">{formatCurrency(service.price, settings.currency)}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className="text-xs text-gray-600 capitalize font-medium">{service.gender}</span>

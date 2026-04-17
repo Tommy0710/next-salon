@@ -49,13 +49,16 @@ export function getCurrencySymbol(code: string): string {
     return currencies[code]?.symbol || '\u20ab';
 }
 
-export function formatCurrency(amount: number, currencyCode: string = 'USD'): string {
+export function formatCurrency(amount: number, currencyCode: string = 'VND'): string {
     if (currencyCode === 'VND') {
         const formattedNumber = new Intl.NumberFormat('vi-VN').format(amount);
-        return `${formattedNumber}\u20ab`;
+        return `${formattedNumber}₫`;
     }
-    const symbol = getCurrencySymbol(currencyCode);
-    return `${symbol}${amount.toFixed(2)}`;
+    // Các loại tiền tệ khác (USD, EUR...) giữ nguyên định dạng quốc tế
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+    }).format(amount);
 }
 
 export function getAllCurrencies(): CurrencyInfo[] {

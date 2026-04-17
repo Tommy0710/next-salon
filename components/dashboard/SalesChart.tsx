@@ -1,5 +1,5 @@
 "use client";
-
+import { formatCurrency } from "@/lib/currency";
 import {
     AreaChart,
     Area,
@@ -71,7 +71,7 @@ export default function SalesChart({ data }: SalesChartProps) {
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: '#6b7280', fontSize: 12 }}
-                            tickFormatter={(value) => `${settings.symbol}${value.toLocaleString()}`}
+                            tickFormatter={(value) => formatCurrency(value, settings.currency)}
                             width={70}
                         />
                         <Tooltip
@@ -81,7 +81,7 @@ export default function SalesChart({ data }: SalesChartProps) {
                                 border: '1px solid #e5e7eb',
                                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                             }}
-                            formatter={(value: number) => [`${settings.symbol}${value.toLocaleString()}`, 'Sales']}
+                            formatter={(value: number) => [formatCurrency(value, settings.currency), 'Sales']}
                         />
                         <Area
                             type="monotone"

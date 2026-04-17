@@ -8,6 +8,7 @@ import FormInput, { FormButton } from "@/components/dashboard/FormInput";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatDate } from "@/lib/dateUtils";
 import { useRouter } from "next/navigation";
+import { formatCurrency } from "@/lib/currency";
 
 interface Invoice {
     _id: string;
@@ -329,27 +330,29 @@ export default function InvoicesPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${inv.appointment ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                }`}>
-                                                {inv.appointment ? 'Appointment' : 'POS'}
-                                            </span>
-                                            {/* 👉 HIỂN THỊ BOOKING CODE NẾU CÓ */}
-                                            {inv.bookingCode && (
-                                                <span className="text-[10px] text-gray-400 font-mono mt-1 font-medium">
-                                                    #{inv.bookingCode}
+                                        <td className="px-6 py-4 whitespace-nowrap align-middle text-left">
+                                            <div className="flex flex-col justify-center items-center">
+                                                <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${inv.appointment ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                    }`}>
+                                                    {inv.appointment ? 'Appointment' : 'POS'}
                                                 </span>
-                                            )}
+                                                {/* 👉 HIỂN THỊ BOOKING CODE NẾU CÓ */}
+                                                {inv.bookingCode && (
+                                                    <span className="text-[10px] text-gray-400 font-mono mt-1 font-medium">
+                                                        #{inv.bookingCode}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm font-bold text-gray-900">{settings.symbol}{(inv.totalAmount || 0).toFixed(2)}</span>
+                                            <span className="text-sm font-bold text-gray-900">{formatCurrency(inv.totalAmount)}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm font-bold text-green-600">{settings.symbol}{(inv.amountPaid || 0).toFixed(2)}</span>
+                                            <span className="text-sm font-bold text-green-600">{formatCurrency(inv.amountPaid)}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-sm font-bold ${((inv.totalAmount || 0) - (inv.amountPaid || 0)) > 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                                                {settings.symbol}{((inv.totalAmount || 0) - (inv.amountPaid || 0)).toFixed(2)}
+                                                {formatCurrency((inv.totalAmount || 0) - (inv.amountPaid || 0))}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">

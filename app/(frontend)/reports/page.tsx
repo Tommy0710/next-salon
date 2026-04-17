@@ -26,6 +26,7 @@ import { format, subMonths, isValid } from "date-fns";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import StatCard from "@/components/dashboard/StatCard";
 import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatCurrency } from "@/lib/currency";
 import { getCurrentDateInTimezone, getMonthDateRangeInTimezone } from "@/lib/dateUtils";
 
 type ReportType = 'summary' | 'sales' | 'services' | 'staff' | 'customers' | 'inventory' | 'expenses' | 'profit' | 'daily' | 'activity-log';
@@ -139,10 +140,10 @@ export default function ReportsPage() {
         });
     };
 
-    const formatCurrency = (val: any) => {
-        const num = parseFloat(val);
-        return isNaN(num) ? `${settings.symbol}0` : `${settings.symbol}${num.toLocaleString()}`;
-    };
+    // const formatCurrency = (val: any) => {
+    //     const num = parseFloat(val);
+    //     return isNaN(num) ? `${settings.symbol}0` : `${settings.symbol}${num.toLocaleString()}`;
+    // };
 
     const formatSafeDate = (date: any, formatStr: string = "dd MMM yyyy") => {
         if (!date) return "N/A";
