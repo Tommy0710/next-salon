@@ -55,14 +55,14 @@ export default function ProfilePage() {
             setSaving(false);
             return;
         }
-        
+
         // Additional password strength validation
         if (profile.password && profile.password.length < 8) {
             setMessage({ type: "error", text: "Password must be at least 8 characters" });
             setSaving(false);
             return;
         }
-        
+
         if (profile.password) {
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
             if (!passwordRegex.test(profile.password)) {
@@ -102,7 +102,7 @@ export default function ProfilePage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-900 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-900 border-t-transparent"></div>
             </div>
         );
     }
@@ -134,7 +134,7 @@ export default function ProfilePage() {
                 {/* Personal Information */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <User className="w-5 h-5 text-blue-900" />
+                        <User className="w-5 h-5 text-primary-900" />
                         Personal Information
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                 {/* Security */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-blue-900" />
+                        <Shield className="w-5 h-5 text-primary-900" />
                         Security
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

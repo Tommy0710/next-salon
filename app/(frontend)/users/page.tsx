@@ -99,7 +99,7 @@ export default function UsersPage() {
                             <input
                                 type="text"
                                 placeholder="Search users..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -144,7 +144,7 @@ export default function UsersPage() {
                                         <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm">
                                                         {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                                                     </div>
                                                     <div>
@@ -162,8 +162,8 @@ export default function UsersPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {user.role ? (
                                                     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${user.role.isSystem
-                                                        ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                                        : 'bg-primary-50 text-blue-700 border-blue-200'
+                                                        ? 'bg-primary-50 text-primary-700 border-primary-200'
+                                                        : 'bg-primary-50 text-primary-700 border-primary-200'
                                                         }`}>
                                                         <Shield className="w-3 h-3" />
                                                         {user.role.name}
@@ -185,7 +185,7 @@ export default function UsersPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === user._id ? null : user._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -197,7 +197,7 @@ export default function UsersPage() {
                                                                     href={`/users/${user._id}`}
                                                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-blue-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600" />
                                                                     Edit User
                                                                 </Link>
                                                             </PermissionGate>

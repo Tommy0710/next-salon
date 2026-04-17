@@ -67,7 +67,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
                 </div>
                 {lowStockItems.length > 5 && (
                     <div className="mt-3 text-center">
-                        <Link href="#" className="text-sm text-blue-900 hover:text-blue-700 font-medium">
+                        <Link href="#" className="text-sm text-primary-900 hover:text-primary-700 font-medium">
                             View all {lowStockItems.length} items →
                         </Link>
                     </div>

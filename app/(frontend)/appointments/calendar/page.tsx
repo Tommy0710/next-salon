@@ -333,7 +333,7 @@ export default function CalendarPage() {
         <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden text-black">
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
+                    <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 shadow-sm border border-primary-100">
                         <Clock className="w-6 h-6" />
                     </div>
                     <div>
@@ -348,14 +348,14 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setRefreshTrigger(prev => prev + 1)}
-                        className="p-3 text-gray-500 hover:text-blue-900 hover:bg-primary-50 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm group"
+                        className="p-3 text-gray-500 hover:text-primary-900 hover:bg-primary-50 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm group"
                         title="Refresh"
                     >
                         <RefreshCw className={`w-5 h-5 transition-transform duration-500 group-hover:rotate-180 ${loadingSlots ? "animate-spin" : ""}`} />
                     </button>
                     <button
                         onClick={() => { closeModal(); setIsModalOpen(true); }}
-                        className="px-6 py-3 bg-primary-900 text-white rounded-2xl hover:bg-primary-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-blue-900/30 hover:-translate-y-0.5"
+                        className="px-6 py-3 bg-primary-900 text-white rounded-2xl hover:bg-primary-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-primary-900/30 hover:-translate-y-0.5"
                     >
                         <Plus className="w-5 h-5" />
                         Book Appointment
@@ -406,7 +406,7 @@ export default function CalendarPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsAddCustomerModalOpen(true)}
-                                    className="p-3 bg-primary-100 text-blue-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
+                                    className="p-3 bg-primary-100 text-primary-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
@@ -434,7 +434,7 @@ export default function CalendarPage() {
 
                     <div className="space-y-3">
                         <label className="text-sm font-bold text-gray-700 flex items-center gap-2 px-1">
-                            <Clock className="w-4 h-4 text-blue-900" />
+                            <Clock className="w-4 h-4 text-primary-900" />
                             Select Available Time Slot
                             {formData.date && loadingSlots && (
                                 <span className="text-xs font-normal text-gray-400 animate-pulse ml-2">(Updating slots...)</span>
@@ -450,8 +450,8 @@ export default function CalendarPage() {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
                                             className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
-                                                ? "bg-primary-900 text-white border-blue-900 shadow-lg scale-105"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-700 hover:bg-primary-50"
+                                                ? "bg-primary-900 text-white border-primary-900 shadow-lg scale-105"
+                                                : "bg-white text-gray-700 border-gray-300 hover:border-primary-400 hover:text-primary-700 hover:bg-primary-50"
                                                 }`}
                                         >
                                             {slot.startTime}
@@ -472,12 +472,12 @@ export default function CalendarPage() {
                         )}
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-blue-900 to-indigo-900 rounded-2xl text-white shadow-xl">
+                    <div className="p-4 bg-gradient-to-br from-primary-900 to-indigo-900 rounded-2xl text-white shadow-xl">
                         <div className="flex items-center justify-between">
                             <div className="space-y-1">
-                                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-wider">Estimated Duration</p>
+                                <p className="text-primary-100 text-[10px] font-bold uppercase tracking-wider">Estimated Duration</p>
                                 <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-blue-300" />
+                                    <Clock className="w-4 h-4 text-primary-300" />
                                     <span className="text-xl font-bold">
                                         {services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.duration, 0)} min
                                     </span>
@@ -485,7 +485,7 @@ export default function CalendarPage() {
                             </div>
                             <div className="h-10 w-px bg-white/20" />
                             <div className="text-right space-y-1">
-                                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-wider">Total Amount</p>
+                                <p className="text-primary-100 text-[10px] font-bold uppercase tracking-wider">Total Amount</p>
                                 <div className="flex items-center justify-end gap-2">
                                     <DollarSign className="w-5 h-5 text-emerald-400" />
                                     <span className="text-2xl font-black">
@@ -534,7 +534,7 @@ export default function CalendarPage() {
                             <FormButton
                                 type="submit"
                                 loading={isSubmitting}
-                                className="rounded-2xl font-black px-10 shadow-lg shadow-blue-900/20"
+                                className="rounded-2xl font-black px-10 shadow-lg shadow-primary-900/20"
                             >
                                 {editingAppointment ? "Save Changes" : "Confirm Booking"}
                             </FormButton>
@@ -564,7 +564,7 @@ export default function CalendarPage() {
                                     type="text"
                                     value={newCustomerName}
                                     onChange={(e) => setNewCustomerName(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập tên khách hàng"
                                 />
                             </div>
@@ -575,7 +575,7 @@ export default function CalendarPage() {
                                     value={newCustomerPhone}
                                     required
                                     onChange={(e) => setNewCustomerPhone(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập số điện thoại"
                                 />
                             </div>

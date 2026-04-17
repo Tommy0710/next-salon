@@ -169,7 +169,7 @@ export default function StaffPage() {
                             <input
                                 type="text"
                                 placeholder="Search by name, email or phone..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -215,8 +215,8 @@ export default function StaffPage() {
                                         <tr key={staff._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-purple-50 rounded-lg">
-                                                        <User className="w-4 h-4 text-purple-600" />
+                                                    <div className="p-2 bg-primary-50 rounded-lg">
+                                                        <User className="w-4 h-4 text-primary-600" />
                                                     </div>
                                                     <div>
                                                         <span className="text-sm font-bold text-gray-900">{staff.name}</span>
@@ -243,7 +243,7 @@ export default function StaffPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                                                     {staff.skills?.slice(0, 3).map((skill, i) => (
-                                                        <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-blue-700 border border-blue-100">
+                                                        <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-primary-700 border border-primary-100">
                                                             {skill}
                                                         </span>
                                                     ))}
@@ -262,7 +262,7 @@ export default function StaffPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === staff._id ? null : staff._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -277,7 +277,7 @@ export default function StaffPage() {
                                                                     }}
                                                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-blue-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600" />
                                                                     Edit Details
                                                                 </button>
                                                             </PermissionGate>
@@ -413,7 +413,7 @@ export default function StaffPage() {
                             value={formData.skills}
                             onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
                             placeholder="Hair Cut, Facial, Makeup"
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-transparent text-sm"
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm"
                         />
                     </div>
 

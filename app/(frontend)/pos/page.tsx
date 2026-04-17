@@ -544,7 +544,7 @@ export default function POSPage() {
                                         placeholder="Tìm sản phẩm..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-900"
                                     />
                                 </div>
                             </div>
@@ -568,7 +568,7 @@ export default function POSPage() {
                     {/* Grid */}
                     <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 pb-20 md:pb-4">
                         {loading ? (
-                            <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-900 border-t-transparent"></div></div>
+                            <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-900 border-t-transparent"></div></div>
                         ) : (
                             <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
                                 {filteredItems.map(item => (
@@ -579,8 +579,8 @@ export default function POSPage() {
                                     >
                                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 group-hover:scale-110 transition-transform">
                                             {item.type === 'Service' ? (
-                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-purple-100 flex items-center justify-center">
-                                                    <ScissorsIcon className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
+                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-primary-100 flex items-center justify-center">
+                                                    <ScissorsIcon className="w-4 h-4 md:w-5 md:h-5 text-primary-600" />
                                                 </div>
                                             ) : (
                                                 <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-green-100 flex items-center justify-center">
@@ -589,7 +589,7 @@ export default function POSPage() {
                                             )}
                                         </div>
                                         <h3 className="font-semibold text-gray-800 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
-                                        <p className="text-blue-900 font-bold text-xs md:text-sm">{settings.symbol}{item.price}</p>
+                                        <p className="text-primary-900 font-bold text-xs md:text-sm">{settings.symbol}{item.price}</p>
                                     </div>
                                 ))}
                             </div>
@@ -610,7 +610,7 @@ export default function POSPage() {
                             placeholder="Tìm tên bill..."
                             value={billSearchQuery}
                             onChange={(e) => setBillSearchQuery(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-900"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-900"
                         />
                     </div>
                     <button
@@ -629,7 +629,7 @@ export default function POSPage() {
                             key={bill.id}
                             onClick={() => switchBill(bill.id)}
                             className={`flex items-center gap-2 px-3 py-1.5 min-w-[100px] cursor-pointer rounded-t-md text-xs font-semibold border-b-2 transition-colors ${activeBillId === bill.id
-                                ? "bg-white text-blue-900 border-blue-900 shadow-sm"
+                                ? "bg-white text-primary-900 border-primary-900 shadow-sm"
                                 : "text-gray-500 border-transparent hover:bg-gray-200"
                                 }`}
                         >
@@ -661,7 +661,7 @@ export default function POSPage() {
                                     placeholder="Đặt tên Bill (VD: Bàn 1, Chị Hà VIP...)"
                                     value={activeBill.name}
                                     onChange={(e) => updateActiveBill({ name: e.target.value })}
-                                    className="flex-1 px-3 py-1.5 text-sm font-bold text-blue-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 transition-all shadow-sm"
+                                    className="flex-1 px-3 py-1.5 text-sm font-bold text-primary-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 transition-all shadow-sm"
                                 />
                             </div>
                             <div className="bg-gray-50 flex-shrink-0 space-y-3">
@@ -676,7 +676,7 @@ export default function POSPage() {
                                     />
                                     <button
                                         onClick={() => setIsAddCustomerModalOpen(true)}
-                                        className="p-2 bg-primary-100 text-blue-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
+                                        className="p-2 bg-primary-100 text-primary-900 rounded-lg hover:bg-primary-200 transition-colors flex-shrink-0"
                                         title="Thêm khách hàng mới"
                                     >
                                         <Plus className="w-4 h-4 md:w-5 md:h-5" />
@@ -699,8 +699,8 @@ export default function POSPage() {
                                             <div className="flex items-center gap-2 overflow-hidden flex-1">
                                                 <div className="flex-shrink-0">
                                                     {item.type === 'Service' ? (
-                                                        <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
-                                                            <ScissorsIcon className="w-3 h-3 text-purple-600" />
+                                                        <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
+                                                            <ScissorsIcon className="w-3 h-3 text-primary-600" />
                                                         </div>
                                                     ) : (
                                                         <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
@@ -734,9 +734,9 @@ export default function POSPage() {
                                                         {(activeBill.serviceStaffAssignments[getCartItemKey(item._id, item.type)] || []).map(assignment => {
                                                             const staff = staffList.find(s => s._id === assignment.staffId);
                                                             return (
-                                                                <div key={assignment.staffId} className="flex items-center gap-1.5 bg-primary-50 p-1 rounded border border-blue-100">
+                                                                <div key={assignment.staffId} className="flex items-center gap-1.5 bg-primary-50 p-1 rounded border border-primary-100">
                                                                     <p className="text-[9px] font-bold text-gray-800 flex-1 truncate">{staff?.name}</p>
-                                                                    <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-blue-200">
+                                                                    <div className="flex items-center gap-1 bg-white px-1 py-0.5 rounded border border-primary-200">
                                                                         <input
                                                                             type="number"
                                                                             min="0"
@@ -745,7 +745,7 @@ export default function POSPage() {
                                                                             onChange={(e) => updateServiceStaffPercentage(item._id, item.type, assignment.staffId, parseFloat(e.target.value) || 0)}
                                                                             className="w-6 text-right text-[9px] font-black focus:outline-none"
                                                                         />
-                                                                        <span className="text-[9px] font-bold text-blue-900">%</span>
+                                                                        <span className="text-[9px] font-bold text-primary-900">%</span>
                                                                     </div>
                                                                     <button
                                                                         onClick={() => removeServiceStaffAssignment(item._id, item.type, assignment.staffId)}
@@ -799,23 +799,23 @@ export default function POSPage() {
                                         type="number"
                                         value={activeBill.discount}
                                         onChange={(e) => updateActiveBill({ discount: parseFloat(e.target.value) || 0 })}
-                                        className="w-16 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-blue-900 outline-none"
+                                        className="w-16 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
                                         min="0"
                                     />
                                 </div>
-                                <div className="flex justify-between items-center text-blue-900 border-t border-gray-200 pt-1.5 mt-1">
+                                <div className="flex justify-between items-center text-primary-900 border-t border-gray-200 pt-1.5 mt-1">
                                     <span className="text-[10px] font-bold">Đã thanh toán</span>
                                     <input
                                         type="number"
                                         placeholder={total.toFixed(2)}
                                         value={activeBill.amountPaid}
                                         onChange={(e) => updateActiveBill({ amountPaid: e.target.value })}
-                                        className="w-20 text-right text-[10px] md:text-xs border-2 border-blue-900/20 rounded px-1 py-0.5 focus:border-blue-900 outline-none font-bold"
+                                        className="w-20 text-right text-[10px] md:text-xs border-2 border-primary-900/20 rounded px-1 py-0.5 focus:border-primary-900 outline-none font-bold"
                                     />
                                 </div>
                                 <div className="flex justify-between text-sm md:text-base font-black text-gray-900 pt-1 border-t border-gray-200">
                                     <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Còn nợ' : 'Tổng cộng'}</span>
-                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600' : 'text-blue-900'}>
+                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600' : 'text-primary-900'}>
                                         {settings.symbol}{((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total).toFixed(2)}
                                     </span>
                                 </div>
@@ -828,7 +828,7 @@ export default function POSPage() {
                                             <button
                                                 key={method}
                                                 onClick={() => updateActiveBill({ paymentMethod: method })}
-                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-primary-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-primary-900 text-white border-primary-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
                                             >
                                                 {method}
                                             </button>
@@ -842,7 +842,7 @@ export default function POSPage() {
                                             <select
                                                 value={activeBill.selectedQrIndex}
                                                 onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
-                                                className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-primary-50/50 outline-none font-medium"
+                                                className="w-full p-2 text-xs border border-primary-200 rounded-lg focus:ring-1 focus:ring-primary-900 bg-primary-50/50 outline-none font-medium"
                                             >
                                                 {settings.qrCodes.map((qr: any, idx: number) => (
                                                     <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
@@ -871,7 +871,7 @@ export default function POSPage() {
             <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-center justify-around h-16 z-50 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
                 <button
                     onClick={() => setMobileTab('catalog')}
-                    className={`flex flex-col items-center justify-center w-20 h-full transition-all ${mobileTab === 'catalog' ? 'text-blue-900 scale-110' : 'text-gray-400'}`}
+                    className={`flex flex-col items-center justify-center w-20 h-full transition-all ${mobileTab === 'catalog' ? 'text-primary-900 scale-110' : 'text-gray-400'}`}
                 >
                     <LayoutDashboard className="w-5 h-5 mb-1" />
                     <span className="text-[10px] font-bold">Danh mục</span>
@@ -880,7 +880,7 @@ export default function POSPage() {
                 <div className="w-px h-8 bg-gray-100"></div>
                 <button
                     onClick={() => setMobileTab('cart')}
-                    className={`flex flex-col items-center justify-center w-20 h-full transition-all relative ${mobileTab === 'cart' ? 'text-blue-900 scale-110' : 'text-gray-400'}`}
+                    className={`flex flex-col items-center justify-center w-20 h-full transition-all relative ${mobileTab === 'cart' ? 'text-primary-900 scale-110' : 'text-gray-400'}`}
                 >
                     <div className="relative">
                         <ShoppingCart className="w-5 h-5 mb-1" />
@@ -947,7 +947,7 @@ export default function POSPage() {
                                     type="text"
                                     value={newCustomerName}
                                     onChange={(e) => setNewCustomerName(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 transition-shadow bg-gray-50 focus:bg-white"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 focus:bg-white"
                                     placeholder="Nhập tên khách hàng..."
                                     autoFocus
                                 />
@@ -960,7 +960,7 @@ export default function POSPage() {
                                     type="text"
                                     value={newCustomerPhone}
                                     onChange={(e) => setNewCustomerPhone(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 transition-shadow bg-gray-50 focus:bg-white"
+                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 focus:bg-white"
                                     placeholder="Nhập số điện thoại..."
                                 />
                             </div>

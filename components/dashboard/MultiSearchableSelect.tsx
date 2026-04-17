@@ -72,7 +72,7 @@ export default function MultiSearchableSelect({
             )}
             <div className="relative">
                 <div
-                    className={`w-full px-3 py-1.5 border rounded-lg cursor-pointer flex flex-wrap items-center gap-2 bg-white min-h-[42px] ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent"
+                    className={`w-full px-3 py-1.5 border rounded-lg cursor-pointer flex flex-wrap items-center gap-2 bg-white min-h-[42px] ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
                         }`}
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -80,11 +80,11 @@ export default function MultiSearchableSelect({
                         selectedOptions.map((opt) => (
                             <span
                                 key={opt.value}
-                                className="bg-primary-50 text-blue-700 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-blue-100"
+                                className="bg-primary-50 text-primary-700 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-primary-100"
                             >
                                 {opt.label}
                                 <X
-                                    className="w-3 h-3 cursor-pointer hover:text-blue-900"
+                                    className="w-3 h-3 cursor-pointer hover:text-primary-900"
                                     onClick={(e) => removeOption(opt.value, e)}
                                 />
                             </span>
@@ -104,7 +104,7 @@ export default function MultiSearchableSelect({
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
                                     placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
@@ -122,7 +122,7 @@ export default function MultiSearchableSelect({
                                     return (
                                         <div
                                             key={option.value}
-                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-primary-50 transition-colors ${isSelected ? "bg-primary-50 text-blue-900 font-semibold" : "text-gray-700"
+                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-primary-50 transition-colors ${isSelected ? "bg-primary-50 text-primary-900 font-semibold" : "text-gray-700"
                                                 }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -130,7 +130,7 @@ export default function MultiSearchableSelect({
                                             }}
                                         >
                                             {option.label}
-                                            {isSelected && <Check className="w-4 h-4 text-blue-600" />}
+                                            {isSelected && <Check className="w-4 h-4 text-primary-600" />}
                                         </div>
                                     );
                                 })

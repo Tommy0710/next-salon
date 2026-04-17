@@ -70,7 +70,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 p-4 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-slate-900 p-4 relative overflow-hidden">
             {/* Animated Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                             {logo ? (
                                 <img src={logo} alt={storeName} className="h-20 w-auto object-contain drop-shadow-lg" />
                             ) : (
-                                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/30 flex items-center justify-center">
+                                <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-xl shadow-lg shadow-primary-500/30 flex items-center justify-center">
                                     <Sparkles className="w-7 h-7 text-white" />
                                 </div>
                             )}
@@ -95,24 +95,24 @@ export default function LoginPage() {
                         <h1 className="text-2xl font-bold text-white uppercase tracking-tight">
                             {storeName}
                         </h1>
-                        <p className="text-blue-200/60 text-sm mt-1">Sign in to continue</p>
+                        <p className="text-primary-200/60 text-sm mt-1">Sign in to continue</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-xs font-medium text-blue-100 mb-1.5">
+                            <label htmlFor="email" className="block text-xs font-medium text-primary-100 mb-1.5">
                                 Email
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400/50" />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-400/50" />
                                 <input
                                     id="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-blue-300/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
+                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -120,18 +120,18 @@ export default function LoginPage() {
 
                         {/* Password */}
                         <div>
-                            <label htmlFor="password" className="block text-xs font-medium text-blue-100 mb-1.5">
+                            <label htmlFor="password" className="block text-xs font-medium text-primary-100 mb-1.5">
                                 Password
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-400/50" />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-400/50" />
                                 <input
                                     id="password"
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-blue-300/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
+                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -139,10 +139,10 @@ export default function LoginPage() {
 
                         {/* Remember Me */}
                         <div className="flex items-center">
-                            <label className="flex items-center gap-2 text-xs text-blue-200/60 cursor-pointer hover:text-blue-200 transition-colors">
+                            <label className="flex items-center gap-2 text-xs text-primary-200/60 cursor-pointer hover:text-primary-200 transition-colors">
                                 <input
                                     type="checkbox"
-                                    className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/50 focus:ring-offset-0 cursor-pointer"
+                                    className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500/50 focus:ring-offset-0 cursor-pointer"
                                 />
                                 Remember me
                             </label>
@@ -160,7 +160,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium py-2.5 px-4 rounded-lg text-sm hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-medium py-2.5 px-4 rounded-lg text-sm hover:from-primary-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all hover:shadow-lg hover:shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? (
                                 <>
@@ -177,7 +177,7 @@ export default function LoginPage() {
                     </form>
 
                     {/* Footer */}
-                    <p className="text-center text-blue-400/30 text-xs mt-6 pt-4 border-t border-white/5">
+                    <p className="text-center text-primary-400/30 text-xs mt-6 pt-4 border-t border-white/5">
                         © {new Date().getFullYear()} {storeName}
                     </p>
                 </div>

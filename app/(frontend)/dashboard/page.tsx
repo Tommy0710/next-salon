@@ -187,7 +187,7 @@ export default async function DashboardPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
                     <p className="text-gray-500">
-                        Xin chào, <span className="font-semibold text-blue-800">{session.user?.name || 'User'}</span>!
+                        Xin chào, <span className="font-semibold text-primary-800">{session.user?.name || 'User'}</span>!
                         {reportPermission?.view === 'own' ? " Dưới đây là số liệu của bạn." : " Tổng quan hoạt động Spa hôm nay."}
                     </p>
                 </div>
@@ -230,8 +230,8 @@ export default async function DashboardPage() {
                 {/* Block 1: Biểu đồ khách hàng */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
                     <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-blue-600" />
-                        Khách hàng hôm nay <span className="ml-auto bg-primary-50 text-blue-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
+                        <Users className="w-5 h-5 text-primary-600" />
+                        Khách hàng hôm nay <span className="ml-auto bg-primary-50 text-primary-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
                     </h3>
                     <CustomerChart data={customerChartData} />
                 </div>
@@ -250,12 +250,12 @@ export default async function DashboardPage() {
                             </div>
                             <p className="text-3xl font-black text-yellow-900">{apptStats.pending}</p>
                         </div>
-                        <div className="p-4 bg-primary-50 rounded-xl border border-blue-100 transition-all hover:shadow-md">
-                            <div className="flex items-center gap-2 text-blue-800 mb-2">
+                        <div className="p-4 bg-primary-50 rounded-xl border border-primary-100 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-primary-800 mb-2">
                                 <Calendar className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã xác nhận</span>
                             </div>
-                            <p className="text-3xl font-black text-blue-900">{apptStats.confirmed}</p>
+                            <p className="text-3xl font-black text-primary-900">{apptStats.confirmed}</p>
                         </div>
                         <div className="p-4 bg-green-50 rounded-xl border border-green-100 transition-all hover:shadow-md">
                             <div className="flex items-center gap-2 text-green-800 mb-2">

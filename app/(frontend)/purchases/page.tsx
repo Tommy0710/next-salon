@@ -135,7 +135,7 @@ export default function PurchasesPage() {
                         <input
                             type="text"
                             placeholder="Search purchase # or supplier..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -212,7 +212,7 @@ export default function PurchasesPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${purchase.paymentStatus === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                purchase.paymentStatus === 'partially_paid' ? 'bg-primary-50 text-blue-700 border-blue-200' :
+                                                purchase.paymentStatus === 'partially_paid' ? 'bg-primary-50 text-primary-700 border-primary-200' :
                                                     'bg-orange-50 text-orange-700 border-orange-200'
                                                 }`}>
                                                 {purchase.paymentStatus?.replace('_', ' ') || 'Pending'}
@@ -222,7 +222,7 @@ export default function PurchasesPage() {
                                             <div className="relative flex justify-end dropdown-trigger">
                                                 <button
                                                     onClick={() => setActiveDropdown(activeDropdown === purchase._id ? null : purchase._id)}
-                                                    className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                    className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                 >
                                                     <MoreVertical className="w-5 h-5" />
                                                 </button>
@@ -232,7 +232,7 @@ export default function PurchasesPage() {
                                                             href={`/purchases/${purchase._id}`}
                                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                                         >
-                                                            <Eye className="w-4 h-4 text-blue-600" />
+                                                            <Eye className="w-4 h-4 text-primary-600" />
                                                             View Details
                                                         </Link>
                                                         {purchase.paymentStatus !== 'paid' && (
@@ -298,7 +298,7 @@ export default function PurchasesPage() {
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-primary-900 text-white">
                             <div>
                                 <h3 className="text-xl font-bold">Add Deposit</h3>
-                                <p className="text-blue-200 text-xs mt-1">Order: {selectedPurchase.purchaseNumber}</p>
+                                <p className="text-primary-200 text-xs mt-1">Order: {selectedPurchase.purchaseNumber}</p>
                             </div>
                             <button onClick={() => setShowDepositModal(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                                 <X className="w-5 h-5" />
@@ -327,7 +327,7 @@ export default function PurchasesPage() {
                                             value={depositAmount}
                                             onChange={(e) => setDepositAmount(e.target.value)}
                                             placeholder="0.00"
-                                            className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all font-bold text-lg"
+                                            className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-bold text-lg"
                                         />
                                     </div>
                                 </div>
@@ -337,7 +337,7 @@ export default function PurchasesPage() {
                                     <select
                                         value={paymentMethod}
                                         onChange={(e) => setPaymentMethod(e.target.value)}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all font-semibold text-gray-700"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-semibold text-gray-700"
                                     >
                                         <option value="Cash">Cash</option>
                                         <option value="Card">Bank Transfer / Card</option>

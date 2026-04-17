@@ -276,7 +276,7 @@ export default function StaffSlotsPage() {
                                 <button
                                     onClick={() => setCreationType('date')}
                                     className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${creationType === 'date'
-                                        ? 'border-blue-900 text-blue-900'
+                                        ? 'border-primary-900 text-primary-900'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                                 >
                                     Date-wise Slots
@@ -284,7 +284,7 @@ export default function StaffSlotsPage() {
                                 <button
                                     onClick={() => setCreationType('day')}
                                     className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${creationType === 'day'
-                                        ? 'border-blue-900 text-blue-900'
+                                        ? 'border-primary-900 text-primary-900'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                                 >
                                     Day-wise Slots (Recurring)
@@ -321,8 +321,8 @@ export default function StaffSlotsPage() {
                         </div>
 
                         {selectedStaffData && (
-                            <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-blue-100">
-                                <div className="flex items-center gap-2 text-sm text-blue-900">
+                            <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                                <div className="flex items-center gap-2 text-sm text-primary-900">
                                     <User className="w-4 h-4" />
                                     <span className="font-semibold">{selectedStaffData.name}</span>
                                     <span className="text-gray-400 mx-2">|</span>
@@ -442,8 +442,8 @@ export default function StaffSlotsPage() {
 
                     <Modal isOpen={isModalOpen} onClose={closeModal} title="Create Time Slots">
                         <div className="space-y-4">
-                            <div className="p-3 bg-primary-50 border border-blue-200 rounded-lg">
-                                <p className="text-sm text-blue-800">
+                            <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                                <p className="text-sm text-primary-800">
                                     <strong>Template:</strong> Multiple slots will be created for <strong>{creationType === 'date' ? selectedDate : selectedDay}</strong>.
                                 </p>
                             </div>
@@ -478,7 +478,7 @@ export default function StaffSlotsPage() {
                                     id="isAvailable"
                                     checked={slotForm.isAvailable}
                                     onChange={(e: any) => setSlotForm({ ...slotForm, isAvailable: e.target.checked })}
-                                    className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                 />
                                 <label htmlFor="isAvailable" className="text-sm text-gray-700">Mark as available for booking</label>
                             </div>

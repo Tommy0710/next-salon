@@ -89,7 +89,7 @@ export default function PaymentHistory({ transactionId, transactionType, onUpdat
             {deposits.map((deposit) => (
                 <div key={deposit._id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="p-2 bg-primary-50 text-blue-600 rounded-lg">
+                        <div className="p-2 bg-primary-50 text-primary-600 rounded-lg">
                             <DollarSign className="w-5 h-5" />
                         </div>
                         <div>

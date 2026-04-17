@@ -39,11 +39,11 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
                     placeholder={initialTab === "zalo" ? "Search Zalo events by phone, template, or event type..." : "Search logs by action or resource..."}
                     defaultValue={initialSearch}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                 />
                 {isPending && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-900"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-900"></div>
                     </div>
                 )}
             </div>
@@ -61,7 +61,7 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
                                 router.push(`${pathname}?${params.toString()}`);
                             });
                         }}
-                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                     >
                         <option value="10">10</option>
                         <option value="25">25</option>
@@ -74,7 +74,7 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
                     onClick={() => {
                         router.push(pathname);
                     }}
-                    className="text-sm font-medium text-gray-500 hover:text-blue-900 transition-colors px-2"
+                    className="text-sm font-medium text-gray-500 hover:text-primary-900 transition-colors px-2"
                 >
                     Reset All
                 </button>

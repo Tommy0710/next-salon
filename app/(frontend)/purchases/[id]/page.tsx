@@ -94,7 +94,7 @@ export default function PurchaseDetailsPage() {
                 <div className="flex items-center gap-4">
                     <Link
                         href="/purchases"
-                        className="p-2 hover:bg-white rounded-full transition-all text-gray-400 hover:text-blue-900 shadow-sm"
+                        className="p-2 hover:bg-white rounded-full transition-all text-gray-400 hover:text-primary-900 shadow-sm"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
@@ -135,7 +135,7 @@ export default function PurchaseDetailsPage() {
                 {/* Supplier Info */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-primary-50 text-blue-600 rounded-xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center">
                             <User className="w-5 h-5" />
                         </div>
                         <h2 className="text-lg font-bold text-gray-900">Supplier Information</h2>
@@ -197,7 +197,7 @@ export default function PurchaseDetailsPage() {
                             <div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Payment Status</p>
                                 <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${purchase.paymentStatus === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
-                                    purchase.paymentStatus === 'partially_paid' ? 'bg-primary-50 text-blue-700 border-blue-200' :
+                                    purchase.paymentStatus === 'partially_paid' ? 'bg-primary-50 text-primary-700 border-primary-200' :
                                         'bg-orange-50 text-orange-700 border-orange-200'
                                     }`}>
                                     {purchase.paymentStatus?.replace('_', ' ') || 'Pending'}
@@ -257,7 +257,7 @@ export default function PurchaseDetailsPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-50 text-blue-700 border border-blue-100">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary-50 text-primary-700 border border-primary-100">
                                             {item.quantity} units
                                         </span>
                                     </td>
@@ -300,7 +300,7 @@ export default function PurchaseDetailsPage() {
                         )}
                         <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
                             <span className="text-lg font-black text-gray-900 uppercase tracking-widest">Total</span>
-                            <span className="text-2xl font-black text-blue-900">{settings.symbol}{purchase.totalAmount.toFixed(2)}</span>
+                            <span className="text-2xl font-black text-primary-900">{settings.symbol}{purchase.totalAmount.toFixed(2)}</span>
                         </div>
                         <div className="pt-2 flex justify-between items-center text-xs">
                             <span className="font-bold text-gray-400 uppercase tracking-wider">Paid Amount</span>

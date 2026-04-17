@@ -114,7 +114,7 @@ export default function RolesPage() {
                             <input
                                 type="text"
                                 placeholder="Search roles..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -159,13 +159,13 @@ export default function RolesPage() {
                                         <tr key={role._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${role.isSystem ? 'bg-purple-100' : 'bg-primary-100'}`}>
-                                                        <Shield className={`w-4 h-4 ${role.isSystem ? 'text-purple-600' : 'text-blue-600'}`} />
+                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${role.isSystem ? 'bg-primary-100' : 'bg-primary-100'}`}>
+                                                        <Shield className={`w-4 h-4 ${role.isSystem ? 'text-primary-600' : 'text-primary-600'}`} />
                                                     </div>
                                                     <div>
                                                         <div className="text-sm font-semibold text-gray-900">{role.name}</div>
                                                         {role.isSystem && (
-                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-primary-700 border border-primary-100">
                                                                 System Default
                                                             </span>
                                                         )}
@@ -194,7 +194,7 @@ export default function RolesPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === role._id ? null : role._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -206,7 +206,7 @@ export default function RolesPage() {
                                                                     href={`/roles/${role._id}`}
                                                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-blue-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600" />
                                                                     Edit Role
                                                                 </Link>
                                                             </PermissionGate>

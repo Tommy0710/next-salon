@@ -182,16 +182,16 @@ export default function PrintInvoicePage() {
                 </div>
             </div>
             {statusMessage && (
-                <div className="max-w-[400px] mx-auto text-sm text-blue-700 mb-4 print:hidden">{statusMessage}</div>
+                <div className="max-w-[400px] mx-auto text-sm text-primary-700 mb-4 print:hidden">{statusMessage}</div>
             )}
 
             {/* Thermal Receipt Content */}
-            <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-blue-900 print:border-t-0">
+            <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0">
                 {/* Store Header */}
                 <div className="text-center mb-6">
                     {settings?.logoUrl && (
                         <div className="mb-4">
-                            <img src={settings.logoUrl} alt="Store Logo" className="w-20 h-20 mx-auto object-contain" />
+                            <img src={settings.logoUrl} alt="Store Logo" className="w-40 h-auto mx-auto object-contain" />
                         </div>
                     )}
                     {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1>
@@ -218,7 +218,7 @@ export default function PrintInvoicePage() {
                     </div>
                     {/* <div className="flex justify-between items-center">
                         <span className="text-gray-500">Trạng thái:</span>
-                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-primary-50 text-blue-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
+                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase ${invoice.status === 'paid' ? 'bg-green-50 text-green-700' : invoice.status === 'partially_paid' ? 'bg-primary-50 text-primary-700' : invoice.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
                             {invoice.status?.replace('_', ' ') || 'N/A'}
                         </span>
                     </div> */}

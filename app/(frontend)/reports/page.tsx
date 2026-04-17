@@ -191,7 +191,7 @@ export default function ReportsPage() {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900">Platform Growth</h3>
-                        <Users className="w-5 h-5 text-purple-600" />
+                        <Users className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex items-end gap-2">
                         <span className="text-3xl font-bold">{reportData?.totalCustomers || 0}</span>
@@ -213,7 +213,7 @@ export default function ReportsPage() {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900">Profit Margin</h3>
-                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                        <TrendingUp className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-3xl font-bold">
@@ -268,7 +268,7 @@ export default function ReportsPage() {
     const renderContent = () => {
         if (loading) return (
             <div className="flex flex-col items-center justify-center py-40">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-900 border-t-transparent shadow-sm"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-900 border-t-transparent shadow-sm"></div>
                 <p className="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">Generating Your Report...</p>
             </div>
         );
@@ -293,9 +293,9 @@ export default function ReportsPage() {
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Sales</p>
                                 <p className="text-xl font-black text-gray-900">{salesSummary.count}</p>
                             </div>
-                            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm border-l-4 border-l-blue-600">
+                            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm border-l-4 border-l-primary-600">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
-                                <p className="text-xl font-black text-blue-900">{formatCurrency(salesSummary.total)}</p>
+                                <p className="text-xl font-black text-primary-900">{formatCurrency(salesSummary.total)}</p>
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm border-l-4 border-l-green-600">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Received</p>
@@ -411,7 +411,7 @@ export default function ReportsPage() {
                             </div>
                         </div>
                         <div className="bg-gray-900 p-8 rounded-xl shadow-lg text-white flex flex-col justify-center items-center text-center">
-                            <TrendingUp className="w-16 h-16 text-blue-400 mb-6 animate-pulse" />
+                            <TrendingUp className="w-16 h-16 text-primary-400 mb-6 animate-pulse" />
                             <h4 className="text-xl font-bold mb-2">Growth Forecast</h4>
                             <p className="text-gray-400 text-sm">Our AI models are processing your salon's patterns to provide next month's projections.</p>
                         </div>
@@ -422,10 +422,10 @@ export default function ReportsPage() {
                     <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-2xl p-10">
                         <div className="text-center mb-10 pb-8 border-b border-gray-50">
                             <div className="inline-flex p-3 bg-primary-50 rounded-2xl mb-4">
-                                <PieChart className="w-8 h-8 text-blue-900" />
+                                <PieChart className="w-8 h-8 text-primary-900" />
                             </div>
                             <h3 className="text-3xl font-black text-gray-900">Daily Reconciliation</h3>
-                            <p className="text-blue-600 font-bold text-sm tracking-tight mt-2">
+                            <p className="text-primary-600 font-bold text-sm tracking-tight mt-2">
                                 Period: {formatSafeDate(dateRange.start, "EEEE, MMMM dd, yyyy")}
                             </p>
                         </div>
@@ -465,7 +465,7 @@ export default function ReportsPage() {
             case 'activity-log':
                 return (
                     <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-                        <Shield className="w-16 h-16 text-blue-900 mb-4" />
+                        <Shield className="w-16 h-16 text-primary-900 mb-4" />
                         <h3 className="text-xl font-bold text-gray-900">System Activity Audit</h3>
                         <p className="text-gray-500 max-w-md text-center mt-2 mb-8">
                             Detailed logs of all user actions, security events, and system changes are stored in the dedicated audit module.
@@ -532,7 +532,7 @@ export default function ReportsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`pb-4 text-sm font-bold whitespace-nowrap transition-all border-b-2 ${activeTab === tab.id
-                                    ? 'text-blue-900 border-blue-900'
+                                    ? 'text-primary-900 border-primary-900'
                                     : 'text-gray-400 border-transparent hover:text-gray-600'
                                     }`}
                             >

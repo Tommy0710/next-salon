@@ -57,15 +57,15 @@ export default function AIReportsPage() {
     if (!aiEnabled) {
         return (
             <div className="max-w-4xl mx-auto p-8 text-center">
-                <div className="bg-purple-50 border border-purple-100 rounded-2xl p-12 shadow-sm">
-                    <Sparkles className="w-16 h-16 text-purple-600 mx-auto mb-6" />
+                <div className="bg-primary-50 border border-primary-100 rounded-2xl p-12 shadow-sm">
+                    <Sparkles className="w-16 h-16 text-primary-600 mx-auto mb-6" />
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">AI Reporting is Disabled</h1>
                     <p className="text-gray-600 mb-8">
                         Experience the power of business intelligence with AI. Enable OpenAI integration in your settings to get started.
                     </p>
                     <a
                         href="/settings"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
                     >
                         Go to Settings
                     </a>
@@ -79,7 +79,7 @@ export default function AIReportsPage() {
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Sparkles className="w-6 h-6 text-purple-600" />
+                        <Sparkles className="w-6 h-6 text-primary-600" />
                         AI Power Reports
                     </h1>
                     <p className="text-gray-500">Intelligent business analysis and strategic insights</p>
@@ -88,7 +88,7 @@ export default function AIReportsPage() {
                     <select
                         value={timeRange}
                         onChange={(e) => setTimeRange(e.target.value)}
-                        className="bg-white text-gray-900 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                        className="bg-white text-gray-900 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                     >
                         <option value="7">Last 7 Days</option>
                         <option value="30">Last 30 Days</option>
@@ -111,7 +111,7 @@ export default function AIReportsPage() {
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 overflow-hidden relative group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Lightbulb className="w-12 h-12 text-purple-600" />
+                            <Lightbulb className="w-12 h-12 text-primary-600" />
                         </div>
                         <h3 className="font-bold text-gray-900 mb-4">Strategic Assistant</h3>
                         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
@@ -122,7 +122,7 @@ export default function AIReportsPage() {
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder="e.g. How can I improve service revenue next month?"
-                                className="w-full h-32 px-4 py-3 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none text-sm"
+                                className="w-full h-32 px-4 py-3 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none text-sm"
                             />
                             <FormButton
                                 type="submit"
@@ -136,9 +136,9 @@ export default function AIReportsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                        <div className="p-4 bg-primary-50 border border-blue-100 rounded-xl flex items-center gap-3">
-                            <TrendingUp className="w-5 h-5 text-blue-600" />
-                            <span className="text-xs font-medium text-blue-800">Growth Analysis Included</span>
+                        <div className="p-4 bg-primary-50 border border-primary-100 rounded-xl flex items-center gap-3">
+                            <TrendingUp className="w-5 h-5 text-primary-600" />
+                            <span className="text-xs font-medium text-primary-800">Growth Analysis Included</span>
                         </div>
                         <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3">
                             <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -151,7 +151,7 @@ export default function AIReportsPage() {
                 <div className="lg:col-span-2">
                     {loading ? (
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
-                            <Loader2 className="w-12 h-12 text-purple-600 animate-spin mb-6" />
+                            <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-6" />
                             <h3 className="text-xl font-bold text-gray-900 mb-2">Analyzing Business Data...</h3>
                             <p className="text-gray-500 max-w-sm">
                                 AI is crunching your numbers and generating strategic recommendations. This may take a few seconds.
@@ -161,7 +161,7 @@ export default function AIReportsPage() {
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full">
                             <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <PieChart className="w-4 h-4 text-purple-600" />
+                                    <PieChart className="w-4 h-4 text-primary-600" />
                                     <span className="text-sm font-semibold text-gray-900">AI Intelligent Insights</span>
                                 </div>
                                 <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400 bg-white px-2 py-1 rounded-full border border-gray-100">

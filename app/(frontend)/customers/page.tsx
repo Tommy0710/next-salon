@@ -168,7 +168,7 @@ export default function CustomersPage() {
                             <input
                                 type="text"
                                 placeholder="Search by name, email or phone..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -215,7 +215,7 @@ export default function CustomersPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-primary-50 rounded-lg">
-                                                        <User className="w-4 h-4 text-blue-600" />
+                                                        <User className="w-4 h-4 text-primary-600" />
                                                     </div>
                                                     <div>
                                                         <span className="text-sm font-bold text-gray-900">{customer.name}</span>
@@ -263,7 +263,7 @@ export default function CustomersPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === customer._id ? null : customer._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -278,7 +278,7 @@ export default function CustomersPage() {
                                                                     }}
                                                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-blue-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600" />
                                                                     Edit Details
                                                                 </button>
                                                             </PermissionGate>
@@ -399,7 +399,7 @@ export default function CustomersPage() {
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
                             placeholder="Additional notes"
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-transparent text-sm resize-none"
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm resize-none"
                         />
                     </div>
                     <FormSelect

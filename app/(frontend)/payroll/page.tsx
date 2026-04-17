@@ -204,7 +204,7 @@ export default function PayrollPage() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "paid": return "bg-green-100 text-green-700 border-green-200";
-            case "approved": return "bg-primary-100 text-blue-700 border-blue-200";
+            case "approved": return "bg-primary-100 text-primary-700 border-primary-200";
             default: return "bg-gray-100 text-gray-700 border-gray-200";
         }
     };
@@ -238,7 +238,7 @@ export default function PayrollPage() {
                             <input
                                 type="text"
                                 placeholder="Search by staff name..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -286,7 +286,7 @@ export default function PayrollPage() {
                                         <tr key={payroll._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-blue-700 font-bold text-xs">
+                                                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
                                                         {payroll.staff.name.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-900">{payroll.staff.name}</span>
@@ -304,7 +304,7 @@ export default function PayrollPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                                                 {settings.symbol}{payroll.totalCommission.toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-600">
                                                 {settings.symbol}{payroll.totalTips.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
@@ -326,7 +326,7 @@ export default function PayrollPage() {
                                                     </button>
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === payroll._id ? null : payroll._id)}
-                                                        className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
@@ -340,7 +340,7 @@ export default function PayrollPage() {
                                                                 }}
                                                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                             >
-                                                                <FileText className="w-4 h-4 text-blue-600" />
+                                                                <FileText className="w-4 h-4 text-primary-600" />
                                                                 View Details
                                                             </button>
                                                             {payroll.status === "draft" && (
@@ -501,14 +501,14 @@ export default function PayrollPage() {
                             </div>
                             <div className="flex justify-between py-2 border-b">
                                 <span className="text-gray-600">Total Tips</span>
-                                <span className="font-semibold text-purple-600">{settings.symbol}{selectedPayroll.totalTips.toLocaleString()}</span>
+                                <span className="font-semibold text-primary-600">{settings.symbol}{selectedPayroll.totalTips.toLocaleString()}</span>
                             </div>
 
                             <div className="pt-2">
                                 <label className="text-sm font-medium text-gray-700">Bonuses</label>
                                 <input
                                     type="number"
-                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent"
                                     value={editPayrollData.bonuses}
                                     onChange={(e) => setEditPayrollData({ ...editPayrollData, bonuses: parseFloat(e.target.value) || 0 })}
                                     disabled={selectedPayroll.status === "paid"}
@@ -519,7 +519,7 @@ export default function PayrollPage() {
                                 <label className="text-sm font-medium text-gray-700">Deductions</label>
                                 <input
                                     type="number"
-                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent"
                                     value={editPayrollData.deductions}
                                     onChange={(e) => setEditPayrollData({ ...editPayrollData, deductions: parseFloat(e.target.value) || 0 })}
                                     disabled={selectedPayroll.status === "paid"}
@@ -529,7 +529,7 @@ export default function PayrollPage() {
                             <div>
                                 <label className="text-sm font-medium text-gray-700">Notes</label>
                                 <textarea
-                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent"
                                     rows={2}
                                     value={editPayrollData.notes}
                                     onChange={(e) => setEditPayrollData({ ...editPayrollData, notes: e.target.value })}
@@ -538,7 +538,7 @@ export default function PayrollPage() {
 
                             <div className="flex justify-between py-3 bg-primary-50 px-3 rounded-lg mt-2">
                                 <span className="font-bold text-gray-900">Final Total</span>
-                                <span className="font-bold text-blue-900 text-lg">
+                                <span className="font-bold text-primary-900 text-lg">
                                     {settings.symbol}{(selectedPayroll.baseSalary + selectedPayroll.totalCommission + selectedPayroll.totalTips + editPayrollData.bonuses - editPayrollData.deductions).toLocaleString()}
                                 </span>
                             </div>

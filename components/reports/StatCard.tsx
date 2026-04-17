@@ -23,11 +23,11 @@ export default function StatCard({
 }: StatCardProps) {
 
     const colorStyles = {
-        blue: "bg-primary-50 text-blue-600 border-blue-100",
+        blue: "bg-primary-50 text-primary-600 border-primary-100",
         green: "bg-green-50 text-green-600 border-green-100",
         red: "bg-red-50 text-red-600 border-red-100",
         orange: "bg-orange-50 text-orange-600 border-orange-100",
-        purple: "bg-purple-50 text-purple-600 border-purple-100",
+        purple: "bg-primary-50 text-primary-600 border-primary-100",
     };
 
     if (loading) {

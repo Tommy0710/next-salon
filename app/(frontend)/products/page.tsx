@@ -181,7 +181,7 @@ export default function ProductsPage() {
                                 <input
                                     type="text"
                                     placeholder="Search by product name..."
-                                    className="w-full pl-10 pr-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                                    className="w-full pl-10 pr-4 py-2 bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
@@ -253,7 +253,7 @@ export default function ProductsPage() {
                                                     <span className="text-sm font-bold text-gray-900">{settings.symbol}{product.price.toFixed(2)}</span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${product.type === 'retail' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-purple-50 text-purple-700 border-purple-200'}`}>
+                                                    <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${product.type === 'retail' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-primary-50 text-primary-700 border-primary-200'}`}>
                                                         {product.type}
                                                     </span>
                                                 </td>
@@ -261,7 +261,7 @@ export default function ProductsPage() {
                                                     <div className="relative flex justify-end dropdown-trigger">
                                                         <button
                                                             onClick={() => setActiveDropdown(activeDropdown === product._id ? null : product._id)}
-                                                            className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                            className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                         >
                                                             <MoreVertical className="w-5 h-5" />
                                                         </button>
@@ -276,7 +276,7 @@ export default function ProductsPage() {
                                                                         }}
                                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                                     >
-                                                                        <Edit className="w-4 h-4 text-blue-600" />
+                                                                        <Edit className="w-4 h-4 text-primary-600" />
                                                                         Edit Details
                                                                     </button>
                                                                 </PermissionGate>

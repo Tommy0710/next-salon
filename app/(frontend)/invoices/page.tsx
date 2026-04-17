@@ -247,7 +247,7 @@ export default function InvoicesPage() {
                             placeholder="Search by invoice number or customer..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                         />
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto text-black">
@@ -317,13 +317,13 @@ export default function InvoicesPage() {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
                                                 <div className="p-2 bg-primary-50 rounded-lg">
-                                                    <FileText className="w-4 h-4 text-blue-900" />
+                                                    <FileText className="w-4 h-4 text-primary-900" />
                                                 </div>
                                                 <div>
                                                     <span className="text-sm font-bold text-gray-900">{inv.invoiceNumber}</span>
                                                     <div className="text-[10px] text-gray-400 font-medium uppercase">{formatDate(inv.date, settings.timezone)}</div>
                                                     <div className="mt-1 flex flex-col">
-                                                        <span className="text-xs font-semibold text-blue-700">{inv.customer?.name || "Walk-in"}</span>
+                                                        <span className="text-xs font-semibold text-primary-700">{inv.customer?.name || "Walk-in"}</span>
                                                         {inv.customer?.phone && <span className="text-[10px] text-gray-500">{inv.customer.phone}</span>}
                                                     </div>
                                                 </div>
@@ -354,7 +354,7 @@ export default function InvoicesPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${inv.status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                inv.status === 'partially_paid' ? 'bg-primary-50 text-blue-700 border-blue-200' :
+                                                inv.status === 'partially_paid' ? 'bg-primary-50 text-primary-700 border-primary-200' :
                                                     inv.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
                                                         'bg-red-50 text-red-700 border-red-200'
                                                 }`}>
@@ -382,7 +382,7 @@ export default function InvoicesPage() {
                                             <div className="relative flex justify-end dropdown-trigger">
                                                 <button
                                                     onClick={() => setActiveDropdown(activeDropdown === inv._id ? null : inv._id)}
-                                                    className="p-2 text-gray-400 hover:text-blue-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                    className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
                                                 >
                                                     <MoreVertical className="w-5 h-5" />
                                                 </button>
@@ -406,7 +406,7 @@ export default function InvoicesPage() {
                                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
                                                             onClick={() => setActiveDropdown(null)}
                                                         >
-                                                            <Eye className="w-4 h-4 text-blue-600" />
+                                                            <Eye className="w-4 h-4 text-primary-600" />
                                                             View Receipt
                                                         </Link>
                                                         <button
@@ -499,7 +499,7 @@ export default function InvoicesPage() {
                 title={`Record Payment for ${payingInvoice?.invoiceNumber}`}
             >
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                    <div className="bg-primary-50 p-4 rounded-lg mb-4 flex justify-between items-center text-blue-900">
+                    <div className="bg-primary-50 p-4 rounded-lg mb-4 flex justify-between items-center text-primary-900">
                         <span className="text-sm font-medium">Total Balance Due</span>
                         <span className="text-xl font-bold">{settings.symbol}{(payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0).toFixed(2)}</span>
                     </div>
@@ -523,7 +523,7 @@ export default function InvoicesPage() {
                                         key={method}
                                         type="button"
                                         onClick={() => setPaymentData({ ...paymentData, method: method })}
-                                        className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${paymentData.method === method ? 'bg-primary-900 text-white border-blue-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                        className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${paymentData.method === method ? 'bg-primary-900 text-white border-primary-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
                                     >
                                         {method}
                                     </button>
@@ -537,7 +537,7 @@ export default function InvoicesPage() {
                                     <select
                                         value={paymentData.selectedQrIndex}
                                         onChange={(e) => setPaymentData({ ...paymentData, selectedQrIndex: parseInt(e.target.value) })}
-                                        className="w-full p-2 text-xs border border-blue-200 rounded-lg focus:ring-1 focus:ring-blue-900 bg-primary-50/50 outline-none font-medium text-black"
+                                        className="w-full p-2 text-xs border border-primary-200 rounded-lg focus:ring-1 focus:ring-primary-900 bg-primary-50/50 outline-none font-medium text-black"
                                     >
                                         {settings.qrCodes.map((qr: any, idx: number) => (
                                             <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
@@ -586,7 +586,7 @@ export default function InvoicesPage() {
                         <select
                             value={editFormData.status}
                             onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all text-black"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 outline-none transition-all text-black"
                         >
                             <option value="paid">Paid</option>
                             <option value="partially_paid">Partially Paid</option>
@@ -599,7 +599,7 @@ export default function InvoicesPage() {
                         <textarea
                             value={editFormData.notes}
                             onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all text-black"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 outline-none transition-all text-black"
                             rows={3}
                             placeholder="Add invoice notes..."
                         />

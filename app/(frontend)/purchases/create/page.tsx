@@ -207,7 +207,7 @@ export default function CreatePurchasePage() {
                             <button
                                 type="button"
                                 onClick={addItem}
-                                className="px-3 py-1.5 text-sm bg-primary-50 text-blue-700 rounded-lg hover:bg-primary-100 font-medium flex items-center gap-2 transition-colors"
+                                className="px-3 py-1.5 text-sm bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 font-medium flex items-center gap-2 transition-colors"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Item
@@ -253,7 +253,7 @@ export default function CreatePurchasePage() {
                                                         min="1"
                                                         value={item.quantity}
                                                         onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value))}
-                                                        className="w-full p-2 border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-blue-900/20 outline-none"
+                                                        className="w-full p-2 border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-primary-900/20 outline-none"
                                                         required
                                                     />
                                                 </td>
@@ -264,7 +264,7 @@ export default function CreatePurchasePage() {
                                                         step="0.01"
                                                         value={item.costPrice}
                                                         onChange={(e) => updateItem(index, "costPrice", parseFloat(e.target.value))}
-                                                        className="w-full p-2 border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-blue-900/20 outline-none"
+                                                        className="w-full p-2 border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-primary-900/20 outline-none"
                                                         required
                                                     />
                                                 </td>

@@ -37,7 +37,7 @@ export default function AIInsight() {
     }, []);
 
     return (
-        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
+        <div className="bg-gradient-to-r from-primary-900 to-indigo-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
                 <BrainCircuit className="w-32 h-32" />
             </div>
@@ -46,7 +46,7 @@ export default function AIInsight() {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                            <Sparkles className="w-5 h-5 text-blue-200" />
+                            <Sparkles className="w-5 h-5 text-primary-200" />
                         </div>
                         <h3 className="font-bold text-lg tracking-tight">AI Business Assistant</h3>
                     </div>
@@ -69,7 +69,7 @@ export default function AIInsight() {
                         <div className="shrink-0">
                             <Lightbulb className="w-6 h-6 text-yellow-400" />
                         </div>
-                        <p className="text-blue-50 text-sm leading-relaxed font-medium italic">
+                        <p className="text-primary-50 text-sm leading-relaxed font-medium italic">
                             "{insight}"
                         </p>
                     </div>

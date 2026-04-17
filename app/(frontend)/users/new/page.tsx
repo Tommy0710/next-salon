@@ -93,7 +93,7 @@ export default function NewUserPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <UserIcon className="w-5 h-5 text-blue-900" />
+                        <UserIcon className="w-5 h-5 text-primary-900" />
                         User Details
                     </h2>
 
@@ -124,7 +124,7 @@ export default function NewUserPage() {
                             required
                             min="6"
                         />
-                        <div className="text-xs text-blue-600 bg-primary-50/50 p-2.5 rounded-lg border border-blue-100/50 flex flex-col gap-1 shadow-sm -mt-2 mb-2">
+                        <div className="text-xs text-primary-600 bg-primary-50/50 p-2.5 rounded-lg border border-primary-100/50 flex flex-col gap-1 shadow-sm -mt-2 mb-2">
                             <p className="font-bold flex items-center gap-2">
                                 Password Requirements:
                             </p>

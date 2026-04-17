@@ -26,7 +26,7 @@ export default function FormButton({
         danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
         ghost: "bg-transparent hover:bg-gray-100 text-gray-600 disabled:text-gray-300",
         success: "bg-green-600 text-white hover:bg-green-700 disabled:bg-green-300",
-        purple: "bg-purple-600 text-white hover:bg-purple-700 disabled:bg-purple-300",
+        purple: "bg-primary-600 text-white hover:bg-primary-700 disabled:bg-primary-300",
     };
 
     return (

@@ -244,7 +244,7 @@ export default function SettingsPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-900 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-900 border-t-transparent"></div>
             </div>
         );
     }
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Store className="w-5 h-5 text-blue-900" />
+                            <Store className="w-5 h-5 text-primary-900" />
                             Thông tin chung
                         </h2>
                         <ChevronDown
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                                                 reader.readAsDataURL(file);
                                             }
                                         }}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-blue-700 hover:file:bg-primary-100"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                                     />
                                 </div>
                                 {settings.logoUrl && (
@@ -345,7 +345,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Phone className="w-5 h-5 text-blue-900" />
+                            <Phone className="w-5 h-5 text-primary-900" />
                             Chi tiết liên hệ
                         </h2>
                         <ChevronDown
@@ -401,7 +401,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-900" />
+                            <FileText className="w-5 h-5 text-primary-900" />
                             Thông tin kinh doanh
                         </h2>
                         <ChevronDown
@@ -430,7 +430,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-blue-900" />
+                            <DollarSign className="w-5 h-5 text-primary-900" />
                             Cài đặt tài chính
                         </h2>
                         <ChevronDown
@@ -473,7 +473,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-900" />
+                            <FileText className="w-5 h-5 text-primary-900" />
                             Receipt Customization
                         </h2>
                         <ChevronDown
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                                         type="text"
                                         value={settings.receiptFooter}
                                         onChange={(e) => setSettings({ ...settings, receiptFooter: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent"
                                         placeholder="Thank you for your business!"
                                     />
                                 </div>
@@ -503,7 +503,7 @@ export default function SettingsPage() {
                                         value={settings.termsAndConditions}
                                         onChange={(e) => setSettings({ ...settings, termsAndConditions: e.target.value })}
                                         rows={4}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent"
                                         placeholder="Enter your terms and conditions..."
                                     />
                                 </div>
@@ -519,7 +519,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <QrCode className="w-5 h-5 text-blue-900" />
+                            <QrCode className="w-5 h-5 text-primary-900" />
                             Quản lý Mã QR Thanh Toán
                         </h2>
                         <ChevronDown
@@ -529,7 +529,7 @@ export default function SettingsPage() {
                     {openTabs.qrcode && (
                         <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <QrCode className="w-5 h-5 text-blue-900" />
+                                <QrCode className="w-5 h-5 text-primary-900" />
                                 Quản lý Mã QR Thanh Toán
                             </h2>
 
@@ -547,7 +547,7 @@ export default function SettingsPage() {
                                                 <p className="font-bold text-gray-900">{qr.name}</p>
                                                 <p className="text-sm text-gray-600">{qr.bankName}</p>
                                                 <p className="text-sm font-mono text-gray-800">{qr.accountNumber}</p>
-                                                <p className="text-[10px] text-blue-600 font-mono mt-1 border border-blue-200 bg-primary-50 inline-block px-1 rounded">ID: {qr.qrId}</p>
+                                                <p className="text-[10px] text-primary-600 font-mono mt-1 border border-primary-200 bg-primary-50 inline-block px-1 rounded">ID: {qr.qrId}</p>
                                             </div>
                                             <button
                                                 type="button"
@@ -582,7 +582,7 @@ export default function SettingsPage() {
                                                     reader.readAsDataURL(file);
                                                 }
                                             }}
-                                            className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-blue-700"
+                                            className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700"
                                         />
                                     </div>
                                     <button
@@ -610,7 +610,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <MessageSquare className="w-5 h-5 text-blue-900" />
+                            <MessageSquare className="w-5 h-5 text-primary-900" />
                             SMS Settings (Twilio)
                         </h2>
                         <ChevronDown
@@ -620,20 +620,20 @@ export default function SettingsPage() {
                     {openTabs.sms && (
                         <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-blue-100">
+                                <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
                                     <input
                                         type="checkbox"
                                         id="smsEnabled"
                                         checked={settings.smsEnabled}
                                         onChange={(e) => setSettings({ ...settings, smsEnabled: e.target.checked })}
-                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                        className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
                                     <label htmlFor="smsEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
                                         Enable SMS Notifications
                                     </label>
                                 </div>
                                 {settings.smsEnabled && (
-                                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-blue-200">
+                                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-primary-200">
                                         <FormInput
                                             label="Twilio Account SID"
                                             value={settings.twilioAccountSid}
@@ -673,7 +673,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Send className="w-5 h-5 text-blue-900" />
+                            <Send className="w-5 h-5 text-primary-900" />
                             Email Settings (SMTP)
                         </h2>
                         <ChevronDown
@@ -689,7 +689,7 @@ export default function SettingsPage() {
                                         id="emailEnabled"
                                         checked={settings.emailEnabled}
                                         onChange={(e) => setSettings({ ...settings, emailEnabled: e.target.checked })}
-                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                        className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
                                     <label htmlFor="emailEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
                                         Enable Email Notifications
@@ -737,7 +737,7 @@ export default function SettingsPage() {
                                                 id="smtpSecure"
                                                 checked={settings.smtpSecure}
                                                 onChange={(e) => setSettings({ ...settings, smtpSecure: e.target.checked })}
-                                                className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                                className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
                                             <label htmlFor="smtpSecure" className="text-sm text-gray-700 cursor-pointer">
                                                 Use SSL/TLS (Enable for port 465, disable for port 587)
@@ -763,7 +763,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-blue-900" />
+                            <Bell className="w-5 h-5 text-primary-900" />
                             Appointment Reminder Settings
                         </h2>
                         <ChevronDown
@@ -799,10 +799,10 @@ export default function SettingsPage() {
                                                         : currentMethods.filter(m => m !== 'sms');
                                                     setSettings({ ...settings, reminderMethods: methods });
                                                 }}
-                                                className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                                className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
                                             <label htmlFor="reminder-sms" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
-                                                <MessageSquare className="w-4 h-4 text-blue-600" />
+                                                <MessageSquare className="w-4 h-4 text-primary-600" />
                                                 SMS
                                             </label>
                                         </div>
@@ -818,7 +818,7 @@ export default function SettingsPage() {
                                                         : currentMethods.filter(m => m !== 'email');
                                                     setSettings({ ...settings, reminderMethods: methods });
                                                 }}
-                                                className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                                className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
                                             <label htmlFor="reminder-email" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
                                                 <Mail className="w-4 h-4 text-green-600" />
@@ -837,18 +837,18 @@ export default function SettingsPage() {
                                                         : currentMethods.filter(m => m !== 'zalo');
                                                     setSettings({ ...settings, reminderMethods: methods });
                                                 }}
-                                                className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                                className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
                                             <label htmlFor="reminder-zalo" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
-                                                <MessageSquare className="w-4 h-4 text-blue-500" />
+                                                <MessageSquare className="w-4 h-4 text-primary-500" />
                                                 Zalo ZNS
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="mt-4 p-4 bg-primary-50 border border-blue-200 rounded-lg">
-                                <p className="text-sm text-blue-800">
+                            <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+                                <p className="text-sm text-primary-800">
                                     <strong>Note:</strong> Reminders will be sent automatically {settings.reminderDaysBefore} day(s) before appointments via {
                                         (settings.reminderMethods || []).length === 0 ? 'No methods selected' :
                                             (settings.reminderMethods || []).map(method => {
@@ -873,7 +873,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <MessageSquare className="w-5 h-5 text-blue-900" />
+                            <MessageSquare className="w-5 h-5 text-primary-900" />
                             Tích hợp Zalo ZNS
                         </h2>
                         <ChevronDown
@@ -882,13 +882,13 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.zalo && (
                         <div className="px-6 pb-6 border-t border-gray-200 pt-6">
-                            <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-blue-100">
+                            <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
                                 <input
                                     type="checkbox"
                                     id="zaloEnabled"
                                     checked={settings.zaloEnabled}
                                     onChange={(e) => setSettings({ ...settings, zaloEnabled: e.target.checked })}
-                                    className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                 />
                                 <label htmlFor="zaloEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
                                     Enable Zalo ZNS Notifications
@@ -903,7 +903,7 @@ export default function SettingsPage() {
                                             type="text"
                                             value={settings.zaloAppId}
                                             onChange={(e) => setSettings({ ...settings, zaloAppId: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-sm"
                                             placeholder="VD: 123456789012345678"
                                         />
                                     </div>
@@ -913,7 +913,7 @@ export default function SettingsPage() {
                                             type="password"
                                             value={settings.zaloSecretKey}
                                             onChange={(e) => setSettings({ ...settings, zaloSecretKey: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-sm"
                                             placeholder="Chuỗi bí mật của ứng dụng"
                                         />
                                     </div>
@@ -932,7 +932,7 @@ export default function SettingsPage() {
                                                                 type="text"
                                                                 value={template.templateId || ''}
                                                                 onChange={(e) => handleTemplateChange(index, e.target.value)}
-                                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none text-sm"
+                                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-900 outline-none text-sm"
                                                                 placeholder="Nhập Template ID từ Zalo..."
                                                             />
                                                         </div>
@@ -950,7 +950,7 @@ export default function SettingsPage() {
                                         <textarea
                                             value={settings.zaloAccessToken}
                                             onChange={(e) => setSettings({ ...settings, zaloAccessToken: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono"
                                             rows={2}
                                             placeholder="Dán Access Token vào đây (Chỉ cần làm lần đầu tiên)"
                                         />
@@ -960,7 +960,7 @@ export default function SettingsPage() {
                                         <textarea
                                             value={settings.zaloRefreshToken}
                                             onChange={(e) => setSettings({ ...settings, zaloRefreshToken: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono text-red-600"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono text-red-600"
                                             rows={2}
                                             placeholder="Dán Refresh Token vào đây (Quan trọng: Dùng để hệ thống tự động gia hạn)"
                                         />
@@ -980,7 +980,7 @@ export default function SettingsPage() {
                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-blue-900" />
+                            <Sparkles className="w-5 h-5 text-primary-900" />
                             AI Power Reporting Settings
                         </h2>
                         <ChevronDown
@@ -990,20 +990,20 @@ export default function SettingsPage() {
                     {openTabs.ai && (
                         <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                                <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
                                     <input
                                         type="checkbox"
                                         id="aiEnabled"
                                         checked={settings.aiEnabled}
                                         onChange={(e) => setSettings({ ...settings, aiEnabled: e.target.checked })}
-                                        className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                        className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
                                     <label htmlFor="aiEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
                                         Enable AI Powered Insights & Reporting
                                     </label>
                                 </div>
                                 {settings.aiEnabled && (
-                                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-purple-200">
+                                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-primary-200">
                                         <FormInput
                                             label="OpenAI API Key"
                                             type="password"
@@ -1037,7 +1037,7 @@ export default function SettingsPage() {
                 {/* System Management */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Save className="w-5 h-5 text-blue-900" />
+                        <Save className="w-5 h-5 text-primary-900" />
                         System Management
                     </h2>
                     <div className="space-y-4">

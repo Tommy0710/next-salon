@@ -133,7 +133,7 @@ export default function UsageLogsPage() {
                         <input
                             type="text"
                             placeholder="Search by product..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -178,8 +178,8 @@ export default function UsageLogsPage() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2">
-                                                <div className="p-1.5 bg-purple-50 rounded-lg">
-                                                    <Archive className="w-3.5 h-3.5 text-purple-600" />
+                                                <div className="p-1.5 bg-primary-50 rounded-lg">
+                                                    <Archive className="w-3.5 h-3.5 text-primary-600" />
                                                 </div>
                                                 <div>
                                                     <span className="text-sm font-bold text-gray-900">{log.product?.name || "Unknown Product"}</span>

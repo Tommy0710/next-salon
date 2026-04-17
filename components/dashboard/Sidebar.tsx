@@ -171,7 +171,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                             <div className="relative">
                                 <div className="w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden">
                                     {logoUrl ? (
-                                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                        <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
                                     ) : (
                                         <Sparkles className="w-5 h-5 text-white" />
                                     )}
@@ -185,7 +185,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                     ) : (
                         <div className="w-20 h-20 items-center justify-center overflow-hidden">
                             {logoUrl ? (
-                                <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                                <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
                             ) : (
                                 <Sparkles className="w-5 h-5 text-white" />
                             )}
@@ -225,12 +225,12 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                                             title={isSidebarCollapsed ? item.name : ""}
                                             className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
                                                 ${isActive
-                                                    ? "bg-primary-900 text-white shadow-lg shadow-blue-900/20"
+                                                    ? "bg-primary-900 text-white shadow-lg shadow-primary-900/20"
                                                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                                 } ${isSidebarCollapsed ? "justify-center" : ""}`}
                                         >
                                             <item.icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110
-                                                ${isActive ? "text-white" : "text-gray-400 group-hover:text-blue-900"} 
+                                                ${isActive ? "text-white" : "text-gray-400 group-hover:text-primary-900"} 
                                                 ${isSidebarCollapsed ? "" : "mr-3"}`}
                                             />
                                             {!isSidebarCollapsed && (

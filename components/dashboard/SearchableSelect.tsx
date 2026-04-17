@@ -59,7 +59,7 @@ export default function SearchableSelect({
             )}
             <div className="relative">
                 <div
-                    className={`w-full px-4 py-2 border rounded-lg cursor-pointer flex items-center justify-between bg-white ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg cursor-pointer flex items-center justify-between bg-white ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
                         }`}
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -76,7 +76,7 @@ export default function SearchableSelect({
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-blue-500"
+                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary-500"
                                     placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
@@ -92,7 +92,7 @@ export default function SearchableSelect({
                                 filteredOptions.map((option) => (
                                     <div
                                         key={option.value}
-                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 ${option.value === value ? "bg-primary-50 text-blue-900 font-medium" : "text-gray-700"
+                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 ${option.value === value ? "bg-primary-50 text-primary-900 font-medium" : "text-gray-700"
                                             }`}
                                         onClick={() => {
                                             onChange(option.value);

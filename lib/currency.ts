@@ -46,10 +46,14 @@ const currencies: Record<string, CurrencyInfo> = {
 };
 
 export function getCurrencySymbol(code: string): string {
-    return currencies[code]?.symbol || '$';
+    return currencies[code]?.symbol || '\u20ab';
 }
 
 export function formatCurrency(amount: number, currencyCode: string = 'USD'): string {
+    if (currencyCode === 'VND') {
+        const formattedNumber = new Intl.NumberFormat('vi-VN').format(amount);
+        return `${formattedNumber}\u20ab`;
+    }
     const symbol = getCurrencySymbol(currencyCode);
     return `${symbol}${amount.toFixed(2)}`;
 }

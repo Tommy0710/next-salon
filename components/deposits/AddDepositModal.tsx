@@ -101,9 +101,9 @@ export default function AddDepositModal({
                         </div>
                     )}
 
-                    <div className="bg-primary-50 p-4 rounded-lg border border-blue-100 mb-4">
-                        <div className="text-sm text-blue-600 mb-1">Remaining Due</div>
-                        <div className="text-2xl font-bold text-blue-900">
+                    <div className="bg-primary-50 p-4 rounded-lg border border-primary-100 mb-4">
+                        <div className="text-sm text-primary-600 mb-1">Remaining Due</div>
+                        <div className="text-2xl font-bold text-primary-900">
                             {settings.symbol}{maxAmount.toFixed(2)}
                         </div>
                     </div>
@@ -141,7 +141,7 @@ export default function AddDepositModal({
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             rows={3}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent text-sm"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm"
                             placeholder="Add any additional notes..."
                         />
                     </div>

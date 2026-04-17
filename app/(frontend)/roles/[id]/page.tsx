@@ -150,11 +150,11 @@ export default function EditRolePage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <div className="flex justify-between items-start mb-4">
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-blue-900" />
+                            <Shield className="w-5 h-5 text-primary-900" />
                             Role Details
                         </h2>
                         {isSystem && (
-                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                                 System Role
                             </span>
                         )}
@@ -190,28 +190,28 @@ export default function EditRolePage() {
 
                     {/* Special Modules: Dashboard & Settings */}
                     <div className="p-6 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-primary-50 p-4 rounded-lg border border-blue-100">
-                            <h3 className="font-semibold text-blue-900 mb-2">Dashboard</h3>
+                        <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                            <h3 className="font-semibold text-primary-900 mb-2">Dashboard</h3>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={permissions.dashboard?.view}
                                     onChange={(e) => handlePermissionChange('dashboard', 'view', e.target.checked)}
-                                    className="w-4 h-4 text-blue-900 rounded focus:ring-blue-900"
+                                    className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                 />
                                 <span className="text-sm text-gray-700">Can view Dashboard</span>
                             </label>
                         </div>
 
-                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                            <h3 className="font-semibold text-purple-900 mb-2">System Settings</h3>
+                        <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                            <h3 className="font-semibold text-primary-900 mb-2">System Settings</h3>
                             <div className="flex gap-4">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={permissions.settings?.view}
                                         onChange={(e) => handlePermissionChange('settings', 'view', e.target.checked)}
-                                        className="w-4 h-4 text-purple-900 rounded focus:ring-purple-900"
+                                        className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
                                     <span className="text-sm text-gray-700">View</span>
                                 </label>
@@ -220,7 +220,7 @@ export default function EditRolePage() {
                                         type="checkbox"
                                         checked={permissions.settings?.edit}
                                         onChange={(e) => handlePermissionChange('settings', 'edit', e.target.checked)}
-                                        className="w-4 h-4 text-purple-900 rounded focus:ring-purple-900"
+                                        className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
                                     <span className="text-sm text-gray-700">Edit</span>
                                 </label>
@@ -253,7 +253,7 @@ export default function EditRolePage() {
                                                         name={`${res.key}-view`}
                                                         checked={permissions[res.key]?.view === 'none'}
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'none')}
-                                                        className="w-4 h-4 text-blue-900 focus:ring-blue-900 border-gray-300"
+                                                        className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
                                                     <span className="text-sm text-gray-600 group-hover:text-gray-900">None</span>
                                                 </label>
@@ -263,7 +263,7 @@ export default function EditRolePage() {
                                                         name={`${res.key}-view`}
                                                         checked={permissions[res.key]?.view === 'own'}
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'own')}
-                                                        className="w-4 h-4 text-blue-900 focus:ring-blue-900 border-gray-300"
+                                                        className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
                                                     <span className="text-sm text-gray-600 group-hover:text-gray-900">Own Only</span>
                                                 </label>
@@ -273,7 +273,7 @@ export default function EditRolePage() {
                                                         name={`${res.key}-view`}
                                                         checked={permissions[res.key]?.view === 'all'}
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'all')}
-                                                        className="w-4 h-4 text-blue-900 focus:ring-blue-900 border-gray-300"
+                                                        className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
                                                     <span className="text-sm text-gray-600 group-hover:text-gray-900">All</span>
                                                 </label>
