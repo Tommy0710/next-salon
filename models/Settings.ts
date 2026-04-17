@@ -10,6 +10,20 @@ const SettingsSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    bookingRules: {
+        workingDays: {
+            type: [String],
+            default: ['1', '2', '3', '4', '5', '6', '0'] // Mặc định làm việc full tuần (0 là CN)
+        },
+        shift1: {
+            start: { type: String, default: "08:00" },
+            end: { type: String, default: "12:00" }
+        },
+        shift2: {
+            start: { type: String, default: "13:00" },
+            end: { type: String, default: "17:00" }
+        }
+    },
     phone: {
         type: String,
         default: ''

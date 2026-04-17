@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
+import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Calendar, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { getAllCurrencies } from "@/lib/currency";
@@ -51,6 +51,11 @@ interface Settings {
     zaloTemplates: Array<{ eventType: string; name: string; templateId: string }>;
     zaloAccessToken: string;
     zaloRefreshToken: string;
+    bookingRules: {
+        workingDays: string[];
+        shift1: { start: string; end: string };
+        shift2: { start: string; end: string };
+    };
 }
 
 const defaultZaloTemplates = [
@@ -105,6 +110,11 @@ export default function SettingsPage() {
         zaloTemplates: defaultZaloTemplates,
         zaloAccessToken: '',
         zaloRefreshToken: '',
+        bookingRules: {
+            workingDays: ['1', '2', '3', '4', '5', '6', '0'],
+            shift1: { start: "08:00", end: "12:00" },
+            shift2: { start: "13:00", end: "17:00" }
+        }
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -113,6 +123,7 @@ export default function SettingsPage() {
     const [openTabs, setOpenTabs] = useState({
         general: true,
         contact: false,
+        booking: false,
         business: false,
         financial: false,
         receipt: false,
@@ -121,7 +132,7 @@ export default function SettingsPage() {
         zalo: false,
         sms: false,
         email: false,
-        qrcode: false,
+        qrcode: false
     });
     const toggleTab = (tabName: keyof typeof openTabs) => {
         setOpenTabs(prev => ({ ...prev, [tabName]: !prev[tabName] }));
@@ -199,6 +210,11 @@ export default function SettingsPage() {
                     })(),
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
+                    bookingRules: data.data.bookingRules || {
+                        workingDays: ['1', '2', '3', '4', '5', '6', '0'],
+                        shift1: { start: "08:00", end: "12:00" },
+                        shift2: { start: "13:00", end: "17:00" }
+                    }
                 });
             }
         } catch (error) {
@@ -393,6 +409,166 @@ export default function SettingsPage() {
                     )}
                 </div>
 
+                {/* Booking Rules Information */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => toggleTab('booking')}
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-primary-900" />
+                            Quy tắc thời gian làm việc
+                        </h2>
+                        <ChevronDown
+                            className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.booking ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+                    {openTabs.booking && (
+                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                            <div className="space-y-6">
+                                {/* Chọn ngày làm việc */}
+                                <div className="mb-8">
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">Ngày mở cửa trong tuần</label>
+                                    <div className="flex flex-wrap gap-4">
+                                        {[
+                                            { value: '1', label: 'Thứ 2' },
+                                            { value: '2', label: 'Thứ 3' },
+                                            { value: '3', label: 'Thứ 4' },
+                                            { value: '4', label: 'Thứ 5' },
+                                            { value: '5', label: 'Thứ 6' },
+                                            { value: '6', label: 'Thứ 7' },
+                                            { value: '0', label: 'Chủ nhật' }
+                                        ].map((day) => {
+                                            const currentDays = settings.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'];
+                                            const isChecked = currentDays.includes(day.value);
+
+                                            return (
+                                                <label key={day.value} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-xl border transition-all ${isChecked ? 'bg-primary-50 border-primary-200' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                                    }`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={(e) => {
+                                                            const newDays = e.target.checked
+                                                                ? [...currentDays, day.value]
+                                                                : currentDays.filter((d: string) => d !== day.value);
+
+                                                            setSettings({
+                                                                ...settings,
+                                                                bookingRules: {
+                                                                    ...settings.bookingRules,
+                                                                    workingDays: newDays,
+                                                                    shift1: settings.bookingRules?.shift1 || { start: "08:00", end: "12:00" },
+                                                                    shift2: settings.bookingRules?.shift2 || { start: "13:00", end: "17:00" }
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4"
+                                                    />
+                                                    <span className={`text-sm font-medium ${isChecked ? 'text-primary-700' : 'text-gray-600'}`}>
+                                                        {day.label}
+                                                    </span>
+                                                </label>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Thiết lập Ca làm việc */}
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                    {/* Ca 1 */}
+                                    <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-200/60">
+                                        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                            <Clock className="w-4 h-4 text-primary-600" />
+                                            Ca làm việc 1 (Sáng)
+                                        </h4>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Mở cửa lúc</label>
+                                                <input
+                                                    type="time"
+                                                    value={settings.bookingRules?.shift1?.start || '08:00'}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        bookingRules: {
+                                                            ...settings.bookingRules,
+                                                            workingDays: settings.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'],
+                                                            shift2: settings.bookingRules?.shift2 || { start: "13:00", end: "17:00" },
+                                                            shift1: { ...settings.bookingRules?.shift1, start: e.target.value, end: settings.bookingRules?.shift1?.end || '12:00' }
+                                                        }
+                                                    })}
+                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Đóng ca lúc</label>
+                                                <input
+                                                    type="time"
+                                                    value={settings.bookingRules?.shift1?.end || '12:00'}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        bookingRules: {
+                                                            ...settings.bookingRules,
+                                                            workingDays: settings.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'],
+                                                            shift2: settings.bookingRules?.shift2 || { start: "13:00", end: "17:00" },
+                                                            shift1: { ...settings.bookingRules?.shift1, start: settings.bookingRules?.shift1?.start || '08:00', end: e.target.value }
+                                                        }
+                                                    })}
+                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Ca 2 */}
+                                    <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-200/60">
+                                        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                            <Clock className="w-4 h-4 text-primary-600" />
+                                            Ca làm việc 2 (Chiều/Tối)
+                                        </h4>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Mở ca lúc</label>
+                                                <input
+                                                    type="time"
+                                                    value={settings.bookingRules?.shift2?.start || '13:00'}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        bookingRules: {
+                                                            ...settings.bookingRules,
+                                                            workingDays: settings.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'],
+                                                            shift1: settings.bookingRules?.shift1 || { start: "08:00", end: "12:00" },
+                                                            shift2: { ...settings.bookingRules?.shift2, start: e.target.value, end: settings.bookingRules?.shift2?.end || '17:00' }
+                                                        }
+                                                    })}
+                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Đóng cửa lúc</label>
+                                                <input
+                                                    type="time"
+                                                    value={settings.bookingRules?.shift2?.end || '17:00'}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        bookingRules: {
+                                                            ...settings.bookingRules,
+                                                            workingDays: settings.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'],
+                                                            shift1: settings.bookingRules?.shift1 || { start: "08:00", end: "12:00" },
+                                                            shift2: { ...settings.bookingRules?.shift2, start: settings.bookingRules?.shift2?.start || '13:00', end: e.target.value }
+                                                        }
+                                                    })}
+                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
                 {/* Business Information */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <button

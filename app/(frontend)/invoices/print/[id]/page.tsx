@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { Printer, ArrowLeft, Scissors } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import { getCurrencySymbol } from "@/lib/currency";
+import { formatCurrency } from "@/lib/currency";
 
 export default function PrintInvoicePage() {
     const { id } = useParams();
@@ -47,7 +48,8 @@ export default function PrintInvoicePage() {
     const defaultQr = settings?.qrCodes?.[0];
     const qrSource = invoice?.qrCodeImage || defaultQr?.image;
     const bankDetailsSource = invoice?.bankDetails || (defaultQr ? `${defaultQr.bankName} | ${defaultQr.accountNumber} | ${defaultQr.name}` : "");
-    const showQr = !!qrSource && (invoice?.paymentMethod === 'Mã QR' || currentStatus !== 'paid');
+    const isCash = invoice?.paymentMethod === 'Tiền mặt' || invoice?.paymentMethod?.toLowerCase().includes('cash');
+    const showQr = !!qrSource && !isCash && (invoice?.paymentMethod === 'Mã QR' || currentStatus !== 'paid');
 
     const handleMarkAsPaid = async () => {
         if (!invoice || currentStatus === 'paid' || actionLoading) return;
@@ -153,31 +155,39 @@ export default function PrintInvoicePage() {
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white text-black">
             {/* Header / Controls */}
-            <div className="max-w-[400px] mx-auto flex flex-col sm:flex-row gap-2 justify-between items-center mb-6 print:hidden">
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Quay lại
-                    </button>
-                </div>
+            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 print:hidden px-2">
 
-                <div className="flex items-center gap-2">
+                {/* LEFT */}
+                <button
+                    onClick={() => router.push(`/pos?edit=${id}`)}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Chỉnh sửa hóa đơn</span>
+                </button>
+
+                {/* RIGHT ACTIONS */}
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+
                     <FormButton
                         onClick={handleMarkAsPaid}
                         loading={actionLoading}
                         disabled={currentStatus === 'paid' || actionLoading}
-                        className={`gap-2 ${currentStatus === 'paid' ? 'bg-green-600 hover:bg-green-600' : 'bg-primary-900 hover:bg-primary-800'}`}
+                        className={`w-full sm:w-auto justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium
+                ${currentStatus === 'paid'
+                                ? 'bg-green-600 hover:bg-green-600 text-white cursor-default'
+                                : 'bg-primary-900 hover:bg-primary-800 text-white'
+                            }`}
                     >
                         {currentStatus === 'paid' ? 'Đã thanh toán' : 'Hoàn thành'}
                     </FormButton>
+
                     <FormButton
                         onClick={handlePrint}
                         icon={<Printer className="w-4 h-4" />}
+                        className="w-full sm:w-auto justify-center gap-2 rounded-xl px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50"
                     >
-                        In Biên Lai
+                        In biên lai
                     </FormButton>
                 </div>
             </div>
@@ -245,12 +255,12 @@ export default function PrintInvoicePage() {
                             <tr key={idx} className="text-[12px]">
                                 <td className="py-2 align-top">
                                     <span className="font-medium">{item.name}</span>
-                                    {item.discount > 0 && <p className="text-[9px] text-red-500">Giảm: -{currencySymbol}{item.discount.toFixed(2)}</p>}
+                                    {item.discount > 0 && <p className="text-[9px] text-red-500">Giảm: -{formatCurrency(item.discount)}</p>}
                                     {/* {item.itemModel === 'Service' && <p className="text-[9px] text-gray-400">Dịch vụ chuyên nghiệp</p>} */}
                                 </td>
                                 <td className="py-2 text-center align-top">{item.quantity}</td>
-                                <td className="py-2 text-right align-top">{currencySymbol}{item.price.toFixed(2)}</td>
-                                <td className="py-2 text-right align-top font-bold">{currencySymbol}{item.total.toFixed(2)}</td>
+                                <td className="py-2 text-right align-top">{formatCurrency(item.price)}</td>
+                                <td className="py-2 text-right align-top font-bold">{formatCurrency(item.total)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -260,30 +270,30 @@ export default function PrintInvoicePage() {
                 <div className="border-t border-gray-100 pt-4 space-y-2 text-[13px]">
                     <div className="flex justify-between">
                         <span className="text-gray-500">Tổng phụ</span>
-                        <span>{currencySymbol}{invoice.subtotal.toFixed(2)}</span>
+                        <span>{formatCurrency(invoice.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-gray-700">
                         <span>Thuế ({((invoice.tax / invoice.subtotal) * 100).toFixed(0)}%)</span>
-                        <span>{currencySymbol}{invoice.tax.toFixed(2)}</span>
+                        <span>{formatCurrency(invoice.tax)}</span>
                     </div>
                     {invoice.discount > 0 && (
                         <div className="flex justify-between text-red-600">
                             <span>Giảm giá</span>
-                            <span>-{currencySymbol}{invoice.discount.toFixed(2)}</span>
+                            <span>-{formatCurrency(invoice.discount)}</span>
                         </div>
                     )}
                     <div className="flex justify-between pt-2 border-t-2 border-double border-gray-900 text-lg font-black uppercase">
                         <span>Tổng cộng</span>
-                        <span>{currencySymbol}{invoice.totalAmount.toFixed(2)}</span>
+                        <span>{formatCurrency(invoice.totalAmount)}</span>
                     </div>
                     <div className="flex justify-between font-bold">
                         <span>Đã thanh toán</span>
-                        <span>{currencySymbol}{invoice.amountPaid.toFixed(2)}</span>
+                        <span>{formatCurrency(invoice.amountPaid)}</span>
                     </div>
                     {invoice.totalAmount - invoice.amountPaid > 0 && (
                         <div className="flex justify-between font-bold border-t border-dashed border-red-100 mt-1 pt-1">
                             <span>Số dư còn lại</span>
-                            <span>{currencySymbol}{(invoice.totalAmount - invoice.amountPaid).toFixed(2)}</span>
+                            <span>{formatCurrency(invoice.totalAmount - invoice.amountPaid)}</span>
                         </div>
                     )}
                 </div>

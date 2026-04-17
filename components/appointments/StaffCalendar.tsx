@@ -5,6 +5,7 @@ import { Calendar, momentLocalizer, Views, Navigate, View } from "react-big-cale
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { User, Clock, MapPin, Tag, RefreshCw } from "lucide-react";
+import { useSettings } from "@/components/providers/SettingsProvider";
 
 const localizer = momentLocalizer(moment);
 
@@ -31,6 +32,7 @@ interface StaffCalendarProps {
 }
 
 export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCalendarProps) {
+    const { settings } = useSettings();
     const [events, setEvents] = useState<Event[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
     const [loading, setLoading] = useState(true);
@@ -119,7 +121,37 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
         setView(newView);
     };
 
-    const scrollToTime = useMemo(() => moment().set({ h: 9, m: 0 }).toDate(), []);
+    const scrollToTime = useMemo(() => {
+        let h = 8, m = 0;
+        if (settings?.bookingRules?.shift1?.start) {
+            const [sh, sm] = settings.bookingRules.shift1.start.split(':').map(Number);
+            h = sh; m = sm;
+        }
+        return moment().set({ h, m, s: 0, ms: 0 }).toDate();
+    }, [settings]);
+
+    const minTime = useMemo(() => {
+        let h = 8, m = 0;
+        if (settings?.bookingRules?.shift1?.start) {
+            const [sh, sm] = settings.bookingRules.shift1.start.split(':').map(Number);
+            h = sh; m = sm;
+        }
+        return moment().set({ h, m, s: 0, ms: 0 }).toDate();
+    }, [settings]);
+
+    const maxTime = useMemo(() => {
+        let h = 18, m = 0;
+        if (settings?.bookingRules?.shift2?.end) {
+            const [eh, em] = settings.bookingRules.shift2.end.split(':').map(Number);
+            h = eh; m = em;
+        } else if (settings?.bookingRules?.shift1?.end) {
+            const [eh, em] = settings.bookingRules.shift1.end.split(':').map(Number);
+            h = eh; m = em;
+        } else {
+            h = 22; m = 0;
+        }
+        return moment().set({ h, m, s: 0, ms: 0 }).toDate();
+    }, [settings]);
 
     const eventStyleGetter = (event: Event) => {
         let backgroundColor = "#3b82f6"; // Default blue
@@ -176,6 +208,8 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     views={[Views.DAY, Views.WEEK, Views.MONTH]}
                     step={30}
                     timeslots={2}
+                    min={minTime}
+                    max={maxTime}
                     scrollToTime={scrollToTime}
                     eventPropGetter={eventStyleGetter}
                     onSelectEvent={onSelectEvent}

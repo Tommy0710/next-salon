@@ -51,6 +51,7 @@ interface Bill {
     paymentMethod: string;
     selectedQrIndex: number;
     amountPaid: number | string;
+    editInvoiceId?: string;
 }
 
 const createEmptyBill = (): Bill => {
@@ -64,7 +65,8 @@ const createEmptyBill = (): Bill => {
         discount: 0,
         paymentMethod: "Tiền mặt",
         selectedQrIndex: 0,
-        amountPaid: ""
+        amountPaid: "",
+        editInvoiceId: undefined
     };
 };
 export default function POSPage() {
@@ -94,6 +96,45 @@ export default function POSPage() {
     // Load bills from localStorage on mount
     useEffect(() => {
         setIsMounted(true);
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+            fetch(`/api/invoices/${editId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const inv = data.data;
+                        const editBill: Bill = {
+                            id: `edit-${inv._id}`,
+                            editInvoiceId: inv._id,
+                            name: `Edit: ${inv.invoiceNumber}`,
+                            cart: inv.items.map((item: any) => ({
+                                _id: item.item._id || item.item,
+                                name: item.name,
+                                price: item.price,
+                                type: item.itemModel,
+                                quantity: item.quantity
+                            })),
+                            selectedCustomer: inv.customer?._id || "",
+                            serviceStaffAssignments: {},
+                            discount: inv.discount || 0,
+                            paymentMethod: inv.paymentMethod || "Tiền mặt",
+                            selectedQrIndex: 0,
+                            amountPaid: inv.amountPaid === 0 ? "" : inv.amountPaid,
+                        };
+                        setBills(prev => {
+                            const newBills = [...prev.filter(b => b.id !== editBill.id), editBill];
+                            return newBills;
+                        });
+                        setActiveBillId(editBill.id);
+                        window.history.replaceState({}, '', '/pos');
+                    }
+                })
+                .catch(console.error);
+            return;
+        }
+
         const savedBills = localStorage.getItem("pos_waiting_bills");
         const savedActiveId = localStorage.getItem("pos_active_bill_id");
 
@@ -470,8 +511,11 @@ export default function POSPage() {
             };
 
 
-            const res = await fetch("/api/invoices", {
-                method: "POST",
+            const url = activeBill.editInvoiceId ? `/api/invoices/${activeBill.editInvoiceId}` : "/api/invoices";
+            const method = activeBill.editInvoiceId ? "PUT" : "POST";
+
+            const res = await fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });

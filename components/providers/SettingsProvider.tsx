@@ -17,6 +17,11 @@ interface Settings {
         accountNumber: string;
         image: string;
     }[];
+    bookingRules?: {
+        workingDays: string[];
+        shift1: { start: string; end: string };
+        shift2: { start: string; end: string };
+    };
 }
 
 interface SettingsContextType {
@@ -27,12 +32,17 @@ interface SettingsContextType {
 
 const defaultSettings: Settings = {
     storeName: 'SalonNext',
-    currency: 'USD',
+    currency: 'VND',
     timezone: 'UTC',
     taxRate: 0,
     logoUrl: '',
-    symbol: '$',
-    qrCodes: []
+    symbol: '₫',
+    qrCodes: [],
+    bookingRules: {
+        workingDays: ['1', '2', '3', '4', '5', '6', '0'],
+        shift1: { start: "08:00", end: "12:00" },
+        shift2: { start: "13:00", end: "17:00" }
+    }
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
