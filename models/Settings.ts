@@ -116,14 +116,14 @@ const SettingsSchema = new mongoose.Schema({
         default: ''
     },
     // Reminder Settings
-    reminderDaysBefore: {
+    reminderHoursBefore: {
         type: Number,
-        default: 1
+        default: 24,
+        max: 72
     },
-    reminderMethod: {
-        type: String,
-        enum: ['sms', 'email', 'both'],
-        default: 'both'
+    reminderMethods: {
+        type: [String],
+        default: ['email']
     },
     // AI Settings
     aiEnabled: {

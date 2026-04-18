@@ -38,7 +38,7 @@ interface Settings {
     smtpPassword: string;
     smtpFrom: string;
     // Reminder Settings
-    reminderDaysBefore: number;
+    reminderHoursBefore: number;
     reminderMethods: string[];
     // AI Settings
     aiEnabled: boolean;
@@ -96,8 +96,8 @@ export default function SettingsPage() {
         smtpPassword: "",
         smtpFrom: "",
         // Reminder Settings
-        reminderDaysBefore: 1,
-        reminderMethods: ["sms", "email"],
+        reminderHoursBefore: 24,
+        reminderMethods: ["sms", "email", "zalo"],
         // AI Settings
         aiEnabled: false,
         openaiApiKey: "",
@@ -180,7 +180,7 @@ export default function SettingsPage() {
                     smtpPassword: data.data.smtpPassword || "",
                     smtpFrom: data.data.smtpFrom || "",
                     // Reminder Settings
-                    reminderDaysBefore: data.data.reminderDaysBefore || 1,
+                    reminderHoursBefore: data.data.reminderHoursBefore || 24,
                     reminderMethods: (() => {
                         // Backward compatibility: convert old reminderMethod to array
                         if (data.data.reminderMethod) {
@@ -950,13 +950,16 @@ export default function SettingsPage() {
                         <div className="px-6 pb-6 border-t border-gray-200 pt-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormInput
-                                    label="Send Reminders (Days Before)"
+                                    label="Send Reminders (Hours Before)"
                                     type="number"
-                                    value={settings.reminderDaysBefore.toString()}
-                                    onChange={(e) => setSettings({ ...settings, reminderDaysBefore: parseInt(e.target.value) || 1 })}
+                                    value={settings.reminderHoursBefore?.toString() || "24"}
+                                    onChange={(e) => {
+                                        let val = parseInt(e.target.value) || 0;
+                                        if (val > 72) val = 72;
+                                        setSettings({ ...settings, reminderHoursBefore: val });
+                                    }}
                                     min="0"
-                                    max="7"
-                                    placeholder="1"
+                                    max="72"
                                 />
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -1025,7 +1028,7 @@ export default function SettingsPage() {
                             </div>
                             <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
                                 <p className="text-sm text-primary-800">
-                                    <strong>Note:</strong> Reminders will be sent automatically {settings.reminderDaysBefore} day(s) before appointments via {
+                                    <strong>Note:</strong> Reminders will be sent automatically {settings.reminderHoursBefore} hour(s) before appointments via {
                                         (settings.reminderMethods || []).length === 0 ? 'No methods selected' :
                                             (settings.reminderMethods || []).map(method => {
                                                 switch (method) {
