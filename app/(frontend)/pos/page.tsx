@@ -125,7 +125,7 @@ export default function POSPage() {
                             })),
                             selectedCustomer: inv.customer?._id || "",
                             serviceStaffAssignments: {},
-                            discount: inv.discount || 0,
+                            discount: inv.subtotal > 0 ? Math.round(((inv.discount || 0) / inv.subtotal) * 100) : 0,
                             paymentMethod: inv.paymentMethod || "Tiền mặt",
                             selectedQrIndex: 0,
                             amountPaid: inv.amountPaid === 0 ? "" : inv.amountPaid,
@@ -399,10 +399,11 @@ export default function POSPage() {
     };
 
     const calculateTotal = () => {
-        if (!activeBill) return { subtotal: 0, tax: 0, total: 0, commission: 0, assignments: [] };
+        if (!activeBill) return { subtotal: 0, tax: 0, total: 0, discountAmount: 0, commission: 0, assignments: [] };
         const subtotal = activeBill.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const tax = subtotal * (settings.taxRate / 100);
-        const total = subtotal + tax - activeBill.discount;
+        const discountAmount = subtotal * ((activeBill.discount || 0) / 100);
+        const total = subtotal + tax - discountAmount;
 
         // Commission calculation aggregated per staff from per-service assignments
         let totalCommission = 0;
@@ -440,8 +441,8 @@ export default function POSPage() {
             percentage: serviceNetBase > 0 ? (assignment.commission / serviceNetBase) * 100 : 0,
             commission: assignment.commission
         }));
-
-        return { subtotal, tax, total, commission: totalCommission, assignments: updatedAssignments };
+        //return vào database
+        return { subtotal, tax, total, discountAmount, commission: totalCommission, assignments: updatedAssignments };
     };
 
     const handleCheckout = async () => {
@@ -477,7 +478,7 @@ export default function POSPage() {
 
         setSubmitting(true);
         try {
-            const { subtotal, tax, total, commission, assignments } = calculateTotal();
+            const { subtotal, tax, total, discountAmount, commission, assignments } = calculateTotal();
 
             const paid = activeBill.amountPaid === "" ? 0 : parseFloat(activeBill.amountPaid.toString());
             const status = "pending"; // POS tạo đơn luôn pending, hoàn tất ở trang invoice
@@ -500,7 +501,7 @@ export default function POSPage() {
                 })),
                 subtotal,
                 tax,
-                discount: activeBill.discount,
+                discount: discountAmount,
                 totalAmount: total,
                 commission,
                 staffAssignments: assignments.map(a => ({
@@ -845,17 +846,32 @@ export default function POSPage() {
                                         })}
                                     </div>
                                 )}
-                                <div className="flex justify-between text-gray-600 items-center">
-                                    <span>Giảm giá</span>
-                                    <input
-                                        type="number"
-                                        value={activeBill.discount}
-                                        onChange={(e) => updateActiveBill({ discount: parseFloat(e.target.value) || 0 })}
-                                        className="w-16 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
-                                        min="0"
-                                    />
-                                </div>
-                                <div className="flex justify-between items-center text-primary-900 border-t border-gray-200 pt-1.5 mt-1">
+                                <div className="flex justify-between text-gray-600 items-center border-t border-gray-100 pt-1 mt-1">
+                                    <div className="flex flex-col">
+                                        <span>Giảm giá</span>
+                                        {activeBill.discount > 0 && (
+                                            <span className="text-[9px] font-bold text-red-500">
+                                                -{formatCurrency(subtotal * (activeBill.discount / 100))}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            value={activeBill.discount || ""}
+                                            onChange={(e) => {
+                                                let val = parseFloat(e.target.value) || 0;
+                                                if (val > 100) val = 100;
+                                                updateActiveBill({ discount: val });
+                                            }}
+                                            className="w-12 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
+                                            min="0"
+                                            max="100"
+                                            placeholder="0"
+                                        />
+                                        <span className="text-[10px] text-gray-400 font-bold">%</span>
+                                    </div>
+                                </div>                                <div className="flex justify-between items-center text-primary-900 border-t border-gray-200 pt-1.5 mt-1">
                                     <span className="text-[10px] font-bold">Đã thanh toán</span>
                                     <input
                                         type="number"

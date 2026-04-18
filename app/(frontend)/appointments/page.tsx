@@ -10,6 +10,7 @@ import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect"
 import StaffCalendar from "@/components/appointments/StaffCalendar";
 import { formatAppointmentDateTime } from '@/lib/zaloDate';
 import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatCurrency } from "@/lib/currency";
 
 interface Service {
     _id: string;
@@ -692,7 +693,7 @@ export default function AppointmentsPage() {
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="text-sm font-bold text-gray-900">{settings.symbol}{apt.totalAmount.toFixed(2)}</span>
+                                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(apt.totalAmount)}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="text-sm text-gray-700 capitalize">{apt.source || 'Direct'}</span>
@@ -874,7 +875,11 @@ export default function AppointmentsPage() {
                     )}
                     <div className="grid grid-cols-2 gap-4">
                         <FormInput label="Date" type="date" required value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
-                        <FormInput label={`Discount (${settings.symbol})`} type="number" min="0" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} />
+                        <FormInput label="Giảm giá (%)" type="number" min="0" max="100" value={formData.discount?.toString() || "0"} onChange={(e) => {
+                            let val = parseFloat(e.target.value) || 0;
+                            if (val > 100) val = 100;
+                            setFormData({ ...formData, discount: val });
+                        }} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -924,7 +929,7 @@ export default function AppointmentsPage() {
                         required
                         value={formData.serviceIds}
                         onChange={(values) => setFormData({ ...formData, serviceIds: values })}
-                        options={services.map(s => ({ value: s._id, label: `${s.name} (${settings.symbol}${s.price})` }))}
+                        options={services.map(s => ({ value: s._id, label: `${s.name} (${formatCurrency(s.price)})` }))}
                         key={`service-select-${editingAppointment?._id || 'new'}`}
                     />
 
@@ -985,7 +990,12 @@ export default function AppointmentsPage() {
                                 <div className="flex items-center justify-end gap-2">
                                     <DollarSign className="w-5 h-5 text-emerald-400" />
                                     <span className="text-2xl font-black">
-                                        {settings.symbol}{((services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0) * (1 + settings.taxRate / 100)) - (formData.discount || 0)).toFixed(2)}
+                                        {(() => {
+                                            const subtotal = services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0);
+                                            const tax = subtotal * (settings.taxRate / 100);
+                                            const discountAmount = subtotal * ((formData.discount || 0) / 100);
+                                            return formatCurrency((subtotal + tax) - discountAmount);
+                                        })()}
                                     </span>
                                 </div>
                             </div>

@@ -607,7 +607,7 @@ export default function SettingsPage() {
                     >
                         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                             <DollarSign className="w-5 h-5 text-primary-900" />
-                            Cài đặt tài chính
+                            Cài đặt tài chính và ngôn ngữ
                         </h2>
                         <ChevronDown
                             className={`w-5 h-5 text-gray-600 transition-transform ${openTabs.financial ? 'rotate-180' : ''}`}

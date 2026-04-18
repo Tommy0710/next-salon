@@ -8,6 +8,7 @@ import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormIn
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect";
 import StaffCalendar from "@/components/appointments/StaffCalendar";
+import { formatCurrency } from "@/lib/currency";
 import { useSettings } from "@/components/providers/SettingsProvider";
 
 interface Service {
@@ -153,9 +154,9 @@ export default function CalendarPage() {
             const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
             const subtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
 
-            const discount = formData.discount || 0;
+            const discountAmount = subtotal * ((formData.discount || 0) / 100);
             const tax = subtotal * (settings.taxRate / 100);
-            const totalAmount = (subtotal + tax) - discount;
+            const totalAmount = (subtotal + tax) - discountAmount;
 
             const staff = staffList.find(s => s._id === formData.staffId);
             const staffRate = staff?.commissionRate || 0;
@@ -190,7 +191,7 @@ export default function CalendarPage() {
                 endTime,
                 totalDuration,
                 totalAmount,
-                discount,
+                discount: discountAmount,
                 commission,
                 status: formData.status,
                 notes: formData.notes
@@ -257,7 +258,7 @@ export default function CalendarPage() {
             serviceIds: serviceIds,
             startTime: apt.startTime || "",
             date: apt.date ? format(new Date(apt.date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-            discount: apt.discount || 0,
+            discount: apt.services ? Math.round(((apt.discount || 0) / apt.services.reduce((sum, s) => sum + (s.price || 0), 0)) * 100) : 0,
             notes: apt.notes || "",
             status: apt.status || "confirmed"
         });
@@ -381,7 +382,11 @@ export default function CalendarPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <FormInput label="Date" type="date" required value={formData.date} onChange={(e: any) => setFormData({ ...formData, date: e.target.value })} />
-                        <FormInput label={`Discount (${settings.symbol})`} type="number" min="0" value={formData.discount} onChange={(e: any) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} />
+                        <FormInput label="Giảm giá (%)" type="number" min="0" max="100" value={formData.discount?.toString() || "0"} onChange={(e: any) => {
+                            let val = parseFloat(e.target.value) || 0;
+                            if (val > 100) val = 100;
+                            setFormData({ ...formData, discount: val });
+                        }} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -429,7 +434,7 @@ export default function CalendarPage() {
                         required
                         value={formData.serviceIds}
                         onChange={(values) => setFormData({ ...formData, serviceIds: values })}
-                        options={services.map(s => ({ value: s._id, label: `${s.name} (${settings.symbol}${s.price})` }))}
+                        options={services.map(s => ({ value: s._id, label: `${s.name} (${formatCurrency(s.price)})` }))}
                     />
 
                     <div className="space-y-3">
@@ -489,7 +494,12 @@ export default function CalendarPage() {
                                 <div className="flex items-center justify-end gap-2">
                                     <DollarSign className="w-5 h-5 text-emerald-400" />
                                     <span className="text-2xl font-black">
-                                        {settings.symbol}{((services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0) * (1 + settings.taxRate / 100)) - (formData.discount || 0)).toFixed(2)}
+                                        {(() => {
+                                            const subtotal = services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0);
+                                            const tax = subtotal * (settings.taxRate / 100);
+                                            const discountAmount = subtotal * ((formData.discount || 0) / 100);
+                                            return formatCurrency((subtotal + tax) - discountAmount);
+                                        })()}
                                     </span>
                                 </div>
                             </div>

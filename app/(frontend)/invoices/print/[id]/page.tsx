@@ -205,9 +205,9 @@ export default function PrintInvoicePage() {
                             <img src={settings.logoUrl} alt="Store Logo" className="w-40 h-auto mx-auto object-contain" />
                         </div>
                     )}
-                    {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1>
+                    {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1> */}
                     <p className="text-[11px] text-gray-500 uppercase">{settings?.address || "123 Beauty Lane, Salon City"}</p>
-                    <p className="text-[11px] text-gray-500">TEL: {settings?.phone || "000-000-0000"}</p> */}
+                    <p className="text-[11px] text-gray-500">SĐT: {settings?.phone || "000-000-0000"}</p>
                     {/* <div className="mt-4 border-y border-dashed border-gray-300 py-2">
                         <p className="font-bold text-lg">BIÊN LAI THUẾ</p>
                     </div> */}
@@ -291,17 +291,17 @@ export default function PrintInvoicePage() {
 
                 {/* Summary Section */}
                 <div className="border-t border-gray-100 pt-4 space-y-2 text-[13px]">
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                         <span className="text-gray-500">Tổng phụ</span>
                         <span>{formatCurrency(invoice.subtotal)}</span>
-                    </div>
+                    </div> */}
                     <div className="flex justify-between text-gray-700">
                         <span>Thuế ({((invoice.tax / invoice.subtotal) * 100).toFixed(0)}%)</span>
                         <span>{formatCurrency(invoice.tax)}</span>
                     </div>
                     {invoice.discount > 0 && (
                         <div className="flex justify-between text-red-600">
-                            <span>Giảm giá</span>
+                            <span>Chiết khấu ({invoice.subtotal > 0 ? Math.round((invoice.discount / invoice.subtotal) * 100) : 0}%)</span>
                             <span>-{formatCurrency(invoice.discount)}</span>
                         </div>
                     )}
@@ -309,16 +309,16 @@ export default function PrintInvoicePage() {
                         <span>Tổng cộng</span>
                         <span>{formatCurrency(invoice.totalAmount)}</span>
                     </div>
-                    <div className="flex justify-between font-bold">
+                    {/* <div className="flex justify-between font-bold">
                         <span>Đã thanh toán</span>
                         <span>{formatCurrency(invoice.amountPaid)}</span>
-                    </div>
-                    {invoice.totalAmount - invoice.amountPaid > 0 && (
+                    </div> */}
+                    {/* {invoice.totalAmount - invoice.amountPaid > 0 && (
                         <div className="flex justify-between font-bold border-t border-dashed border-red-100 mt-1 pt-1">
                             <span>Số dư còn lại</span>
                             <span>{formatCurrency(invoice.totalAmount - invoice.amountPaid)}</span>
                         </div>
-                    )}
+                    )} */}
                 </div>
 
                 {/* Footer Section */}
