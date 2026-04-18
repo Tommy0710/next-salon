@@ -13,7 +13,7 @@ export const formatAppointmentDateTime = (date: any, time: string) => {
 
     const hh = String(combined.getHours()).padStart(2, '0');
     const mm = String(combined.getMinutes()).padStart(2, '0');
-    const ss = String(combined.getSeconds()).padStart(2, '0');
+    // const ss = String(combined.getSeconds()).padStart(2, '0');
 
-    return `${hh}:${mm}:${ss} ${day}/${month}/${year}`;
+    return `${hh}:${mm} ${day}/${month}/${year}`;
 };

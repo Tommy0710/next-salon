@@ -19,9 +19,9 @@ export const buildTemplateData = (eventType: string, data: any) => {
         const year = d.getFullYear();
         const hours = String(d.getHours()).padStart(2, '0');
         const minutes = String(d.getMinutes()).padStart(2, '0');
-        const seconds = String(d.getSeconds()).padStart(2, '0');
+        // const seconds = String(d.getSeconds()).padStart(2, '0');
 
-        return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+        return `${hours}:${minutes} ${day}/${month}/${year}`;
     };
     const now = new Date();
 
