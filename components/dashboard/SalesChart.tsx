@@ -28,13 +28,13 @@ export default function SalesChart({ data }: SalesChartProps) {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 h-full">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">Sales Overview</h3>
-                    <p className="text-sm text-gray-500 mt-1">Doanh thu theo thời gian, dễ đọc với nhãn gọn và tooltip rõ ràng.</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Sales Overview</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Doanh thu theo thời gian, dễ đọc với nhãn gọn và tooltip rõ ràng.</p>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                     {data.length} point{data.length > 1 ? 's' : ''}
                 </div>
             </div>

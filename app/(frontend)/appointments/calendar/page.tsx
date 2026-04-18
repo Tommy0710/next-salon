@@ -331,17 +331,17 @@ export default function CalendarPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden text-black">
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col h-screen overflow-hidden text-black dark:text-white">
+            <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 shadow-sm border border-primary-100">
+                    <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-sm border border-primary-100 dark:border-primary-900/50">
                         <Clock className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Salon Calendar</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Salon Calendar</h1>
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Live Schedule Management</p>
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest">Live Schedule Management</p>
                         </div>
                     </div>
                 </div>
@@ -349,7 +349,7 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setRefreshTrigger(prev => prev + 1)}
-                        className="p-3 text-gray-500 hover:text-primary-900 hover:bg-primary-50 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm group"
+                        className="p-3 text-gray-500 hover:text-primary-900 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-primary-900/20 rounded-2xl transition-all border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm group"
                         title="Refresh"
                     >
                         <RefreshCw className={`w-5 h-5 transition-transform duration-500 group-hover:rotate-180 ${loadingSlots ? "animate-spin" : ""}`} />
@@ -364,7 +364,7 @@ export default function CalendarPage() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-white p-6">
+            <div className="flex-1 overflow-auto bg-white dark:bg-slate-900 p-6">
                 <StaffCalendar
                     refreshTrigger={refreshTrigger}
                     onSelectEvent={onSelectEvent}

@@ -52,31 +52,31 @@ export default function SearchableSelect({
     return (
         <div className={`${label ? 'mb-4' : ''} ${className}`} ref={wrapperRef}>
             {label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <div className="relative">
                 <div
-                    className={`w-full px-4 py-2 border rounded-lg cursor-pointer flex items-center justify-between bg-white ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
+                    className={`w-full px-4 py-2 border rounded-lg cursor-pointer flex items-center justify-between bg-white dark:bg-slate-900 ${error ? "border-red-500" : "border-gray-300 dark:border-slate-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
                         }`}
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    <span className={`block truncate ${!selectedOption ? "text-gray-500" : "text-gray-900"}`}>
+                    <span className={`block truncate ${!selectedOption ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-white"}`}>
                         {selectedOption ? selectedOption.label : placeholder}
                     </span>
                     <ChevronDown className="w-4 h-4 text-gray-400" />
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
-                        <div className="p-2 sticky top-0 bg-white border-b border-gray-100">
+                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-auto">
+                        <div className="p-2 sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800">
                             <div className="relative">
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary-500"
+                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500 dark:focus:border-primary-500"
                                     placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
@@ -87,12 +87,12 @@ export default function SearchableSelect({
                         </div>
                         <div className="py-1">
                             {filteredOptions.length === 0 ? (
-                                <div className="px-4 py-2 text-sm text-gray-500">No results found</div>
+                                <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">No results found</div>
                             ) : (
                                 filteredOptions.map((option) => (
                                     <div
                                         key={option.value}
-                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 ${option.value === value ? "bg-primary-50 text-primary-900 font-medium" : "text-gray-700"
+                                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 dark:hover:bg-slate-800 ${option.value === value ? "bg-primary-50 dark:bg-primary-900/20 text-primary-900 dark:text-primary-400 font-medium" : "text-gray-700 dark:text-gray-300"
                                             }`}
                                         onClick={() => {
                                             onChange(option.value);

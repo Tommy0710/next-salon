@@ -70,12 +70,12 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
     }, []);
 
     return (
-        <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors">
             <div className="flex items-center">
                 {/* Mobile menu button */}
                 <button
                     onClick={toggleSidebar}
-                    className="p-2 mr-4 text-gray-600 rounded-lg md:hidden hover:bg-gray-100"
+                    className="p-2 mr-4 text-gray-600 dark:text-gray-300 rounded-lg md:hidden hover:bg-gray-100 dark:hover:bg-slate-800"
                 >
                     <span className="sr-only">Open menu</span>
                     <Menu className="w-6 h-6" />
@@ -84,7 +84,7 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
                 {/* Desktop Collapse Button */}
                 <button
                     onClick={toggleCollapse}
-                    className="hidden md:flex p-2 text-gray-600 rounded-lg hover:bg-gray-100"
+                    className="hidden md:flex p-2 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
                 >
                     {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
                 </button>
@@ -92,11 +92,11 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
 
             <div className="flex items-center gap-6">
                 {/* Time and Timezone Display */}
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-lg border border-primary-100">
-                    <Clock className="w-4 h-4 text-primary-900" />
+                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-950/30 rounded-lg border border-primary-100 dark:border-primary-900/50">
+                    <Clock className="w-4 h-4 text-primary-900 dark:text-primary-400" />
                     <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-primary-900">{currentTime}</span>
-                        <span className="text-xs text-primary-600">{timezone}</span>
+                        <span className="text-sm font-semibold text-primary-900 dark:text-primary-300">{currentTime}</span>
+                        <span className="text-xs text-primary-600 dark:text-primary-500">{timezone}</span>
                     </div>
                 </div>
 
@@ -110,31 +110,31 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
                             <User className="w-5 h-5" />
                         </div>
                         {user?.name ? (
-                            <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{user.name}</span>
                         ) : (
-                            <User className="w-5 h-5 text-gray-700" />
+                            <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
                         )}
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute right-0 z-10 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="absolute right-0 z-10 w-48 mt-2 origin-top-right bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <div className="py-1">
-                                <div className="px-4 py-2 border-b border-gray-100">
-                                    <p className="text-sm font-medium text-gray-900">{user?.name || "User"}</p>
-                                    <p className="text-xs text-gray-500 truncate">{user?.email || ""}</p>
+                                <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-800">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || "User"}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || ""}</p>
                                 </div>
-                                <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">
                                     <User className="w-4 h-4 mr-2" />
                                     Profile
                                 </Link>
-                                <Link href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <Link href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800">
                                     <Settings className="w-4 h-4 mr-2" />
                                     Settings
                                 </Link>
 
                                 <button
                                     onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                    className="flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
                                 >
                                     <LogOut className="w-4 h-4 mr-2" />
                                     Logout

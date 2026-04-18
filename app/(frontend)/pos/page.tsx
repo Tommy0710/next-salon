@@ -574,18 +574,18 @@ export default function POSPage() {
 
     const filteredBills = bills.filter(b => b.name.toLowerCase().includes(billSearchQuery.toLowerCase()));
     return (
-        <div className="flex h-[100dvh] w-full bg-gray-50 overflow-hidden flex-col md:flex-row">
+        <div className="flex h-[100dvh] w-full bg-gray-50 dark:bg-slate-950 overflow-hidden flex-col md:flex-row text-black dark:text-white">
             {/* Left Side: Items Catalog */}
-            <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 border-r border-gray-200 bg-white ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
-                <div className="bg-white flex flex-col h-full overflow-hidden">
+            <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
+                <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
                     {/* Header/Tabs */}
-                    <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+                    <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-900 z-10">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                            <h1 className="text-lg md:text-xl font-bold text-gray-800">Hệ thống POS</h1>
+                            <h1 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white">Hệ thống POS</h1>
                             <div className="flex items-center gap-2 md:gap-3 flex-wrap sm:flex-nowrap">
                                 <button
                                     onClick={() => router.push("/dashboard")}
-                                    className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-200 transition-colors"
+                                    className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     <LayoutDashboard className="w-4 h-4" />
                                     <span className="hidden xs:inline">Bảng điều khiển</span>
@@ -597,7 +597,7 @@ export default function POSPage() {
                                         placeholder="Tìm sản phẩm..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg text-xs md:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                     />
                                 </div>
                             </div>
@@ -605,13 +605,13 @@ export default function POSPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setActiveTab('services')}
-                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'services' ? 'bg-primary-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'services' ? 'bg-primary-900 text-white dark:bg-primary-800' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}
                             >
                                 Dịch vụ
                             </button>
                             <button
                                 onClick={() => setActiveTab('products')}
-                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'products' ? 'bg-primary-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${activeTab === 'products' ? 'bg-primary-900 text-white dark:bg-primary-800' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}
                             >
                                 Sản phẩm
                             </button>
@@ -619,7 +619,7 @@ export default function POSPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 pb-20 md:pb-4">
+                    <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 dark:bg-slate-950 pb-20 md:pb-4">
                         {loading ? (
                             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-900 border-t-transparent"></div></div>
                         ) : (
@@ -628,21 +628,21 @@ export default function POSPage() {
                                     <div
                                         key={item._id}
                                         onClick={() => addToCart(item)}
-                                        className="bg-white p-2 md:p-3 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow flex flex-col items-center text-center group min-h-[120px] md:min-h-[132px] active:scale-95 duration-75"
+                                        className="bg-white dark:bg-slate-900 p-2 md:p-3 rounded-lg shadow-sm border border-gray-200 dark:border-slate-800 cursor-pointer hover:shadow-md transition-shadow flex flex-col items-center text-center group min-h-[120px] md:min-h-[132px] active:scale-95 duration-75"
                                     >
                                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 group-hover:scale-110 transition-transform">
                                             {item.type === 'Service' ? (
-                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-primary-100 flex items-center justify-center">
-                                                    <ScissorsIcon className="w-4 h-4 md:w-5 md:h-5 text-primary-600" />
+                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+                                                    <ScissorsIcon className="w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400" />
                                                 </div>
                                             ) : (
-                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-green-100 flex items-center justify-center">
-                                                    <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                                                <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                                                    <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
                                                 </div>
                                             )}
                                         </div>
-                                        <h3 className="font-semibold text-gray-800 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
-                                        <p className="text-primary-900 font-bold text-xs md:text-sm">{formatCurrency(item.price)}</p>
+                                        <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
+                                        <p className="text-primary-900 dark:text-primary-400 font-bold text-xs md:text-sm">{formatCurrency(item.price)}</p>
                                     </div>
                                 ))}
                             </div>
@@ -652,10 +652,10 @@ export default function POSPage() {
             </div>
 
             {/* Right Side: Cart */}
-            <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col bg-white border-l border-gray-200 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
+            <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
 
                 {/* --- MỚI: THANH TÌM KIẾM BILL & TẠO BILL MỚI --- */}
-                <div className="p-2 border-b border-gray-200 bg-gray-50 flex items-center gap-2 flex-shrink-0">
+                <div className="p-2 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 flex items-center gap-2 flex-shrink-0">
                     <div className="relative flex-1">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
                         <input
@@ -663,7 +663,7 @@ export default function POSPage() {
                             placeholder="Tìm tên bill..."
                             value={billSearchQuery}
                             onChange={(e) => setBillSearchQuery(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-900"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-1 focus:ring-primary-900"
                         />
                     </div>
                     <button
@@ -676,14 +676,14 @@ export default function POSPage() {
                 </div>
 
                 {/* 1. BILL TABS UI */}
-                <div className="flex overflow-x-auto bg-gray-100 border-b border-gray-200 hide-scrollbar p-1 flex-shrink-0">
+                <div className="flex overflow-x-auto bg-gray-100 dark:bg-slate-950 border-b border-gray-200 dark:border-slate-800 hide-scrollbar p-1 flex-shrink-0">
                     {filteredBills.map((bill) => (
                         <div
                             key={bill.id}
                             onClick={() => switchBill(bill.id)}
                             className={`flex items-center gap-2 px-3 py-1.5 min-w-[100px] cursor-pointer rounded-t-md text-xs font-semibold border-b-2 transition-colors ${activeBillId === bill.id
-                                ? "bg-white text-primary-900 border-primary-900 shadow-sm"
-                                : "text-gray-500 border-transparent hover:bg-gray-200"
+                                ? "bg-white dark:bg-slate-900 text-primary-900 dark:text-primary-400 border-primary-900 dark:border-primary-500 shadow-sm"
+                                : "text-gray-500 dark:text-gray-400 border-transparent hover:bg-gray-200 dark:hover:bg-slate-800"
                                 }`}
                         >
                             <span className="nowrap flex-1">{bill.name}</span>
@@ -701,10 +701,10 @@ export default function POSPage() {
 
                 {/* 2. ACTIVE BILL CONTENT */}
                 {isMounted && activeBill && (
-                    <div className="bg-white flex flex-col h-full overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
 
                         {/* Customer Selection & Bill Renaming */}
-                        <div className="p-3 md:p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0 space-y-3">
+                        <div className="p-3 md:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 flex-shrink-0 space-y-3">
 
                             {/* --- MỚI: Ô ĐỔI TÊN BILL --- */}
                             <div className="flex items-center gap-2">
@@ -714,10 +714,10 @@ export default function POSPage() {
                                     placeholder="Đặt tên Bill (VD: Bàn 1, Chị Hà VIP...)"
                                     value={activeBill.name}
                                     onChange={(e) => updateActiveBill({ name: e.target.value })}
-                                    className="flex-1 px-3 py-1.5 text-sm font-bold text-primary-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 transition-all shadow-sm"
+                                    className="flex-1 px-3 py-1.5 text-sm font-bold text-primary-900 dark:text-primary-400 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 transition-all shadow-sm"
                                 />
                             </div>
-                            <div className="bg-gray-50 flex-shrink-0 space-y-3">
+                            <div className="bg-gray-50 dark:bg-slate-900 flex-shrink-0 space-y-3">
                                 <div className="flex items-center gap-2">
                                     <User className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                                     <SearchableSelect
@@ -741,36 +741,36 @@ export default function POSPage() {
                         {/* Cart Items */}
                         <div className="flex-grow overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
                             {activeBill.cart.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-gray-400 py-10">
+                                <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-slate-600 py-10">
                                     <ShoppingCart className="w-8 h-8 md:w-10 md:h-10 mb-2 opacity-30" />
                                     <p className="text-xs md:text-sm">Giỏ hàng trống</p>
                                 </div>
                             ) : (
                                 activeBill.cart.map(item => (
-                                    <div key={`${item.type}-${item._id}`} className="p-2 border border-gray-100 rounded-lg bg-white shadow-sm space-y-2">
+                                    <div key={`${item.type}-${item._id}`} className="p-2 border border-gray-100 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-950 shadow-sm space-y-2">
                                         <div className="flex items-center justify-between gap-1">
                                             <div className="flex items-center gap-2 overflow-hidden flex-1">
                                                 <div className="flex-shrink-0">
                                                     {item.type === 'Service' ? (
-                                                        <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
-                                                            <ScissorsIcon className="w-3 h-3 text-primary-600" />
+                                                        <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+                                                            <ScissorsIcon className="w-3 h-3 text-primary-600 dark:text-primary-400" />
                                                         </div>
                                                     ) : (
-                                                        <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                                                            <Package className="w-3 h-3 text-green-600" />
+                                                        <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                                                            <Package className="w-3 h-3 text-green-600 dark:text-green-400" />
                                                         </div>
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="text-[10px] md:text-xs font-semibold text-gray-800 truncate">{item.name}</p>
-                                                    <p className="text-[9px] md:text-[10px] text-gray-500">{settings.symbol}{item.price}</p>
+                                                    <p className="text-[10px] md:text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{item.name}</p>
+                                                    <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">{settings.symbol}{item.price}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1 flex-shrink-0">
-                                                <button onClick={() => updateQuantity(item._id, item.type, -1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Minus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
-                                                <span className="text-[10px] md:text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item._id, item.type, 1)} className="p-1 hover:bg-gray-200 rounded text-gray-600"><Plus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
-                                                <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                                <button onClick={() => updateQuantity(item._id, item.type, -1)} className="p-1 hover:bg-gray-200 dark:hover:bg-slate-800 rounded text-gray-600 dark:text-gray-400"><Minus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                                <span className="text-[10px] md:text-xs font-bold w-4 text-center dark:text-white">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item._id, item.type, 1)} className="p-1 hover:bg-gray-200 dark:hover:bg-slate-800 rounded text-gray-600 dark:text-gray-400"><Plus className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
+                                                <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
                                             </div>
                                         </div>
                                         {/* {item.type === 'Service' && (
@@ -819,26 +819,26 @@ export default function POSPage() {
                         </div>
 
                         {/* Summary Section */}
-                        <div className="flex-shrink-0 p-3 bg-gray-50 border-t border-gray-200 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                        <div className="flex-shrink-0 p-3 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="space-y-1 mb-3 text-[10px] md:text-xs">
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Tổng phụ</span>
                                     <span>{formatCurrency(subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Thuế ({settings.taxRate}%)</span>
                                     <span>{formatCurrency(tax)}</span>
                                 </div>
                                 {commission > 0 && (
-                                    <div className="space-y-1 bg-indigo-50 px-2 py-1.5 rounded border border-indigo-100/50">
-                                        <div className="flex justify-between text-indigo-600 font-bold mb-1 border-b border-indigo-200/50 pb-0.5">
+                                    <div className="space-y-1 bg-indigo-50 dark:bg-indigo-900/10 px-2 py-1.5 rounded border border-indigo-100/50 dark:border-indigo-900/30">
+                                        <div className="flex justify-between text-indigo-600 dark:text-indigo-400 font-bold mb-1 border-b border-indigo-200/50 dark:border-indigo-900/50 pb-0.5">
                                             <span>Tổng hoa hồng</span>
                                             <span>{formatCurrency(commission)}</span>
                                         </div>
                                         {assignments.map((assignment, idx) => {
                                             const staff = staffList.find(s => s._id === assignment.staffId);
                                             return (
-                                                <div key={idx} className="flex justify-between text-[9px] text-indigo-500 font-medium pl-1">
+                                                <div key={idx} className="flex justify-between text-[9px] text-indigo-500 dark:text-indigo-300 font-medium pl-1">
                                                     <span className="truncate pr-2">{staff?.name}</span>
                                                     <span className="flex-shrink-0">{settings.symbol}{(assignment.commission || 0).toFixed(2)}</span>
                                                 </div>
@@ -846,7 +846,7 @@ export default function POSPage() {
                                         })}
                                     </div>
                                 )}
-                                <div className="flex justify-between text-gray-600 items-center border-t border-gray-100 pt-1 mt-1">
+                                <div className="flex justify-between text-gray-600 dark:text-gray-400 items-center border-t border-gray-100 dark:border-slate-800 pt-1 mt-1">
                                     <div className="flex flex-col">
                                         <span>Giảm giá</span>
                                         {activeBill.discount > 0 && (
@@ -864,26 +864,26 @@ export default function POSPage() {
                                                 if (val > 100) val = 100;
                                                 updateActiveBill({ discount: val });
                                             }}
-                                            className="w-12 text-right text-[10px] md:text-xs border border-gray-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
+                                            className="w-12 text-right text-[10px] md:text-xs border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-white rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
                                             min="0"
                                             max="100"
                                             placeholder="0"
                                         />
                                         <span className="text-[10px] text-gray-400 font-bold">%</span>
                                     </div>
-                                </div>                                <div className="flex justify-between items-center text-primary-900 border-t border-gray-200 pt-1.5 mt-1">
+                                </div>                                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 pt-1.5 mt-1">
                                     <span className="text-[10px] font-bold">Đã thanh toán</span>
                                     <input
                                         type="number"
                                         placeholder={total.toFixed(2)}
                                         value={activeBill.amountPaid}
                                         onChange={(e) => updateActiveBill({ amountPaid: e.target.value })}
-                                        className="w-20 text-right text-[10px] md:text-xs border-2 border-primary-900/20 rounded px-1 py-0.5 focus:border-primary-900 outline-none font-bold"
+                                        className="w-20 text-right text-[10px] md:text-xs border-2 border-primary-900/20 dark:border-primary-900/50 rounded px-1 py-0.5 focus:border-primary-900 bg-white dark:bg-slate-950 text-gray-900 dark:text-white outline-none font-bold"
                                     />
                                 </div>
-                                <div className="flex justify-between text-sm md:text-base font-black text-gray-900 pt-1 border-t border-gray-200">
+                                <div className="flex justify-between text-sm md:text-base font-black text-gray-900 dark:text-gray-100 pt-1 border-t border-gray-200 dark:border-slate-800">
                                     <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Còn nợ' : 'Tổng cộng'}</span>
-                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600' : 'text-primary-900'}>
+                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600 dark:text-red-400' : 'text-primary-900 dark:text-primary-400'}>
                                         {formatCurrency(((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total))}
                                     </span>
                                 </div>
@@ -896,7 +896,7 @@ export default function POSPage() {
                                             <button
                                                 key={method}
                                                 onClick={() => updateActiveBill({ paymentMethod: method })}
-                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-primary-900 text-white border-primary-900 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                                                className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${activeBill.paymentMethod === method ? 'bg-primary-900 text-white border-primary-900 shadow-sm' : 'bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700'}`}
                                             >
                                                 {method}
                                             </button>
@@ -906,14 +906,14 @@ export default function POSPage() {
                                     {/* Hiển thị danh sách QR nếu chọn Mã QR */}
                                     {activeBill.paymentMethod === 'Mã QR' && settings?.qrCodes && settings.qrCodes.length > 0 && (
                                         <div className="animate-in fade-in slide-in-from-top-1">
-                                            <label className="text-[10px] text-gray-500 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
+                                            <label className="text-[10px] text-gray-500 dark:text-gray-400 font-bold mb-1 block">Chọn mã QR hiển thị:</label>
                                             <select
                                                 value={activeBill.selectedQrIndex}
                                                 onChange={(e) => updateActiveBill({ selectedQrIndex: parseInt(e.target.value) })}
-                                                className="w-full p-2 text-xs border border-primary-200 rounded-lg focus:ring-1 focus:ring-primary-900 bg-primary-50/50 outline-none font-medium"
+                                                className="w-full p-2 text-xs border border-primary-200 dark:border-primary-900/50 rounded-lg focus:ring-1 focus:ring-primary-900 bg-primary-50/50 dark:bg-primary-900/10 text-gray-900 dark:text-white outline-none font-medium"
                                             >
                                                 {settings.qrCodes.map((qr: any, idx: number) => (
-                                                    <option key={idx} value={idx}>{qr.name} - {qr.bankName}</option>
+                                                    <option key={idx} value={idx} className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white">{qr.name} - {qr.bankName}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -936,19 +936,19 @@ export default function POSPage() {
             </div>
 
             {/* Mobile Navigation Bar */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-center justify-around h-16 z-50 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-around h-16 z-50 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
                 <button
                     onClick={() => setMobileTab('catalog')}
-                    className={`flex flex-col items-center justify-center w-20 h-full transition-all ${mobileTab === 'catalog' ? 'text-primary-900 scale-110' : 'text-gray-400'}`}
+                    className={`flex flex-col items-center justify-center w-20 h-full transition-all ${mobileTab === 'catalog' ? 'text-primary-900 dark:text-primary-400 scale-110' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                     <LayoutDashboard className="w-5 h-5 mb-1" />
                     <span className="text-[10px] font-bold">Danh mục</span>
-                    {mobileTab === 'catalog' && <div className="absolute top-0 w-8 h-1 bg-primary-900 rounded-b-full"></div>}
+                    {mobileTab === 'catalog' && <div className="absolute top-0 w-8 h-1 bg-primary-900 dark:bg-primary-500 rounded-b-full"></div>}
                 </button>
-                <div className="w-px h-8 bg-gray-100"></div>
+                <div className="w-px h-8 bg-gray-100 dark:bg-slate-800"></div>
                 <button
                     onClick={() => setMobileTab('cart')}
-                    className={`flex flex-col items-center justify-center w-20 h-full transition-all relative ${mobileTab === 'cart' ? 'text-primary-900 scale-110' : 'text-gray-400'}`}
+                    className={`flex flex-col items-center justify-center w-20 h-full transition-all relative ${mobileTab === 'cart' ? 'text-primary-900 dark:text-primary-400 scale-110' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                     <div className="relative">
                         <ShoppingCart className="w-5 h-5 mb-1" />
@@ -959,26 +959,26 @@ export default function POSPage() {
                         )}
                     </div>
                     <span className="text-[10px] font-bold">Giỏ hàng</span>
-                    {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-primary-900 rounded-b-full"></div>}
+                    {mobileTab === 'cart' && <div className="absolute top-0 w-8 h-1 bg-primary-900 dark:bg-primary-500 rounded-b-full"></div>}
                 </button>
             </div>
             {/* THÊM VÀO ĐÂY: Modal Xác nhận xóa Bill */}
             {billToDelete && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                                <Trash2 className="w-6 h-6 text-red-600" />
+                            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4">
+                                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận xóa hóa đơn</h3>
-                            <p className="text-sm text-gray-500 mb-6">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Xác nhận xóa hóa đơn</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                                 Bạn có chắc chắn muốn xóa hóa đơn này không? Các sản phẩm đã chọn trong bill sẽ bị mất.
                             </p>
                         </div>
                         <div className="flex justify-end gap-3 w-full">
                             <button
                                 onClick={() => setBillToDelete(null)}
-                                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-bold transition-colors"
+                                className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 text-sm font-bold transition-colors"
                             >
                                 Hủy
                             </button>
@@ -995,12 +995,12 @@ export default function POSPage() {
             {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-5 border-b border-gray-100 pb-3">
-                            <h3 className="text-lg font-bold text-gray-900">Thêm khách hàng mới</h3>
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-slate-800 pb-3">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm khách hàng mới</h3>
                             <button
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 p-1.5 rounded-full transition-colors"
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 p-1.5 rounded-full transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -1008,36 +1008,36 @@ export default function POSPage() {
 
                         <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                                    Tên khách hàng <span className="text-red-500">*</span>
+                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide">
+                                    Tên khách hàng <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={newCustomerName}
                                     onChange={(e) => setNewCustomerName(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 focus:bg-white"
+                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
                                     placeholder="Nhập tên khách hàng..."
                                     autoFocus
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide">
                                     Số điện thoại
                                 </label>
                                 <input
                                     type="text"
                                     value={newCustomerPhone}
                                     onChange={(e) => setNewCustomerPhone(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 focus:bg-white"
+                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
                                     placeholder="Nhập số điện thoại..."
                                 />
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-3 w-full border-t border-gray-100 pt-4">
+                        <div className="flex justify-end gap-3 w-full border-t border-gray-100 dark:border-slate-800 pt-4">
                             <button
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-bold transition-colors"
+                                className="px-5 py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 text-sm font-bold transition-colors"
                                 disabled={isSubmittingCustomer}
                             >
                                 Hủy

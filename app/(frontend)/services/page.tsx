@@ -207,19 +207,19 @@ export default function ServicesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Services</h1>
-                        <p className="text-sm text-gray-500">Manage your salon service catalog and categories</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Services</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your salon service catalog and categories</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <PermissionGate resource="services" action="create">
                             <button
                                 onClick={() => setIsCategoryModalOpen(true)}
-                                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
+                                className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 shadow-sm font-semibold text-sm"
                             >
                                 <Tag className="w-4 h-4" />
                                 New Category
@@ -236,24 +236,24 @@ export default function ServicesPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-950/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search by service name..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white placeholder:text-gray-400 border border-gray-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
                         <div className="flex items-center gap-3 w-full md:w-auto">
-                            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
-                                <Filter className="w-4 h-4 text-gray-400" />
+                            <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg px-3 py-1.5 shadow-sm">
+                                <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                 <select
-                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700"
+                                    className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-300 outline-none"
                                     value={selectedCategory}
                                     onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
                                 >
@@ -265,27 +265,27 @@ export default function ServicesPage() {
                             </div>
                             <button
                                 onClick={() => { setSearch(""); setSelectedCategory(""); setPage(1); }}
-                                className="text-gray-500 hover:text-gray-700 font-medium text-sm px-2"
+                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium text-sm px-2"
                             >
                                 Reset
                             </button>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="overflow-x-auto text-black dark:text-white">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
+                            <thead className="bg-gray-50 dark:bg-slate-900/50">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Service</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Gender</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gender</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
+                            <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
                                 {loading && services.length === 0 ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
@@ -294,44 +294,44 @@ export default function ServicesPage() {
                                     ))
                                 ) : services.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                             <Scissors className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                             <p>No services found</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     services.map((service) => (
-                                        <tr key={service._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={service._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-primary-50 rounded-lg">
-                                                        <Scissors className="w-4 h-4 text-primary-900" />
+                                                    <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                                                        <Scissors className="w-4 h-4 text-primary-900 dark:text-primary-400" />
                                                     </div>
                                                     <div>
-                                                        <span className="text-sm font-bold text-gray-900">{service.name}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{service.name}</span>
                                                         <div className="text-[10px] text-gray-400 font-medium uppercase">Internal ID: {service._id.slice(-6)}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-50 text-gray-700 border border-gray-200">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
                                                     {service.category?.name || 'Uncategorized'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                                                <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                                                     <Clock className="w-3.5 h-3.5 text-gray-400" />
                                                     {service.duration} min
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-bold text-gray-900">{formatCurrency(service.price, settings.currency)}</span>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(service.price, settings.currency)}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-xs text-gray-600 capitalize font-medium">{service.gender}</span>
+                                                <span className="text-xs text-gray-600 dark:text-gray-400 capitalize font-medium">{service.gender}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${service.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                                                <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${service.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}>
                                                     {service.status}
                                                 </span>
                                             </td>
@@ -339,33 +339,33 @@ export default function ServicesPage() {
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === service._id ? null : service._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
 
                                                     {activeDropdown === service._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                                                        <div className="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
                                                             <PermissionGate resource="services" action="edit">
                                                                 <button
                                                                     onClick={() => {
                                                                         openServiceModal(service);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-primary-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600 dark:text-primary-500" />
                                                                     Edit Details
                                                                 </button>
                                                             </PermissionGate>
-                                                            <div className="h-px bg-gray-100 my-1" />
+                                                            <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
                                                             <PermissionGate resource="services" action="delete">
                                                                 <button
                                                                     onClick={() => {
                                                                         handleDelete(service._id);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                                 >
                                                                     <Trash2 className="w-4 h-4" />
                                                                     Delete Service
@@ -383,15 +383,15 @@ export default function ServicesPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                        <div className="text-sm text-gray-500 font-medium">
-                            Showing <span className="text-gray-900">{services.length}</span> of <span className="text-gray-900">{pagination.total}</span> services
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                            Showing <span className="text-gray-900 dark:text-white">{services.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> services
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -412,8 +412,8 @@ export default function ServicesPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-primary-900 text-white"
-                                                : "text-gray-600 hover:bg-gray-100"
+                                                ? "bg-primary-900 dark:bg-primary-700 text-white"
+                                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                                 }`}
                                         >
                                             {pageNum}
@@ -424,7 +424,7 @@ export default function ServicesPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -498,7 +498,7 @@ export default function ServicesPage() {
                         <button
                             type="button"
                             onClick={closeServiceModal}
-                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                            className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 font-medium transition-colors"
                         >
                             Cancel
                         </button>
@@ -526,7 +526,7 @@ export default function ServicesPage() {
                         <button
                             type="button"
                             onClick={() => setIsCategoryModalOpen(false)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                            className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 font-medium transition-colors"
                         >
                             Cancel
                         </button>

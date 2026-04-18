@@ -33,7 +33,7 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 dark:bg-[#0b1120] dark:text-slate-200">
             {/* Navigation Loading Overlay */}
             <NavigationLoader />
 

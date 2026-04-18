@@ -28,10 +28,13 @@ import {
     History,
     ShoppingBasket,
     Clock,
-    Activity
+    Activity,
+    Moon,
+    Sun
 } from "lucide-react";
 import { usePermission } from "@/hooks/usePermission";
 import { signOut } from "next-auth/react";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 interface SidebarProps {
     isSidebarOpen: boolean;
@@ -76,7 +79,7 @@ const menuSections = [
             { name: "Payroll", href: "/payroll", icon: DollarSign },
             { name: "Expenses", href: "/expenses", icon: DollarSign },
             { name: "Reports", href: "/reports", icon: BarChart3 },
-            { name: "AI Reports", href: "/ai-reports", icon: Sparkles },
+            // { name: "AI Reports", href: "/ai-reports", icon: Sparkles },
         ]
     },
     {
@@ -93,6 +96,7 @@ const menuSections = [
 export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSidebar }: SidebarProps) {
     const pathname = usePathname();
     const { canView } = usePermission();
+    const { theme, toggleTheme } = useTheme();
     const [storeName, setStoreName] = useState("SalonNext");
     const [logoUrl, setLogoUrl] = useState("");
 
@@ -138,7 +142,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
             'Roles': 'roles',
             'Settings': 'settings',
             'Invoices': 'invoices',
-            'AI Reports': 'aiReports',
+            // 'AI Reports': 'aiReports',
             'Activity Log': 'activityLogs',
             'Calendar': 'calendarView'
         };
@@ -157,14 +161,14 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
 
     return (
         <aside
-            className={`fixed inset-y-0 left-0 z-40 bg-white border-r border-gray-200 transition-all duration-300 transform flex flex-col shadow-xl
+            className={`fixed inset-y-0 left-0 z-40 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 transition-all duration-300 transform flex flex-col shadow-xl
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0 
         ${isSidebarCollapsed ? "w-20" : "w-64"}
       `}
         >
             {/* Premium Header */}
-            <div className={`relative h-20 border-b border-gray-100 ${isSidebarCollapsed ? "px-2" : "px-5"}`}>
+            <div className={`relative h-20 border-b border-gray-100 dark:border-slate-800 ${isSidebarCollapsed ? "px-2" : "px-5"}`}>
                 <div className={`relative h-full flex items-center ${isSidebarCollapsed ? "justify-center" : "justify-between"}`}>
                     {!isSidebarCollapsed ? (
                         <div className="flex items-center gap-3">
@@ -178,8 +182,8 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                                 </div>
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-gray-900 tracking-tight">{storeName}</h1>
-                                <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Business Suite</p>
+                                <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">{storeName}</h1>
+                                <p className="text-[10px] text-gray-500 dark:text-slate-400 font-medium uppercase tracking-wider">Business Suite</p>
                             </div>
                         </div>
                     ) : (
@@ -226,7 +230,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                                             className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
                                                 ${isActive
                                                     ? "bg-primary-900 text-white shadow-lg shadow-primary-900/20"
-                                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                    : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white"
                                                 } ${isSidebarCollapsed ? "justify-center" : ""}`}
                                         >
                                             <item.icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110
@@ -248,11 +252,23 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                 ))}
             </nav>
 
-            {/* Footer with Logout */}
-            <div className="p-3 border-t border-gray-100 bg-gray-50/50">
+            {/* Footer with Toggle & Logout */}
+            <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900 flex flex-col gap-2">
+                <button
+                    onClick={toggleTheme}
+                    className={`flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-200 ${isSidebarCollapsed ? "justify-center" : ""}`}
+                    title={isSidebarCollapsed ? (theme === "dark" ? "Light Mode" : "Dark Mode") : ""}
+                >
+                    {theme === "dark" ? (
+                        <Sun className={`w-5 h-5 text-amber-400 ${isSidebarCollapsed ? "" : "mr-3"}`} />
+                    ) : (
+                        <Moon className={`w-5 h-5 text-slate-500 ${isSidebarCollapsed ? "" : "mr-3"}`} />
+                    )}
+                    {!isSidebarCollapsed && <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
+                </button>
                 <button
                     onClick={() => signOut({ callbackUrl: '/login' })}
-                    className={`flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-500 rounded-xl hover:bg-red-50 hover:text-red-700 transition-all duration-200 ${isSidebarCollapsed ? "justify-center" : ""}`}
+                    className={`flex items-center w-full px-3 py-2.5 text-sm font-medium text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400 transition-all duration-200 ${isSidebarCollapsed ? "justify-center" : ""}`}
                     title={isSidebarCollapsed ? "Logout" : ""}
                 >
                     <LogOut className={`w-5 h-5 ${isSidebarCollapsed ? "" : "mr-3"}`} />

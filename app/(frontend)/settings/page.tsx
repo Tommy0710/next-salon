@@ -277,8 +277,8 @@ export default function SettingsPage() {
     return (
         <div className="max-w-4xl mx-auto p-6">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">Cài đặt cửa hàng</h1>
-                <p className="text-gray-500">Quản lý chi tiết và cấu hình cửa hàng của bạn</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cài đặt cửa hàng</h1>
+                <p className="text-gray-500 dark:text-gray-400">Quản lý chi tiết và cấu hình cửa hàng của bạn</p>
             </div>
 
             {message.text && (
@@ -289,13 +289,13 @@ export default function SettingsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* General Information */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('general')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Store className="w-5 h-5 text-primary-900" />
                             Thông tin chung
                         </h2>
@@ -304,7 +304,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.general && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="grid grid-cols-1 gap-6">
                                 <FormInput
                                     label="Tên cửa hàng"
@@ -354,13 +354,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Contact Details */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('contact')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Phone className="w-5 h-5 text-primary-900" />
                             Chi tiết liên hệ
                         </h2>
@@ -369,7 +369,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.contact && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormInput
                                     label="Số điện thoại"
@@ -410,13 +410,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Booking Rules Information */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('booking')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Calendar className="w-5 h-5 text-primary-900" />
                             Quy tắc thời gian làm việc
                         </h2>
@@ -425,7 +425,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.booking && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="space-y-6">
                                 {/* Chọn ngày làm việc */}
                                 <div className="mb-8">
@@ -444,7 +444,7 @@ export default function SettingsPage() {
                                             const isChecked = currentDays.includes(day.value);
 
                                             return (
-                                                <label key={day.value} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-xl border transition-all ${isChecked ? 'bg-primary-50 border-primary-200' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                                <label key={day.value} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-xl border transition-all ${isChecked ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800' : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700'
                                                     }`}>
                                                     <input
                                                         type="checkbox"
@@ -466,7 +466,7 @@ export default function SettingsPage() {
                                                         }}
                                                         className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4"
                                                     />
-                                                    <span className={`text-sm font-medium ${isChecked ? 'text-primary-700' : 'text-gray-600'}`}>
+                                                    <span className={`text-sm font-medium ${isChecked ? 'text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'}`}>
                                                         {day.label}
                                                     </span>
                                                 </label>
@@ -478,8 +478,8 @@ export default function SettingsPage() {
                                 {/* Thiết lập Ca làm việc */}
                                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                                     {/* Ca 1 */}
-                                    <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-200/60">
-                                        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <div className="p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                        <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 1 (Sáng)
                                         </h4>
@@ -498,7 +498,7 @@ export default function SettingsPage() {
                                                             shift1: { ...settings.bookingRules?.shift1, start: e.target.value, end: settings.bookingRules?.shift1?.end || '12:00' }
                                                         }
                                                     })}
-                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                    className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
                                                 />
                                             </div>
                                             <div className="flex-1">
@@ -515,15 +515,15 @@ export default function SettingsPage() {
                                                             shift1: { ...settings.bookingRules?.shift1, start: settings.bookingRules?.shift1?.start || '08:00', end: e.target.value }
                                                         }
                                                     })}
-                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                    className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
                                                 />
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Ca 2 */}
-                                    <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-200/60">
-                                        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                    <div className="p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                        <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 2 (Chiều/Tối)
                                         </h4>
@@ -542,7 +542,7 @@ export default function SettingsPage() {
                                                             shift2: { ...settings.bookingRules?.shift2, start: e.target.value, end: settings.bookingRules?.shift2?.end || '17:00' }
                                                         }
                                                     })}
-                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                    className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
                                                 />
                                             </div>
                                             <div className="flex-1">
@@ -559,7 +559,7 @@ export default function SettingsPage() {
                                                             shift2: { ...settings.bookingRules?.shift2, start: settings.bookingRules?.shift2?.start || '13:00', end: e.target.value }
                                                         }
                                                     })}
-                                                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                    className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
                                                 />
                                             </div>
                                         </div>
@@ -570,13 +570,13 @@ export default function SettingsPage() {
                     )}
                 </div>
                 {/* Business Information */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('business')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <FileText className="w-5 h-5 text-primary-900" />
                             Thông tin kinh doanh
                         </h2>
@@ -585,7 +585,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.business && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="grid grid-cols-1 gap-6">
                                 <FormInput
                                     label="Mã số thuế / Số đăng ký"
@@ -599,13 +599,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Financial Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('financial')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <DollarSign className="w-5 h-5 text-primary-900" />
                             Cài đặt tài chính và ngôn ngữ
                         </h2>
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.financial && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormSelect
                                     label="Tiền tệ"
@@ -642,13 +642,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Receipt Customization */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('receipt')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <FileText className="w-5 h-5 text-primary-900" />
                             Receipt Customization
                         </h2>
@@ -657,7 +657,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.receipt && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -688,13 +688,13 @@ export default function SettingsPage() {
                     )}
                 </div>
                 {/* --- MỚI: QUẢN LÝ MÃ QR THANH TOÁN --- */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('qrcode')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <QrCode className="w-5 h-5 text-primary-900" />
                             Quản lý Mã QR Thanh Toán
                         </h2>
@@ -703,7 +703,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.qrcode && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <QrCode className="w-5 h-5 text-primary-900" />
                                 Quản lý Mã QR Thanh Toán
@@ -713,7 +713,7 @@ export default function SettingsPage() {
                             {settings.qrCodes && settings.qrCodes.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     {settings.qrCodes.map((qr, index) => (
-                                        <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50 relative">
+                                        <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-800 relative">
                                             {qr.image ? (
                                                 <img src={qr.image} alt="QR" className="w-20 h-20 object-contain bg-white border rounded" />
                                             ) : (
@@ -738,8 +738,8 @@ export default function SettingsPage() {
                             )}
 
                             {/* Form thêm QR mới */}
-                            <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg bg-white">
-                                <h3 className="text-sm font-bold text-gray-700 mb-3">Thêm mã QR mới</h3>
+                            <div className="p-4 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
+                                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Thêm mã QR mới</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <FormInput label="Tên gợi nhớ (VD: Momo, VCB...)" value={newQr.name} onChange={(e) => setNewQr({ ...newQr, name: e.target.value })} />
                                     <FormInput label="Tên Ngân Hàng / Ví" value={newQr.bankName} onChange={(e) => setNewQr({ ...newQr, bankName: e.target.value })} />
@@ -779,13 +779,13 @@ export default function SettingsPage() {
                     )}
                 </div>
                 {/* SMS Settings (Twilio) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('sms')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <MessageSquare className="w-5 h-5 text-primary-900" />
                             SMS Settings (Twilio)
                         </h2>
@@ -794,9 +794,9 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.sms && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                                <div className="flex items-center gap-3 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-100 dark:border-primary-900/40">
                                     <input
                                         type="checkbox"
                                         id="smsEnabled"
@@ -842,13 +842,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Email Settings (SMTP) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('email')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Send className="w-5 h-5 text-primary-900" />
                             Email Settings (SMTP)
                         </h2>
@@ -857,9 +857,9 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.email && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
+                                <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-900/40">
                                     <input
                                         type="checkbox"
                                         id="emailEnabled"
@@ -932,13 +932,13 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Reminder Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('reminder')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Bell className="w-5 h-5 text-primary-900" />
                             Appointment Reminder Settings
                         </h2>
@@ -947,7 +947,7 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.reminder && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormInput
                                     label="Send Reminders (Hours Before)"
@@ -1045,13 +1045,13 @@ export default function SettingsPage() {
                     )}
                 </div>
                 {/* --- KHỐI CẤU HÌNH ZALO ZNS --- */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('zalo')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <MessageSquare className="w-5 h-5 text-primary-900" />
                             Tích hợp Zalo ZNS
                         </h2>
@@ -1060,8 +1060,8 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.zalo && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
-                            <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
+                            <div className="flex items-center gap-3 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-100 dark:border-primary-900/40">
                                 <input
                                     type="checkbox"
                                     id="zaloEnabled"
@@ -1152,13 +1152,13 @@ export default function SettingsPage() {
                 </div>
                 {/* --- KẾT THÚC KHỐI ZALO --- */}
                 {/* AI Settings */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('ai')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
                     >
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-primary-900" />
                             AI Power Reporting Settings
                         </h2>
@@ -1167,9 +1167,9 @@ export default function SettingsPage() {
                         />
                     </button>
                     {openTabs.ai && (
-                        <div className="px-6 pb-6 border-t border-gray-200 pt-6">
+                        <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 p-4 bg-primary-50 rounded-lg border border-primary-100">
+                                <div className="flex items-center gap-3 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-100 dark:border-primary-900/40">
                                     <input
                                         type="checkbox"
                                         id="aiEnabled"

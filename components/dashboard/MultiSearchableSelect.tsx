@@ -65,14 +65,14 @@ export default function MultiSearchableSelect({
     return (
         <div className={`${label ? 'mb-4' : ''} ${className}`} ref={wrapperRef}>
             {label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <div className="relative">
                 <div
-                    className={`w-full px-3 py-1.5 border rounded-lg cursor-pointer flex flex-wrap items-center gap-2 bg-white min-h-[42px] ${error ? "border-red-500" : "border-gray-300 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
+                    className={`w-full px-3 py-1.5 border rounded-lg cursor-pointer flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900 min-h-[42px] ${error ? "border-red-500" : "border-gray-300 dark:border-slate-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent"
                         }`}
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -80,7 +80,7 @@ export default function MultiSearchableSelect({
                         selectedOptions.map((opt) => (
                             <span
                                 key={opt.value}
-                                className="bg-primary-50 text-primary-700 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-primary-100"
+                                className="bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1 border border-primary-100 dark:border-primary-800/50"
                             >
                                 {opt.label}
                                 <X
@@ -90,7 +90,7 @@ export default function MultiSearchableSelect({
                             </span>
                         ))
                     ) : (
-                        <span className="text-gray-500 text-sm ml-1">{placeholder}</span>
+                        <span className="text-gray-500 dark:text-slate-400 text-sm ml-1">{placeholder}</span>
                     )}
                     <div className="ml-auto">
                         <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -98,13 +98,13 @@ export default function MultiSearchableSelect({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-hidden flex flex-col">
-                        <div className="p-2 border-b border-gray-100 bg-gray-50">
+                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-hidden flex flex-col">
+                        <div className="p-2 border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
                             <div className="relative">
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+                                    className="w-full pl-8 pr-4 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white"
                                     placeholder="Search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
@@ -115,14 +115,14 @@ export default function MultiSearchableSelect({
                         </div>
                         <div className="overflow-y-auto flex-1 py-1">
                             {filteredOptions.length === 0 ? (
-                                <div className="px-4 py-3 text-sm text-gray-500 text-center">No results found</div>
+                                <div className="px-4 py-3 text-sm text-gray-500 dark:text-slate-400 text-center">No results found</div>
                             ) : (
                                 filteredOptions.map((option) => {
                                     const isSelected = value.includes(option.value);
                                     return (
                                         <div
                                             key={option.value}
-                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-primary-50 transition-colors ${isSelected ? "bg-primary-50 text-primary-900 font-semibold" : "text-gray-700"
+                                            className={`px-4 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors ${isSelected ? "bg-primary-50 dark:bg-slate-800 text-primary-900 dark:text-primary-400 font-semibold" : "text-gray-700 dark:text-gray-300"
                                                 }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();

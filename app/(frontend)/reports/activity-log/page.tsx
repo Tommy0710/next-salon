@@ -124,7 +124,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
         <div className="p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Activity Logs</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Activity Logs</h1>
                     <p className="text-gray-500 text-sm">Monitor system activity and Zalo messaging events.</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -175,7 +175,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                     <table className="min-w-full divide-y divide-gray-200">
                         {tab === "action" ? (
                             <>
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-slate-800/50">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Timestamp / Event</th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User / Identity</th>
@@ -184,7 +184,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-100">
+                                <tbody className="bg-white divide-y divide-gray-100 dark:bg-slate-800/50">
                                     {logs.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-12 text-center text-gray-500">

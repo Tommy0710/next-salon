@@ -508,16 +508,16 @@ export default function AppointmentsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col h-screen overflow-hidden">
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col h-screen overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
-                    <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
+                    <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
                         <button
                             onClick={() => setView('list')}
                             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 ${view === 'list'
-                                ? "bg-white text-primary-900 shadow-sm"
-                                : "text-gray-500 hover:text-gray-700"
+                                ? "bg-white dark:bg-slate-900 text-primary-900 dark:text-primary-400 shadow-sm"
+                                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                                 }`}
                         >
                             <List className="w-3.5 h-3.5" />
@@ -526,8 +526,8 @@ export default function AppointmentsPage() {
                         <button
                             onClick={() => setView('calendar')}
                             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 ${view === 'calendar'
-                                ? "bg-white text-primary-900 shadow-sm"
-                                : "text-gray-500 hover:text-gray-700"
+                                ? "bg-white dark:bg-slate-900 text-primary-900 dark:text-primary-400 shadow-sm"
+                                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                                 }`}
                         >
                             <CalendarIcon className="w-3.5 h-3.5" />
@@ -549,7 +549,7 @@ export default function AppointmentsPage() {
                 </button>
             </div>
 
-            <div className="h-full flex-1 overflow-auto bg-white flex flex-col">
+            <div className="h-full flex-1 overflow-auto bg-white dark:bg-slate-950 flex flex-col">
                 <div className="h-full p-6 space-y-6">
                     {view === 'calendar' ? (
                         <StaffCalendar
@@ -565,24 +565,24 @@ export default function AppointmentsPage() {
                             }}
                         />
                     ) : (
-                        <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                        <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white">
                             {/* List View Filters */}
-                            <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                            <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-950/50">
                                 <div className="relative w-full md:w-96">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input
                                         type="text"
-                                        placeholder="Search by customer, staff, booking code, or services..."
-                                        className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                        placeholder="Search by customer, booking code..."
+                                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white placeholder:text-gray-400 border border-gray-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                 </div>
                                 <div className="flex items-center gap-3 w-full md:w-auto">
-                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
-                                        <Filter className="w-4 h-4 text-gray-400" />
+                                    <div className="flex items-center gap-2 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg px-3 py-1.5 shadow-sm">
+                                        <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                         <select
-                                            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700"
+                                            className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-300 outline-none"
                                             value={statusFilter}
                                             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                                         >
@@ -595,77 +595,77 @@ export default function AppointmentsPage() {
                                     </div>
                                     <button
                                         onClick={() => { setSearchTerm(""); setStatusFilter(""); setPage(1); }}
-                                        className="text-gray-500 hover:text-gray-700 font-medium text-sm px-2"
+                                        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium text-sm px-2"
                                     >
                                         Reset
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
+                            <div className="flex-1 overflow-auto text-black dark:text-white">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
+                                    <thead className="bg-gray-50 dark:bg-slate-900/50">
                                         <tr>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => { setSortBy('appointment'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-colors" onClick={() => { setSortBy('appointment'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
                                                 <div className="flex items-center gap-2">
                                                     <span>Appointment</span>
-                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'appointment' ? 'text-primary-900' : 'text-gray-400'}`} />
+                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'appointment' ? 'text-primary-900 dark:text-primary-400' : 'text-gray-400'}`} />
                                                 </div>
                                             </th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Booking Code</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Services</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => {
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Booking Code</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Services</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-colors" onClick={() => {
                                                 setSortBy('createdAt');
                                                 setSortOrder(prev => sortBy === 'createdAt' ? (prev === 'asc' ? 'desc' : 'asc') : 'desc');
                                             }}>
                                                 <div className="flex items-center gap-2">
                                                     <span>Created</span>
-                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'createdAt' ? 'text-primary-900' : 'text-gray-400'}`} />
+                                                    <ArrowUpDown className={`w-3.5 h-3.5 ${sortBy === 'createdAt' ? 'text-primary-900 dark:text-primary-400' : 'text-gray-400'}`} />
                                                 </div>
                                             </th>
-                                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-100">
+                                    <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
                                         {loading && appointments.length === 0 ? (
                                             Array.from({ length: 5 }).map((_, i) => (
                                                 <tr key={i} className="animate-pulse">
-                                                    <td colSpan={9} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                                    <td colSpan={9} className="px-6 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded"></div></td>
                                                 </tr>
                                             ))
                                         ) : appointments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
+                                                <td colSpan={9} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                                     <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                     <p>No appointments found</p>
                                                 </td>
                                             </tr>
                                         ) : (
                                             appointments.map((apt) => (
-                                                <tr key={apt._id} className="hover:bg-gray-50/50 transition-colors">
+                                                <tr key={apt._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="p-2 bg-primary-50 rounded-lg">
-                                                                <Clock className="w-4 h-4 text-primary-900" />
+                                                            <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                                                                <Clock className="w-4 h-4 text-primary-900 dark:text-primary-400" />
                                                             </div>
                                                             <div>
-                                                                <span className="text-sm font-bold text-gray-900">{format(new Date(apt.date), "dd MMM yyyy")}</span>
+                                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{format(new Date(apt.date), "dd MMM yyyy")}</span>
                                                                 <div className="text-[10px] text-gray-400 font-medium uppercase">{apt.startTime} - {apt.endTime}</div>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="text-sm font-mono font-bold text-primary-900 bg-primary-50 px-2 py-1 rounded">
+                                                        <span className="text-sm font-mono font-bold text-primary-900 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-2 py-1 rounded">
                                                             {apt.bookingCode || 'N/A'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-semibold text-gray-900">{apt.customer?.name}</div>
-                                                        {apt.customer?.phone && <div className="text-[10px] text-gray-500">{apt.customer.phone}</div>}
+                                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">{apt.customer?.name}</div>
+                                                        {apt.customer?.phone && <div className="text-[10px] text-gray-500 dark:text-gray-400">{apt.customer.phone}</div>}
                                                     </td>
                                                     {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -677,56 +677,56 @@ export default function AppointmentsPage() {
                                                         <div className="flex flex-col gap-2 max-w-xs">
                                                             <div className="flex flex-wrap gap-1 overflow-hidden">
                                                                 {apt.services.slice(0, 2).map((s, idx) => (
-                                                                    <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-50 text-primary-800 border border-primary-100 truncate max-w-[160px]" title={s.name}>
+                                                                    <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300 border border-primary-100 dark:border-primary-800/30 truncate max-w-[160px]" title={s.name}>
                                                                         {s.name}
                                                                     </span>
                                                                 ))}
                                                                 {apt.services.length > 2 && (
-                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                                                         +{apt.services.length - 2} more
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <div className="text-[10px] text-gray-500">
+                                                            <div className="text-[10px] text-gray-500 dark:text-gray-400">
                                                                 {apt.services.length} service{apt.services.length > 1 ? 's' : ''}, {apt.services.reduce((sum, s) => sum + s.duration, 0)} min
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(apt.totalAmount)}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(apt.totalAmount)}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="text-sm text-gray-700 capitalize">{apt.source || 'Direct'}</span>
+                                                        <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">{apt.source || 'Direct'}</span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${apt.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                            apt.status === 'completed' ? 'bg-primary-50 text-primary-700 border-primary-200' :
+                                                            apt.status === 'completed' ? 'bg-primary-50 text-primary-700 border-primary-200 dark:bg-primary-900/20 dark:text-primary-400 dark:border-primary-800' :
                                                                 apt.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                                                    'bg-gray-100 text-gray-700 border-gray-200'
+                                                                    'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-slate-700'
                                                             }`}>
                                                             {apt.status}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
                                                         {format(new Date(apt.createdAt || apt.date), "dd MMM yyyy HH:mm")}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                                         <div className="relative flex justify-end dropdown-trigger">
                                                             <button
                                                                 onClick={() => setActiveDropdown(activeDropdown === apt._id ? null : apt._id)}
-                                                                className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                                className="p-2 text-gray-400 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
                                                             >
                                                                 <MoreVertical className="w-5 h-5" />
                                                             </button>
 
                                                             {activeDropdown === apt._id && (
-                                                                <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                                                <div className="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                                                                     <button
                                                                         onClick={() => {
                                                                             openDetailModal(apt);
                                                                             setActiveDropdown(null);
                                                                         }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 hover:bg-primary-50 transition-colors"
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
                                                                     >
                                                                         <Eye className="w-4 h-4" />
                                                                         Xem thông tin
@@ -737,7 +737,7 @@ export default function AppointmentsPage() {
                                                                                 handleStatusUpdate(apt._id, 'completed');
                                                                                 setActiveDropdown(null);
                                                                             }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 hover:bg-green-50 transition-colors"
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-slate-800 transition-colors"
                                                                         >
                                                                             <CheckCircle className="w-4 h-4" />
                                                                             Complete
@@ -749,7 +749,7 @@ export default function AppointmentsPage() {
                                                                                 handleStatusUpdate(apt._id, 'confirmed', true);
                                                                                 setActiveDropdown(null);
                                                                             }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 hover:bg-primary-50 transition-colors"
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
                                                                         >
                                                                             <CheckCircle className="w-4 h-4" />
                                                                             Confirm
@@ -761,7 +761,7 @@ export default function AppointmentsPage() {
                                                                                 handleStatusUpdate(apt._id, 'cancelled', true);
                                                                                 setActiveDropdown(null);
                                                                             }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-slate-800 transition-colors"
                                                                         >
                                                                             <X className="w-4 h-4" />
                                                                             Cancel
@@ -772,18 +772,18 @@ export default function AppointmentsPage() {
                                                                             openEditModal(apt);
                                                                             setActiveDropdown(null);
                                                                         }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
                                                                     >
-                                                                        <Edit className="w-4 h-4 text-primary-600" />
+                                                                        <Edit className="w-4 h-4 text-primary-600 dark:text-primary-500" />
                                                                         Edit Details
                                                                     </button>
-                                                                    <div className="h-px bg-gray-100 my-1" />
+                                                                    <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
                                                                     <button
                                                                         onClick={() => {
                                                                             handleDelete(apt._id);
                                                                             setActiveDropdown(null);
                                                                         }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                                     >
                                                                         <Trash2 className="w-4 h-4" />
                                                                         Delete
@@ -800,9 +800,9 @@ export default function AppointmentsPage() {
                             </div>
 
                             {/* List View Pagination */}
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-wrap gap-4">
-                                <div className="text-sm text-gray-500 font-medium">
-                                    Showing <span className="text-gray-900">{appointments.length}</span> of <span className="text-gray-900">{pagination.total}</span> appointments
+                            <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+                                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                                    Showing <span className="text-gray-900 dark:text-white">{appointments.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> appointments
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <select
@@ -811,7 +811,7 @@ export default function AppointmentsPage() {
                                             setItemsPerPage(parseInt(e.target.value));
                                             setPage(1);
                                         }}
-                                        className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
+                                        className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     >
                                         <option value="10">10 per page</option>
                                         <option value="25">25 per page</option>
@@ -822,7 +822,7 @@ export default function AppointmentsPage() {
                                     <button
                                         onClick={() => page > 1 && setPage(page - 1)}
                                         disabled={page <= 1}
-                                        className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     >
                                         <ChevronLeft className="w-4 h-4" />
                                     </button>
@@ -843,8 +843,8 @@ export default function AppointmentsPage() {
                                                     key={pageNum}
                                                     onClick={() => setPage(pageNum)}
                                                     className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                        ? "bg-primary-900 text-white"
-                                                        : "text-gray-600 hover:bg-gray-100"
+                                                        ? "bg-primary-900 dark:bg-primary-700 text-white"
+                                                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                                         }`}
                                                 >
                                                     {pageNum}
@@ -855,7 +855,7 @@ export default function AppointmentsPage() {
                                     <button
                                         onClick={() => page < pagination.pages && setPage(page + 1)}
                                         disabled={page >= pagination.pages}
-                                        className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     >
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
@@ -934,8 +934,8 @@ export default function AppointmentsPage() {
                     />
 
                     <div className="mt-6">
-                        <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary-900" />
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-3 flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-primary-900 dark:text-primary-400" />
                             Select Available Time Slot
                             {formData.date && loadingSlots && (
                                 <span className="text-xs font-normal text-gray-400 animate-pulse ml-2">(Updating slots...)</span>
@@ -944,15 +944,15 @@ export default function AppointmentsPage() {
 
                         {formData.date ? (
                             availableSlots.length > 0 ? (
-                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
+                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl max-h-48 overflow-y-auto shadow-inner">
                                     {availableSlots.map((slot, idx) => (
                                         <button
                                             key={idx}
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
                                             className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
-                                                ? "bg-primary-900 text-white border-primary-900 shadow-lg scale-105"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-primary-400 hover:text-primary-700 hover:bg-primary-50"
+                                                ? "bg-primary-900 dark:bg-primary-700 text-white border-primary-900 dark:border-primary-700 shadow-lg scale-105"
+                                                : "bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-slate-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800"
                                                 }`}
                                         >
                                             {slot.startTime}
@@ -960,13 +960,13 @@ export default function AppointmentsPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                                <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                     {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                            <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                 <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                 Please select date to view availability
                             </div>
@@ -1018,7 +1018,7 @@ export default function AppointmentsPage() {
                     </div>
 
                     <div className="flex justify-end space-x-3 mt-6">
-                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" disabled={isSubmitting}>Cancel</button>
+                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800" disabled={isSubmitting}>Cancel</button>
                         <FormButton type="submit" loading={isSubmitting}>
                             {editingAppointment ? "Update Appointment" : "Book Appointment"}
                         </FormButton>
@@ -1029,12 +1029,12 @@ export default function AppointmentsPage() {
             {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">Thêm Khách Hàng Mới</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm Khách Hàng Mới</h3>
                             <button
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -1042,23 +1042,23 @@ export default function AppointmentsPage() {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={newCustomerName}
                                     onChange={(e) => setNewCustomerName(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
+                                    className="w-full px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập tên khách hàng"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
                                 <input
                                     type="tel"
                                     value={newCustomerPhone}
                                     required
                                     onChange={(e) => setNewCustomerPhone(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
+                                    className="w-full px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập số điện thoại"
                                 />
                             </div>
@@ -1068,7 +1068,7 @@ export default function AppointmentsPage() {
                             <button
                                 type="button"
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
                                 disabled={isSubmittingCustomer}
                             >
                                 Hủy
@@ -1089,12 +1089,12 @@ export default function AppointmentsPage() {
             {/* MODAL CHI TIẾT APPOINTMENT */}
             {isDetailModalOpen && selectedAppointment && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-gray-900">Chi tiết Appointment</h3>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Chi tiết Appointment</h3>
                             <button
                                 onClick={closeDetailModal}
-                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -1104,53 +1104,53 @@ export default function AppointmentsPage() {
                             {/* Thông tin cơ bản */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Ngày</label>
-                                    <p className="text-sm text-gray-900">{format(new Date(selectedAppointment.date), "dd/MM/yyyy")}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Ngày</label>
+                                    <p className="text-sm text-gray-900 dark:text-white">{format(new Date(selectedAppointment.date), "dd/MM/yyyy")}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Thời gian</label>
-                                    <p className="text-sm text-gray-900">{selectedAppointment.startTime} - {selectedAppointment.endTime}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Thời gian</label>
+                                    <p className="text-sm text-gray-900 dark:text-white">{selectedAppointment.startTime} - {selectedAppointment.endTime}</p>
                                 </div>
                             </div>
 
                             {/* Booking Code */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Booking Code</label>
-                                <div className="bg-primary-50 p-3 rounded-lg">
-                                    <p className="text-lg font-mono font-bold text-primary-900">{selectedAppointment.bookingCode || 'N/A'}</p>
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Booking Code</label>
+                                <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-lg">
+                                    <p className="text-lg font-mono font-bold text-primary-900 dark:text-primary-400">{selectedAppointment.bookingCode || 'N/A'}</p>
                                 </div>
                             </div>
 
                             {/* Khách hàng */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Khách hàng</label>
-                                <div className="bg-gray-50 p-3 rounded-lg">
-                                    <p className="font-medium text-gray-900">{selectedAppointment.customer.name}</p>
-                                    {selectedAppointment.customer.phone && <p className="text-sm text-gray-600">{selectedAppointment.customer.phone}</p>}
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Khách hàng</label>
+                                <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                    <p className="font-medium text-gray-900 dark:text-white">{selectedAppointment.customer.name}</p>
+                                    {selectedAppointment.customer.phone && <p className="text-sm text-gray-600 dark:text-gray-400">{selectedAppointment.customer.phone}</p>}
                                 </div>
                             </div>
 
                             {/* Staff (nếu có) */}
                             {selectedAppointment.staff && (
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Staff</label>
-                                    <div className="bg-gray-50 p-3 rounded-lg">
-                                        <p className="font-medium text-gray-900">{selectedAppointment.staff.name}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Staff</label>
+                                    <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                        <p className="font-medium text-gray-900 dark:text-white">{selectedAppointment.staff.name}</p>
                                     </div>
                                 </div>
                             )}
 
                             {/* Dịch vụ */}
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Dịch vụ</label>
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Dịch vụ</label>
                                 <div className="space-y-2">
                                     {selectedAppointment.services.map((service, idx) => (
-                                        <div key={idx} className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                                        <div key={idx} className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg flex justify-between items-center border border-transparent dark:border-slate-700">
                                             <div>
-                                                <p className="font-medium text-gray-900">{service.name}</p>
-                                                <p className="text-sm text-gray-600">{service.duration} phút</p>
+                                                <p className="font-medium text-gray-900 dark:text-white">{service.name}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">{service.duration} phút</p>
                                             </div>
-                                            <p className="font-semibold text-gray-900">{settings.symbol}{service.price.toFixed(2)}</p>
+                                            <p className="font-semibold text-gray-900 dark:text-white">{settings.symbol}{service.price.toFixed(2)}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -1159,47 +1159,47 @@ export default function AppointmentsPage() {
                             {/* Thông tin tài chính */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Tổng tiền</label>
-                                    <p className="text-lg font-bold text-gray-900">{settings.symbol}{selectedAppointment.totalAmount.toFixed(2)}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tổng tiền</label>
+                                    <p className="text-lg font-bold text-gray-900 dark:text-white">{settings.symbol}{selectedAppointment.totalAmount.toFixed(2)}</p>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Giảm giá</label>
-                                    <p className="text-sm text-gray-900">{settings.symbol}{(selectedAppointment as any).discount?.toFixed(2) || '0.00'}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Giảm giá</label>
+                                    <p className="text-sm text-gray-900 dark:text-white">{settings.symbol}{(selectedAppointment as any).discount?.toFixed(2) || '0.00'}</p>
                                 </div>
                             </div>
 
                             {/* Commission */}
                             {(selectedAppointment as any).commission > 0 && (
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Commission</label>
-                                    <p className="text-sm text-gray-900">{settings.symbol}{(selectedAppointment as any).commission?.toFixed(2) || '0.00'}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Commission</label>
+                                    <p className="text-sm text-gray-900 dark:text-white">{settings.symbol}{(selectedAppointment as any).commission?.toFixed(2) || '0.00'}</p>
                                 </div>
                             )}
 
                             {/* Status và Source */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Trạng thái</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Trạng thái</label>
                                     <span className={`text-sm uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${selectedAppointment.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
-                                        selectedAppointment.status === 'completed' ? 'bg-primary-50 text-primary-700 border-primary-200' :
+                                        selectedAppointment.status === 'completed' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border-primary-200 dark:border-primary-800' :
                                             selectedAppointment.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                                'bg-gray-100 text-gray-700 border-gray-200'
+                                                'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-slate-700'
                                         }`}>
                                         {selectedAppointment.status}
                                     </span>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Nguồn</label>
-                                    <p className="text-sm text-gray-900 capitalize">{selectedAppointment.source || 'Direct'}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nguồn</label>
+                                    <p className="text-sm text-gray-900 dark:text-white capitalize">{selectedAppointment.source || 'Direct'}</p>
                                 </div>
                             </div>
 
                             {/* Notes */}
                             {selectedAppointment.notes && (
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Ghi chú</label>
-                                    <div className="bg-gray-50 p-3 rounded-lg">
-                                        <p className="text-sm text-gray-900 whitespace-pre-wrap">{selectedAppointment.notes}</p>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ghi chú</label>
+                                    <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                        <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{selectedAppointment.notes}</p>
                                     </div>
                                 </div>
                             )}

@@ -10,7 +10,7 @@ export default function CustomerChart({ data }: { data: any[] }) {
 
     if (total === 0) {
         return (
-            <div className="h-[250px] flex items-center justify-center text-sm text-gray-500 italic bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <div className="h-[250px] flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 italic bg-gray-50 dark:bg-slate-800 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
                 Chưa có dữ liệu khách hàng hôm nay.
             </div>
         );

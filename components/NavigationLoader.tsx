@@ -39,16 +39,16 @@ export default function NavigationLoader() {
     if (!loading) return null;
 
     return (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-[9999] flex items-center justify-center">
+        <div className="fixed inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-[9999] flex items-center justify-center transition-colors duration-200">
             <div className="flex flex-col items-center gap-4">
                 {/* Simple elegant spinner */}
                 <div className="relative w-16 h-16">
-                    <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-primary-900 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 border-4 border-gray-200 dark:border-slate-800 rounded-full transition-colors duration-200"></div>
+                    <div className="absolute inset-0 border-4 border-primary-900 dark:border-primary-500 border-t-transparent rounded-full animate-spin transition-colors duration-200"></div>
                 </div>
 
                 {/* Clean text */}
-                <p className="text-gray-700 font-semibold text-lg">Loading...</p>
+                <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg transition-colors duration-200">Loading...</p>
             </div>
         </div>
     );

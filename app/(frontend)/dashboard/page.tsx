@@ -186,9 +186,9 @@ export default async function DashboardPage() {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="text-gray-500">
-                        Xin chào, <span className="font-semibold text-primary-800">{session.user?.name || 'User'}</span>!
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+                    <p className="text-gray-500 dark:text-gray-400">
+                        Xin chào, <span className="font-semibold text-primary-800 dark:text-primary-400">{session.user?.name || 'User'}</span>!
                         {reportPermission?.view === 'own' ? " Dưới đây là số liệu của bạn." : " Tổng quan hoạt động Spa hôm nay."}
                     </p>
                 </div>
@@ -229,48 +229,48 @@ export default async function DashboardPage() {
             {/* DÒNG 2: CHI TIẾT KHÁCH HÀNG & LỊCH HẸN */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Block 1: Biểu đồ khách hàng */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-primary-600" />
-                        Khách hàng hôm nay <span className="ml-auto bg-primary-50 text-primary-700 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex flex-col">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Users className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                        Khách hàng hôm nay <span className="ml-auto bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
                     </h3>
                     <CustomerChart data={customerChartData} />
                 </div>
 
                 {/* Block 2: Trạng thái Lịch hẹn */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-indigo-600" />
-                        Tình trạng lịch hẹn <span className="ml-auto bg-indigo-50 text-indigo-700 py-1 px-3 rounded-full text-sm">{apptStats.total} lịch</span>
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        Tình trạng lịch hẹn <span className="ml-auto bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 py-1 px-3 rounded-full text-sm">{apptStats.total} lịch</span>
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-100 transition-all hover:shadow-md">
-                            <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                        <div className="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-100 dark:border-yellow-900/20 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-yellow-800 dark:text-yellow-500 mb-2">
                                 <Clock className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Chờ xác nhận</span>
                             </div>
-                            <p className="text-3xl font-black text-yellow-900">{apptStats.pending}</p>
+                            <p className="text-3xl font-black text-yellow-900 dark:text-yellow-400">{apptStats.pending}</p>
                         </div>
-                        <div className="p-4 bg-primary-50 rounded-xl border border-primary-100 transition-all hover:shadow-md">
-                            <div className="flex items-center gap-2 text-primary-800 mb-2">
+                        <div className="p-4 bg-primary-50 dark:bg-primary-900/10 rounded-xl border border-primary-100 dark:border-primary-900/20 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-primary-800 dark:text-primary-500 mb-2">
                                 <Calendar className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã xác nhận</span>
                             </div>
-                            <p className="text-3xl font-black text-primary-900">{apptStats.confirmed}</p>
+                            <p className="text-3xl font-black text-primary-900 dark:text-primary-400">{apptStats.confirmed}</p>
                         </div>
-                        <div className="p-4 bg-green-50 rounded-xl border border-green-100 transition-all hover:shadow-md">
-                            <div className="flex items-center gap-2 text-green-800 mb-2">
+                        <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-900/20 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-green-800 dark:text-green-500 mb-2">
                                 <CheckCircle className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã hoàn tất</span>
                             </div>
-                            <p className="text-3xl font-black text-green-900">{apptStats.completed}</p>
+                            <p className="text-3xl font-black text-green-900 dark:text-green-400">{apptStats.completed}</p>
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 transition-all hover:shadow-md">
-                            <div className="flex items-center gap-2 text-gray-600 mb-2">
+                        <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800/10 transition-all hover:shadow-md">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                                 <XCircle className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã hủy</span>
                             </div>
-                            <p className="text-3xl font-black text-gray-800">{apptStats.cancelled}</p>
+                            <p className="text-3xl font-black text-gray-800 dark:text-gray-300">{apptStats.cancelled}</p>
                         </div>
                     </div>
                 </div>
@@ -283,8 +283,8 @@ export default async function DashboardPage() {
             </div>
 
             {/* DÒNG 4: HOẠT ĐỘNG GẦN ĐÂY */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Giao dịch gần đây</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Giao dịch gần đây</h3>
                 <RecentActivity activities={formattedActivity} />
             </div>
         </div>

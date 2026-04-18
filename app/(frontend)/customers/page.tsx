@@ -138,13 +138,13 @@ export default function CustomersPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Customer Management</h1>
-                        <p className="text-sm text-gray-500">Manage your customer database and history</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Customer Management</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your customer database and history</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <PermissionGate resource="customers" action="create">
@@ -160,15 +160,15 @@ export default function CustomersPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-950/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search by name, email or phone..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white placeholder:text-gray-400 border border-gray-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -176,26 +176,26 @@ export default function CustomersPage() {
                         <div className="flex items-center gap-3 w-full md:w-auto">
                             <button
                                 onClick={() => { setSearch(""); setPage(1); }}
-                                className="text-gray-500 hover:text-gray-700 font-medium text-sm px-2"
+                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium text-sm px-2"
                             >
                                 Reset
                             </button>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="overflow-x-auto text-black dark:text-white">
+                        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
+                            <thead className="bg-gray-50 dark:bg-slate-900/50">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Purchases</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Join Date</th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Purchases</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Join Date</th>
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
+                            <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
                                 {loading && customers.length === 0 ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
@@ -204,21 +204,21 @@ export default function CustomersPage() {
                                     ))
                                 ) : customers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                        <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                             <User className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                             <p>No customers found</p>
                                         </td>
                                     </tr>
                                 ) : (
                                     customers.map((customer) => (
-                                        <tr key={customer._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={customer._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-primary-50 rounded-lg">
-                                                        <User className="w-4 h-4 text-primary-600" />
+                                                    <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                                                        <User className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                                     </div>
                                                     <div>
-                                                        <span className="text-sm font-bold text-gray-900">{customer.name}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{customer.name}</span>
                                                         {customer.address && (
                                                             <div className="text-[10px] text-gray-400 font-medium truncate max-w-[150px]" title={customer.address}>
                                                                 {customer.address}
@@ -230,7 +230,7 @@ export default function CustomersPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="space-y-1">
                                                     {customer.email ? (
-                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                             <Mail className="w-3 h-3 text-gray-400" />
                                                             <span className="truncate max-w-[150px]">{customer.email}</span>
                                                         </div>
@@ -238,7 +238,7 @@ export default function CustomersPage() {
                                                         <span className="text-xs text-gray-400 italic">No email</span>
                                                     )}
                                                     {customer.phone && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                             <Phone className="w-3 h-3 text-gray-400" />
                                                             {customer.phone}
                                                         </div>
@@ -246,50 +246,50 @@ export default function CustomersPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-bold text-gray-900">{settings.symbol}{customer.totalPurchases.toFixed(2)}</span>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{settings.symbol}{customer.totalPurchases.toFixed(2)}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${customer.status === "active"
                                                     ? "bg-green-50 text-green-700 border-green-200"
-                                                    : "bg-gray-50 text-gray-600 border-gray-200"
+                                                    : "bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-slate-700"
                                                     }`}>
                                                     {customer.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 {new Date(customer.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                                 <div className="relative flex justify-end dropdown-trigger">
                                                     <button
                                                         onClick={() => setActiveDropdown(activeDropdown === customer._id ? null : customer._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
+                                                        className="p-2 text-gray-400 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
                                                     >
                                                         <MoreVertical className="w-5 h-5" />
                                                     </button>
 
                                                     {activeDropdown === customer._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
+                                                        <div className="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
                                                             <PermissionGate resource="customers" action="edit">
                                                                 <button
                                                                     onClick={() => {
                                                                         openModal(customer);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
                                                                 >
-                                                                    <Edit className="w-4 h-4 text-primary-600" />
+                                                                    <Edit className="w-4 h-4 text-primary-600 dark:text-primary-500" />
                                                                     Edit Details
                                                                 </button>
                                                             </PermissionGate>
-                                                            <div className="h-px bg-gray-100 my-1" />
+                                                            <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
                                                             <PermissionGate resource="customers" action="delete">
                                                                 <button
                                                                     onClick={() => {
                                                                         handleDelete(customer._id);
                                                                         setActiveDropdown(null);
                                                                     }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                                 >
                                                                     <Trash2 className="w-4 h-4" />
                                                                     Delete Customer
@@ -307,15 +307,15 @@ export default function CustomersPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                        <div className="text-sm text-gray-500 font-medium">
-                            Showing <span className="text-gray-900">{customers.length}</span> of <span className="text-gray-900">{pagination.total}</span> customers
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                            Showing <span className="text-gray-900 dark:text-white">{customers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> customers
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -336,8 +336,8 @@ export default function CustomersPage() {
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
                                             className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all ${page === pageNum
-                                                ? "bg-primary-900 text-white"
-                                                : "text-gray-600 hover:bg-gray-100"
+                                                ? "bg-primary-900 dark:bg-primary-700 text-white"
+                                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
                                                 }`}
                                         >
                                             {pageNum}
@@ -348,7 +348,7 @@ export default function CustomersPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -393,13 +393,13 @@ export default function CustomersPage() {
                         placeholder="Enter address"
                     />
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Notes</label>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
                             placeholder="Additional notes"
-                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm resize-none"
+                            className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm resize-none text-gray-900 dark:text-white"
                         />
                     </div>
                     <FormSelect
@@ -416,7 +416,7 @@ export default function CustomersPage() {
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                            className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 font-medium transition-colors"
                         >
                             Cancel
                         </button>

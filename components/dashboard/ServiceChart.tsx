@@ -35,14 +35,14 @@ export default function ServiceChart({ data }: ServiceChartProps) {
     const remainingCount = Math.max(0, data.length - displayData.length);
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 h-full">
             <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">Phân bổ doanh thu dịch vụ</h3>
-                    <p className="text-sm text-gray-500 mt-1">Top dịch vụ theo doanh thu với nhãn dễ đọc.</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Phân bổ doanh thu dịch vụ</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Top dịch vụ theo doanh thu với nhãn dễ đọc.</p>
                 </div>
                 {remainingCount > 0 && (
-                    <div className="text-right text-sm text-gray-500">
+                    <div className="text-right text-sm text-gray-500 dark:text-gray-400">
                         {remainingCount} more service{remainingCount > 1 ? 's' : ''} hidden
                     </div>
                 )}
@@ -79,19 +79,19 @@ export default function ServiceChart({ data }: ServiceChartProps) {
                     </ResponsiveContainer>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-gray-100 bg-slate-50 p-3">
+                <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-3">
                     <div className="space-y-2">
                         {displayData.map((entry, index) => (
-                            <div key={entry.name} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white transition-colors">
+                            <div key={entry.name} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-900 transition-colors">
                                 <span
                                     className="w-3 h-3 rounded-full flex-shrink-0"
                                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                                 />
                                 <div className="min-w-0 grow">
-                                    <div className="text-sm font-semibold text-slate-900 truncate" title={entry.name}>
+                                    <div className="text-sm font-semibold text-slate-900 dark:text-white truncate" title={entry.name}>
                                         {entry.name}
                                     </div>
-                                    <div className="text-xs text-slate-500">
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">
                                         {formatCurrency(entry.revenue, settings.currency)}
                                     </div>
                                 </div>
