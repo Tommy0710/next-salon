@@ -159,8 +159,9 @@ export default function PrintInvoicePage() {
 
                 {/* LEFT */}
                 <button
+                    disabled={currentStatus !== 'pending' || actionLoading}
                     onClick={() => router.push(`/pos?edit=${id}`)}
-                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                    className={`flex items-center gap-2 text-sm transition-colors ${currentStatus !== 'pending' ? 'text-gray-300 cursor-not-allowed hidden' : 'text-gray-500 hover:text-gray-900'}`}
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Chỉnh sửa hóa đơn</span>
@@ -241,26 +242,48 @@ export default function PrintInvoicePage() {
                 </div>
 
                 {/* Items Table */}
-                <table className="w-full border-collapse">
+                <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b-2 border-gray-100 text-[10px] text-left text-gray-500 uppercase tracking-wider">
-                            <th className="py-2 font-semibold">Mô tả mặt hàng</th>
-                            <th className="py-2 font-semibold text-center">SL</th>
-                            <th className="py-2 font-semibold text-right">Giá</th>
-                            <th className="py-2 font-semibold text-right">Tổng</th>
+                        <tr className="border-b border-gray-200 text-[11px] text-gray-500 uppercase">
+                            <th className="py-2 text-left font-semibold">Dịch vụ</th>
+                            <th className="py-2 text-center font-semibold w-[50px]">SL</th>
+                            <th className="py-2 text-right font-semibold w-[90px]">Giá</th>
+                            <th className="py-2 text-right font-semibold w-[100px]">Tổng</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-dashed divide-gray-200">
+
+                    <tbody className="divide-y divide-gray-100">
                         {invoice.items.map((item: any, idx: number) => (
-                            <tr key={idx} className="text-[12px]">
-                                <td className="py-2 align-top">
-                                    <span className="font-medium">{item.name}</span>
-                                    {item.discount > 0 && <p className="text-[9px] text-red-500">Giảm: -{formatCurrency(item.discount)}</p>}
-                                    {/* {item.itemModel === 'Service' && <p className="text-[9px] text-gray-400">Dịch vụ chuyên nghiệp</p>} */}
+                            <tr key={idx} className="align-top">
+
+                                {/* Tên + discount */}
+                                <td className="py-3 pr-2">
+                                    <p className="text-xs text-gray-800 leading-snug">
+                                        {item.name}
+                                    </p>
+
+                                    {item.discount > 0 && (
+                                        <p className="text-[11px] text-red-500 mt-1">
+                                            -{formatCurrency(item.discount)}
+                                        </p>
+                                    )}
                                 </td>
-                                <td className="py-2 text-center align-top">{item.quantity}</td>
-                                <td className="py-2 text-right align-top">{formatCurrency(item.price)}</td>
-                                <td className="py-2 text-right align-top font-bold">{formatCurrency(item.total)}</td>
+
+                                {/* Quantity */}
+                                <td className="py-3 text-center text-gray-700">
+                                    {item.quantity}
+                                </td>
+
+                                {/* Price */}
+                                <td className="py-3 text-right text-gray-600">
+                                    {formatCurrency(item.price)}
+                                </td>
+
+                                {/* Total */}
+                                <td className="py-3 text-right font-semibold text-gray-900">
+                                    {formatCurrency(item.total)}
+                                </td>
+
                             </tr>
                         ))}
                     </tbody>

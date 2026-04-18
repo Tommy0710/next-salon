@@ -210,7 +210,7 @@ export default async function DashboardPage() {
                 />
                 <StatCard
                     title="Đơn hàng hoàn tất"
-                    value={formatCurrency(ordersToday)}
+                    value={ordersToday}
                     icon={ShoppingBag}
                     color="purple"
                     trend="Hôm nay"

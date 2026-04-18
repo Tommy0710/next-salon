@@ -412,6 +412,16 @@ export default function InvoicesPage() {
                                                             <Eye className="w-4 h-4 text-primary-600" />
                                                             View Receipt
                                                         </Link>
+                                                        {inv.status === 'pending' && (
+                                                            <Link
+                                                                href={`/pos?edit=${inv._id}`}
+                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                                                onClick={() => setActiveDropdown(null)}
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                                Edit Invoice (POS)
+                                                            </Link>
+                                                        )}
                                                         <button
                                                             onClick={() => {
                                                                 openEditModal(inv);

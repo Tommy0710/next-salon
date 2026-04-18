@@ -105,6 +105,13 @@ export default function POSPage() {
                 .then(data => {
                     if (data.success && data.data) {
                         const inv = data.data;
+
+                        if (inv.status !== 'pending') {
+                            alert("Chỉ hóa đơn ở trạng thái Pending mới có thể chỉnh sửa.");
+                            window.history.replaceState({}, '', '/pos');
+                            return;
+                        }
+
                         const editBill: Bill = {
                             id: `edit-${inv._id}`,
                             editInvoiceId: inv._id,
