@@ -49,7 +49,8 @@ export default function PrintInvoicePage() {
     const qrSource = invoice?.qrCodeImage || defaultQr?.image;
     const bankDetailsSource = invoice?.bankDetails || (defaultQr ? `${defaultQr.bankName} | ${defaultQr.accountNumber} | ${defaultQr.name}` : "");
     const isCash = invoice?.paymentMethod === 'Tiền mặt' || invoice?.paymentMethod?.toLowerCase().includes('cash');
-    const showQr = !!qrSource && !isCash && (invoice?.paymentMethod === 'Mã QR' || currentStatus !== 'paid');
+    const isCard = invoice?.paymentMethod === 'Cà thẻ' || invoice?.paymentMethod?.toLowerCase().includes('card');
+    const showQr = !!qrSource && !isCash && !isCard && (invoice?.paymentMethod === 'Mã QR' || currentStatus !== 'paid');
 
     const handleMarkAsPaid = async () => {
         if (!invoice || currentStatus === 'paid' || actionLoading) return;

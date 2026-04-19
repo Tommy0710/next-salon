@@ -891,8 +891,8 @@ export default function POSPage() {
 
                             <div className="mb-3">
                                 <div className="mb-3 space-y-2">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {['Tiền mặt', 'Mã QR'].map(method => (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {['Tiền mặt', 'Mã QR', 'Cà thẻ'].map(method => (
                                             <button
                                                 key={method}
                                                 onClick={() => updateActiveBill({ paymentMethod: method })}
