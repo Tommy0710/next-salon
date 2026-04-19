@@ -182,7 +182,9 @@ export async function POST(request: NextRequest) {
         const totalDuration = body.services.reduce((acc: number, s: any) => acc + (s.duration || 0), 0);
         const discount = parseFloat(body.discount) || 0;
         const tax = subtotal * (taxRate / 100);
-        const totalAmount = (subtotal + tax) - discount;
+        const discountValue = Number(body.discount) || 0;
+        const discountAmount = subtotal * (discountValue / 100);
+        const totalAmount = Math.max(0, subtotal - discountAmount);
         const bookingCode = body.bookingCode || `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
         // 👉 ĐÃ SỬA LỖI CRASH KHI KHÔNG CÓ STAFF: Thêm điều kiện check if (body.staff)

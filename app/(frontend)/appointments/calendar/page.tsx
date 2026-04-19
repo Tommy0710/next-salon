@@ -10,6 +10,7 @@ import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect"
 import StaffCalendar from "@/components/appointments/StaffCalendar";
 import { formatCurrency } from "@/lib/currency";
 import { useSettings } from "@/components/providers/SettingsProvider";
+import { formatAppointmentDateTime } from '@/lib/zaloDate';
 
 interface Service {
     _id: string;
@@ -78,6 +79,51 @@ export default function CalendarPage() {
         notes: "",
         status: "confirmed"
     });
+
+    const triggerZaloZNS = async (apt: Appointment | any, newStatus: string) => {
+        // Chỉ gửi nếu khách hàng có số điện thoại
+        if (!apt.customer?.phone) return;
+
+        // Xác định đúng eventType để Backend map với Template ID
+        let eventType = '';
+        if (newStatus === 'confirmed') eventType = 'appointment_confirmed';
+        else if (newStatus === 'cancelled') eventType = 'appointment_cancelled';
+
+        if (!eventType) return;
+
+        try {
+            // Chuẩn bị payloadData khớp chính xác với cấu trúc ở lib/zalo-payloads.ts
+            const payload = {
+                phone: apt.customer.phone,
+                eventType: eventType,
+                payloadData: {
+                    customerName: apt.customer?.name || "Quý khách",
+                    appointmentDate: formatAppointmentDateTime(apt.date, apt.startTime),
+                    bookingCode: apt.bookingCode || apt._id.substring(0, 8).toUpperCase(),
+                    serviceName: apt.services?.map((s: any) => s.name).join(', ') || "Dịch vụ Spa",
+                    status: newStatus === 'confirmed' ? "Đã xác nhận" : "Đã bị hủy",
+                    invoiceId: apt._id
+                }
+            };
+
+            // Bắn API
+            const response = await fetch("/api/zalo/zns", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                console.error("❌ Lỗi gửi Zalo:", result.error);
+            } else {
+                console.log(`✅ Đã yêu cầu gửi Zalo ZNS thành công cho trạng thái: ${newStatus}`);
+            }
+        } catch (error) {
+            console.error("❌ Lỗi hệ thống khi gọi API Zalo:", error);
+        }
+    };
 
     useEffect(() => {
         fetchResources();
@@ -209,6 +255,35 @@ export default function CalendarPage() {
 
             const data = await res.json();
             if (data.success) {
+                const updatedApt = data.data; // Lấy dữ liệu trả về từ Backend
+
+                // 👉 GỬI ZALO NẾU TRẠNG THÁI LÀ CONFIRMED HOẶC CANCELLED
+                if (updatedApt.status === 'confirmed' || updatedApt.status === 'cancelled') {
+
+                    // 1. Tìm khách hàng an toàn (Ép kiểu toString để tránh lỗi so sánh Object và String)
+                    const fullCustomer = customers.find(c =>
+                        c._id?.toString() === formData.customerId?.toString()
+                    );
+
+                    // 2. Lắp ráp dữ liệu thông minh: Ưu tiên customer backend trả về, nếu không có mới dùng fullCustomer
+                    const customerData = updatedApt.customer?.phone
+                        ? updatedApt.customer
+                        : fullCustomer;
+
+                    const aptForZalo = {
+                        ...updatedApt,
+                        customer: customerData || { phone: '', name: 'Quý khách' }
+                    };
+
+                    // 3. THÊM AWAIT: Đợi lệnh gửi Zalo được đẩy đi thành công rồi mới đóng Modal
+                    if (aptForZalo.customer?.phone) {
+                        await triggerZaloZNS(aptForZalo, updatedApt.status);
+                    } else {
+                        console.warn("⚠️ Không thể gửi Zalo vì không tìm thấy số điện thoại khách hàng!");
+                    }
+                }
+
+                // fetchAppointments();
                 setRefreshTrigger(prev => prev + 1);
                 closeModal();
             } else {

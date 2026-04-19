@@ -306,7 +306,7 @@ export default function AppointmentsPage() {
             const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
             const subtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
 
-            const discount = formData.discount || 0;
+            const discount = Number(formData.discount) || 0;
             const tax = subtotal * (settings.taxRate / 100);
             const totalAmount = (subtotal + tax) - discount;
 
@@ -364,22 +364,36 @@ export default function AppointmentsPage() {
             });
 
             const data = await res.json();
+
             if (data.success) {
                 const updatedApt = data.data; // Lấy dữ liệu trả về từ Backend
 
                 // 👉 GỬI ZALO NẾU TRẠNG THÁI LÀ CONFIRMED HOẶC CANCELLED
                 if (updatedApt.status === 'confirmed' || updatedApt.status === 'cancelled') {
-                    // Vì updatedApt trả về có thể chỉ chứa customer._id, ta cần lấy thông tin full từ state customers
-                    const fullCustomer = customers.find(c => c._id === formData.customerId);
 
-                    // Ghép thông tin khách hàng vào lịch hẹn để gửi Zalo
+                    // 1. Tìm khách hàng an toàn (Ép kiểu toString để tránh lỗi so sánh Object và String)
+                    const fullCustomer = customers.find(c =>
+                        c._id?.toString() === formData.customerId?.toString()
+                    );
+
+                    // 2. Lắp ráp dữ liệu thông minh: Ưu tiên customer backend trả về, nếu không có mới dùng fullCustomer
+                    const customerData = updatedApt.customer?.phone
+                        ? updatedApt.customer
+                        : fullCustomer;
+
                     const aptForZalo = {
                         ...updatedApt,
-                        customer: fullCustomer || { phone: '', name: 'Quý khách' }
+                        customer: customerData || { phone: '', name: 'Quý khách' }
                     };
 
-                    triggerZaloZNS(aptForZalo, updatedApt.status);
+                    // 3. THÊM AWAIT: Đợi lệnh gửi Zalo được đẩy đi thành công rồi mới đóng Modal
+                    if (aptForZalo.customer?.phone) {
+                        await triggerZaloZNS(aptForZalo, updatedApt.status);
+                    } else {
+                        console.warn("⚠️ Không thể gửi Zalo vì không tìm thấy số điện thoại khách hàng!");
+                    }
                 }
+
                 fetchAppointments();
                 setRefreshTrigger(prev => prev + 1);
                 closeModal();

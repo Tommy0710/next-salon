@@ -138,7 +138,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
                     // Ensure services array exists and has proper structure
                     const servicesArray = Array.isArray(populatedAppointment.services) ? populatedAppointment.services : [];
-                    
+
                     if (servicesArray.length === 0) {
                         console.warn('⚠️ No services found for appointment', id);
                     }
@@ -199,46 +199,46 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         // ==========================================
         // 2. TRIGGER GỬI ZALO ZNS (GỌI QUA API TRUNG TÂM - NON-BLOCKING)
         // ==========================================
-        if (sendZalo && isStatusChanged && populatedAppointment.customer?.phone) {
-            let eventType = '';
+        // if (sendZalo && isStatusChanged && populatedAppointment.customer?.phone) {
+        //     let eventType = '';
 
-            // Xác định loại sự kiện dựa trên trạng thái mới
-            if (newStatus === 'confirmed') {
-                eventType = 'appointment_confirmed';
-            } else if (newStatus === 'cancelled') {
-                eventType = 'appointment_cancelled';
-            }
+        //     // Xác định loại sự kiện dựa trên trạng thái mới
+        //     if (newStatus === 'confirmed') {
+        //         eventType = 'appointment_confirmed';
+        //     } else if (newStatus === 'cancelled') {
+        //         eventType = 'appointment_cancelled';
+        //     }
 
-            if (eventType) {
-                // Gom tên các dịch vụ thành 1 chuỗi (VD: "Massage 60p, Gội đầu")
-                const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
+        //     if (eventType) {
+        //         // Gom tên các dịch vụ thành 1 chuỗi (VD: "Massage 60p, Gội đầu")
+        //         const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
 
-                // 👉 Lấy URL gốc của server để gọi chéo API trong Next.js
-                const baseUrl = new URL(request.url).origin;
+        //         // 👉 Lấy URL gốc của server để gọi chéo API trong Next.js
+        //         const baseUrl = new URL(request.url).origin;
 
-                // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
-                fetch(`${baseUrl}/api/zalo/zns`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        phone: populatedAppointment.customer.phone,
-                        eventType: eventType,
-                        payloadData: {
-                            customerName: populatedAppointment.customer.name || "Quý khách",
-                            appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
-                            appointmentTime: populatedAppointment.startTime,
-                            serviceName: servicesString,
-                            bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
-                        }
-                    })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success) console.log("Cảnh báo API Zalo ZNS:", data.error || data.message);
-                    })
-                    .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS:", err));
-            }
-        }
+        //         // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
+        //         fetch(`${baseUrl}/api/zalo/zns`, {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify({
+        //                 phone: populatedAppointment.customer.phone,
+        //                 eventType: eventType,
+        //                 payloadData: {
+        //                     customerName: populatedAppointment.customer.name || "Quý khách",
+        //                     appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
+        //                     appointmentTime: populatedAppointment.startTime,
+        //                     serviceName: servicesString,
+        //                     bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
+        //                 }
+        //             })
+        //         })
+        //             .then(res => res.json())
+        //             .then(data => {
+        //                 if (!data.success) console.log("Cảnh báo API Zalo ZNS:", data.error || data.message);
+        //             })
+        //             .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS:", err));
+        //     }
+        // }
 
         return NextResponse.json({ success: true, data: populatedAppointment });
     } catch (error: any) {

@@ -233,12 +233,12 @@ export default function PrintInvoicePage() {
                             {invoice.status?.replace('_', ' ') || 'N/A'}
                         </span>
                     </div> */}
-                    {invoice.appointment && (
+                    {/* {invoice.appointment && (
                         <div className="flex justify-between">
                             <span className="text-gray-500">Loại:</span>
                             <span className="text-indigo-600 font-bold uppercase">Lịch hẹn</span>
                         </div>
-                    )}
+                    )} */}
                 </div>
 
                 {/* Items Table */}
