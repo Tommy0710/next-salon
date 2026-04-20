@@ -255,7 +255,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                         noEventsInRange: "No appointments scheduled for this period",
                     }}
                     components={calendarComponents}
-                // dayLayoutAlgorithm="no-overlap"
+                    dayLayoutAlgorithm="no-overlap"
                 />
             </div>
 
