@@ -11,6 +11,7 @@ import {
     isSMSConfigured,
 } from "@/lib/notifications";
 import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
+import { formatAppointmentDateTime } from '@/lib/zaloDate';
 import Settings from "@/models/Settings";
 import ZaloLog from "@/models/ZaloLog";
 
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
         // Find appointments that haven't had reminders sent
         const appointments = await Appointment.find({
             date: { $gte: startDate, $lte: endDate },
-            status: { $in: ['pending', 'confirmed'] },
+            status: 'confirmed',
             reminderSent: { $ne: true }
         })
             .populate('customer', 'name phone email')
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
                 continue;
             }
 
-            const dateStr = format(new Date(appointment.date), 'MMMM dd, yyyy');
+            const dateStr = formatAppointmentDateTime(appointment.date, appointment.startTime);
             const timeStr = appointment.startTime;
             const services = appointment.services.map((s: any) => s.name);
 
@@ -115,7 +116,11 @@ export async function POST(request: Request) {
             // Send Zalo ZNS
             if (methods.includes('zalo') && zaloEnabled && customer.phone) {
                 try {
-                    const baseUrl = new URL(request.url).origin;
+                    // Dùng Absolute URL chuẩn xác của Next.js (lấy từ Header host)
+                    const host = request.headers.get("host") || "localhost:3000";
+                    const protocol = host.includes("localhost") ? "http" : "https";
+                    const baseUrl = `${protocol}://${host}`;
+
                     const zaloResponse = await fetch(`${baseUrl}/api/zalo/zns`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -124,9 +129,11 @@ export async function POST(request: Request) {
                             eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
                             payloadData: {
                                 customerName: customer.name || "Quý khách",
-                                appointmentDate: dateStr,
-                                appointmentTime: timeStr,
-                                serviceName: services.join(', ')
+                                appointmentDate: formatAppointmentDateTime(appointment.date, appointment.startTime),
+                                bookingCode: appointment.bookingCode || appointment._id.toString().substring(0, 8).toUpperCase(),
+                                serviceName: services.length > 0 ? services.join(', ') : "Dịch vụ Spa",
+                                status: "Sắp tới giờ hẹn",
+                                invoiceId: appointment._id // Để bên trong tự tracking
                             }
                         })
                     });
@@ -134,37 +141,15 @@ export async function POST(request: Request) {
                     const zaloResult = await zaloResponse.json();
                     zaloSent = zaloResult.success;
 
-                    // Log Zalo reminder attempt
-                    const templateConfig = settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER);
-                    await ZaloLog.create({
-                        phone: customer.phone.replace(/^(\+?84|0)/, '84'),
-                        templateId: templateConfig?.templateId || '',
-                        templateName: templateConfig?.name || 'Appointment Reminder',
-                        eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
-                        status: zaloSent ? 'success' : 'failed',
-                        errorMessage: zaloSent ? undefined : 'Zalo reminder failed',
-                        trackingId: `reminder_${appointment._id}_${Date.now()}`,
-                        sentAt: new Date(),
-                        responseData: zaloResult,
-                    });
+                    if (!zaloSent) {
+                        console.error(`❌ Zalo Reminder Failed cho KH ${customer.name}:`, zaloResult.error);
+                    } else {
+                        console.log(`✅ Zalo Reminder Thành công cho KH ${customer.name}`);
+                    }
 
                 } catch (error) {
-                    console.error("Zalo reminder error:", error);
+                    console.error(`🚨 Lỗi hệ thống khi gửi Zalo Reminder cho KH ${customer.name}:`, error);
                     zaloSent = false;
-
-                    // Log Zalo reminder failure
-                    const templateConfig = settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER);
-                    await ZaloLog.create({
-                        phone: customer.phone.replace(/^(\+?84|0)/, '84'),
-                        templateId: templateConfig?.templateId || '',
-                        templateName: templateConfig?.name || 'Appointment Reminder',
-                        eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
-                        status: 'failed',
-                        errorMessage: error instanceof Error ? error.message : 'Unknown error',
-                        trackingId: `reminder_${appointment._id}_${Date.now()}`,
-                        sentAt: new Date(),
-                        responseData: { error: error },
-                    });
                 }
             }
 
@@ -229,7 +214,7 @@ export async function GET(request: Request) {
 
         const appointments = await Appointment.find({
             date: { $gte: startDate, $lte: endDate },
-            status: { $in: ['pending', 'confirmed'] },
+            status: 'confirmed',
             reminderSent: { $ne: true }
         })
             .populate('customer', 'name phone email')

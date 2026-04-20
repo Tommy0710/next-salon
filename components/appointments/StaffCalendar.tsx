@@ -45,10 +45,16 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
             const res = await fetch("/api/staff?isActive=true");
             const data = await res.json();
             if (data.success) {
-                setResources(data.data.map((s: any) => ({
-                    id: s._id,
-                    title: s.name
-                })));
+                setResources([
+                    ...data.data.map((s: any) => ({
+                        id: s._id,
+                        title: s.name
+                    })),
+                    {
+                        id: "unassigned",
+                        title: "No Staff"
+                    }
+                ]);
             }
         } catch (error) {
             console.error("Error fetching staff for calendar:", error);
@@ -77,12 +83,24 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
 
             if (data.success) {
                 const formattedEvents = data.data
-                    .filter((apt: any) => apt.customer && apt.staff) // Filter out appointments without customer or staff
+                    .filter((apt: any) => apt.customer)
                     .map((apt: any) => {
                         const aptDate = moment(apt.date).format("YYYY-MM-DD");
-                        const customerName = typeof apt.customer === 'string' ? apt.customer : apt.customer?.name || 'Unknown Customer';
-                        const staffName = typeof apt.staff === 'string' ? apt.staff : apt.staff?.name || 'Unassigned';
-                        const staffId = typeof apt.staff === 'string' ? apt.staff : apt.staff?._id;
+
+                        const customerName =
+                            typeof apt.customer === 'string'
+                                ? apt.customer
+                                : apt.customer?.name || 'Unknown Customer';
+
+                        const staffName =
+                            typeof apt.staff === 'string'
+                                ? apt.staff
+                                : apt.staff?.name || 'Unassigned';
+
+                        const staffId =
+                            typeof apt.staff === 'string'
+                                ? apt.staff
+                                : apt.staff?._id || "unassigned";
 
                         return {
                             id: apt._id,
@@ -93,7 +111,9 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                             status: apt.status,
                             customer: customerName,
                             staffName: staffName,
-                            services: (apt.services || []).map((s: any) => (typeof s === 'string' ? s : s?.name || 'Unknown Service')).filter(Boolean)
+                            services: (apt.services || [])
+                                .map((s: any) => typeof s === 'string' ? s : s?.name || 'Unknown Service')
+                                .filter(Boolean)
                         };
                     });
                 setEvents(formattedEvents);
@@ -152,6 +172,23 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
         }
         return moment().set({ h, m, s: 0, ms: 0 }).toDate();
     }, [settings]);
+
+    // Định nghĩa custom component để hiển thị thêm services vào event
+    const calendarComponents = useMemo(() => ({
+        event: ({ event }: { event: Event }) => (
+            <div className="flex flex-col h-full overflow-hidden leading-tight">
+                <span className="font-semibold truncate">{event.title}</span>
+                {event.services && event.services.length > 0 && (
+                    <span
+                        className="text-[10px] opacity-90 truncate mt-[2px]"
+                        title={event.services.join(", ")}
+                    >
+                        {event.services.join(", ")}
+                    </span>
+                )}
+            </div>
+        )
+    }), []);
 
     const eventStyleGetter = (event: Event) => {
         let backgroundColor = "#3b82f6"; // Default blue
@@ -217,6 +254,8 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     messages={{
                         noEventsInRange: "No appointments scheduled for this period",
                     }}
+                    components={calendarComponents}
+                // dayLayoutAlgorithm="no-overlap"
                 />
             </div>
 
@@ -310,6 +349,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     color: #94a3b8;
                 }
                 .rbc-event {
+                    // min-width: 120px !important;
                     padding: 2px 4px;
                     border: 1px solid rgba(255,255,255,0.2);
                 }

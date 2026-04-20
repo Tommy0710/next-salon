@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 import { initModels } from "@/lib/initModels";
 import { checkPermission } from "@/lib/rbac";
 import { handleApiError } from "@/lib/errorHandler";
-import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
+// import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
 
 export async function GET(request: NextRequest) {
     try {
@@ -126,19 +126,28 @@ export async function GET(request: NextRequest) {
         // Total count before pagination
         const countPipeline = [...pipeline, { $count: 'total' }];
         const countResult = await Appointment.aggregate(countPipeline);
-        const total = countResult.length > 0 ? countResult[0].total : 0;
+        // const total = countResult.length > 0 ? countResult[0].total : 0;
 
         // Apply Pagination
         const isPaginated = searchParams.has("page");
-        if (isPaginated) {
-            const skip = (page - 1) * limit;
-            pipeline.push({ $skip: skip });
-            pipeline.push({ $limit: limit });
-        } else {
-            pipeline.push({ $limit: 1000 });
-        }
+        const skip = (page - 1) * limit;
 
-        const appointments = await Appointment.aggregate(pipeline);
+        const finalPipeline = [
+            ...pipeline,
+            {
+                $facet: {
+                    data: isPaginated
+                        ? [{ $skip: skip }, { $limit: limit }]
+                        : [{ $limit: 1000 }],
+                    totalCount: [{ $count: "total" }]
+                }
+            }
+        ];
+
+        const result = await Appointment.aggregate(finalPipeline);
+
+        const appointments = result[0].data;
+        const total = result[0].totalCount[0]?.total || 0;
 
         return NextResponse.json({
             success: true,
@@ -166,7 +175,6 @@ export async function POST(request: NextRequest) {
         initModels();
         const body = await request.json();
 
-        // 👉 ĐÃ SỬA LỖI 400: Xóa bỏ điều kiện !body.staff khỏi hàm Validation
         if (!body.customer || !body.startTime || !body.services || !Array.isArray(body.services) || body.services.length === 0) {
             return NextResponse.json({ success: false, error: "Customer, time slot and at least one service are required" }, { status: 400 });
         }
@@ -187,7 +195,6 @@ export async function POST(request: NextRequest) {
         const totalAmount = Math.max(0, subtotal - discountAmount);
         const bookingCode = body.bookingCode || `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
-        // 👉 ĐÃ SỬA LỖI CRASH KHI KHÔNG CÓ STAFF: Thêm điều kiện check if (body.staff)
         let staffRate = 0;
         if (body.staff) {
             const staff = await Staff.findById(body.staff);
@@ -195,8 +202,19 @@ export async function POST(request: NextRequest) {
         }
 
         let commission = 0;
+        const serviceIds = body.services.map(s => s.service);
+
+        const servicesFromDB = await Service.find({
+            _id: { $in: serviceIds }
+        });
+
+        const serviceMap = new Map(
+            servicesFromDB.map(s => [s._id.toString(), s])
+        );
+
         for (const item of body.services) {
-            const service = await Service.findById(item.service);
+            const service = serviceMap.get(item.service.toString());
+
             const commType = service?.commissionType || 'percentage';
             const commValue = service?.commissionValue || staffRate;
 
@@ -207,6 +225,7 @@ export async function POST(request: NextRequest) {
                 commission += commValue;
             }
         }
+
 
         const appointment = await Appointment.create({
             ...body,
@@ -287,40 +306,40 @@ export async function POST(request: NextRequest) {
         // ==========================================
         // TRIGGER GỬI ZALO ZNS KHI TẠO APPOINTMENT MỚI (NON-BLOCKING)
         // ==========================================
-        if (appointment.customer && appointment.status === 'confirmed') {
-            // Populate customer để lấy thông tin phone
-            const populatedAppointment = await Appointment.findById(appointment._id).populate('customer');
+        // if (appointment.customer && appointment.status === 'confirmed') {
+        //     // Populate customer để lấy thông tin phone
+        //     const populatedAppointment = await Appointment.findById(appointment._id).populate('customer');
 
-            if (populatedAppointment?.customer?.phone) {
-                // Gom tên các dịch vụ thành 1 chuỗi
-                const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
+        //     if (populatedAppointment?.customer?.phone) {
+        //         // Gom tên các dịch vụ thành 1 chuỗi
+        //         const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
 
-                // Lấy URL gốc của server để gọi chéo API trong Next.js
-                const baseUrl = new URL(request.url).origin;
+        //         // Lấy URL gốc của server để gọi chéo API trong Next.js
+        //         const baseUrl = new URL(request.url).origin;
 
-                // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
-                fetch(`${baseUrl}/api/zalo/zns`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        phone: populatedAppointment.customer.phone,
-                        eventType: ZALO_EVENTS.APPOINTMENT_CONFIRMED,
-                        payloadData: {
-                            customerName: populatedAppointment.customer.name || "Quý khách",
-                            appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
-                            appointmentTime: populatedAppointment.startTime,
-                            serviceName: servicesString,
-                            bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
-                        }
-                    })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success) console.log("Cảnh báo API Zalo ZNS (tạo mới):", data.error || data.message);
-                    })
-                    .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS (tạo mới):", err));
-            }
-        }
+        //         // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
+        //         fetch(`${baseUrl}/api/zalo/zns`, {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify({
+        //                 phone: populatedAppointment.customer.phone,
+        //                 eventType: ZALO_EVENTS.APPOINTMENT_CONFIRMED,
+        //                 payloadData: {
+        //                     customerName: populatedAppointment.customer.name || "Quý khách",
+        //                     appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
+        //                     appointmentTime: populatedAppointment.startTime,
+        //                     serviceName: servicesString,
+        //                     bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
+        //                 }
+        //             })
+        //         })
+        //             .then(res => res.json())
+        //             .then(data => {
+        //                 if (!data.success) console.log("Cảnh báo API Zalo ZNS (tạo mới):", data.error || data.message);
+        //             })
+        //             .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS (tạo mới):", err));
+        //     }
+        // }
 
         return NextResponse.json({ success: true, data: appointment });
     } catch (error: any) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Invoice from "@/models/Invoice";
+import Appointment from '@/models/Appointment';
 import Customer from "@/models/Customer";
 import { initModels } from "@/lib/initModels";
 import { checkPermission } from "@/lib/rbac";
@@ -38,13 +39,42 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const body = await request.json();
 
         // Find existing invoice to check status change
+        // Find existing invoice to check status change
         const oldInvoice = await Invoice.findById(id);
         if (!oldInvoice) {
             return NextResponse.json({ success: false, error: "Invoice not found" }, { status: 404 });
         }
 
+        // Cập nhật Hóa đơn trước
         const invoice = await Invoice.findByIdAndUpdate(id, body, { new: true });
 
+        // ========================================================
+        // LUỒNG TỰ ĐỘNG KHI HÓA ĐƠN CHUYỂN SANG TRẠNG THÁI "PAID"
+        // ========================================================
+        if (body.status === 'paid' && oldInvoice.status !== 'paid') {
+
+            // 1. ĐỒNG BỘ TRẠNG THÁI SANG APPOINTMENT (Nếu có gắn Lịch hẹn)
+            if (oldInvoice.appointment) {
+                await Appointment.findByIdAndUpdate(
+                    oldInvoice.appointment,
+                    { status: 'completed' }
+                );
+                console.log(`✅ Đã tự động chuyển Lịch hẹn ${oldInvoice.appointment} sang Completed`);
+            }
+
+            // 2. CỘNG ĐIỂM THƯỞNG CHO KHÁCH HÀNG (Nếu có gắn Khách hàng)
+            // if (invoice.customer) {
+            //     const pointsToGain = Math.floor(invoice.totalAmount / 10);
+            //     if (pointsToGain > 0) {
+            //         await Customer.findByIdAndUpdate(invoice.customer, {
+            //             $inc: {
+            //                 loyaltyPoints: pointsToGain,
+            //                 totalPurchases: invoice.totalAmount
+            //             }
+            //         });
+            //     }
+            // }
+        }
         // Loyalty Point Logic: If status changed to 'paid'
         if (body.status === 'paid' && oldInvoice.status !== 'paid' && invoice.customer) {
             const pointsToGain = Math.floor(invoice.totalAmount / 10);
