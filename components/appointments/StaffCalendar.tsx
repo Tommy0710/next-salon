@@ -217,7 +217,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
         <div className="h-[800px] bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between mb-2">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900 capitalize">{view}ly Schedule</h2>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">{view}ly Schedule</h2>
                     <p className="text-sm text-gray-500">Manage appointments across staff members</p>
                 </div>
                 <button
@@ -259,7 +259,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                 />
             </div>
 
-            <div className="flex items-center gap-6 text-xs font-semibold py-2 px-4 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="flex items-center gap-6 text-xs font-semibold py-2 px-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-100">
                 <span className="text-gray-400 uppercase tracking-wider">Legend:</span>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-amber-500"></span>

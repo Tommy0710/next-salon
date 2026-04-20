@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { format, parse, addMinutes } from "date-fns";
-import { Plus, Clock, User, DollarSign, RefreshCw, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { Plus, Clock, User, DollarSign, RefreshCw, Trash2, X, Eye } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -406,7 +407,7 @@ export default function CalendarPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col h-screen overflow-hidden text-black dark:text-white">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col h-screen overflow-hidden text-black dark:text-white">
             <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-sm border border-primary-100 dark:border-primary-900/50">
@@ -523,15 +524,15 @@ export default function CalendarPage() {
 
                         {formData.date ? (
                             availableSlots.length > 0 ? (
-                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
+                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border border-gray-200 rounded-xl max-h-48 overflow-y-auto shadow-inner">
                                     {availableSlots.map((slot, idx) => (
                                         <button
                                             key={idx}
                                             type="button"
                                             onClick={() => setFormData({ ...formData, startTime: slot.startTime })}
                                             className={`px-3 py-2.5 text-xs font-bold rounded-lg border transition-all duration-200 ${formData.startTime === slot.startTime
-                                                ? "bg-primary-900 text-white border-primary-900 shadow-lg scale-105"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-primary-400 hover:text-primary-700 hover:bg-primary-50"
+                                                ? "bg-primary-900 dark:bg-primary-700 text-white border-primary-900 dark:border-primary-700 shadow-lg scale-105"
+                                                : "bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-slate-700 hover:border-primary-400 dark:hover:border-primary-500 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800"
                                                 }`}
                                         >
                                             {slot.startTime}
@@ -539,13 +540,13 @@ export default function CalendarPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                     {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 text-sm text-gray-500 text-center">
+                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
                                 <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                 Please select date to view availability
                             </div>
@@ -607,15 +608,25 @@ export default function CalendarPage() {
                                 <Trash2 className="w-4 h-4" />
                                 Delete
                             </button>
+
                         )}
                         <div className="flex gap-3 ml-auto">
-                            <button
+                            {/* <button
                                 type="button"
                                 onClick={closeModal}
-                                className="px-6 py-3 border border-gray-200 rounded-2xl text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                                className="px-6 py-3 border border-gray-200 rounded-2xl text-sm font-bold text-gray-500 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all"
                             >
                                 Close
-                            </button>
+                            </button> */}
+                            {editingAppointment && (
+                                <Link
+                                    href={`/invoices/print/${editingAppointment._id}`}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors rounded-2xl"
+                                >
+                                    <Eye className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                                    View Receipt
+                                </Link>
+                            )}
                             <FormButton
                                 type="submit"
                                 loading={isSubmitting}
@@ -633,7 +644,7 @@ export default function CalendarPage() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
                     <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900">Thêm Khách Hàng Mới</h3>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm Khách Hàng Mới</h3>
                             <button
                                 onClick={() => setIsAddCustomerModalOpen(false)}
                                 className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
@@ -644,7 +655,7 @@ export default function CalendarPage() {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={newCustomerName}
@@ -654,7 +665,7 @@ export default function CalendarPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
                                 <input
                                     type="tel"
                                     value={newCustomerPhone}
@@ -670,7 +681,7 @@ export default function CalendarPage() {
                             <button
                                 type="button"
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700"
                                 disabled={isSubmittingCustomer}
                             >
                                 Hủy

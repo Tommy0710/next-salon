@@ -113,7 +113,7 @@ export default function SetupForm() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-600 to-indigo-600 rounded-2xl shadow-lg mb-4">
                         <Shield className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to SalonNext</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to SalonNext</h1>
                     <p className="text-gray-600">Let&apos;s set up your administrator account</p>
                 </div>
 
@@ -122,7 +122,7 @@ export default function SetupForm() {
                     {success ? (
                         <div className="text-center py-8">
                             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Setup Complete!</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Setup Complete!</h2>
                             <p className="text-gray-600 mb-4">Redirecting to login page...</p>
                             <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto"></div>
                         </div>

@@ -191,7 +191,7 @@ export default function ReportsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Platform Growth</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white">Platform Growth</h3>
                         <Users className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex items-end gap-2">
@@ -201,7 +201,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Inventory Status</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white">Inventory Status</h3>
                         <Package className="w-5 h-5 text-orange-600" />
                     </div>
                     <div className="flex items-end gap-2">
@@ -213,7 +213,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-gray-900">Profit Margin</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white">Profit Margin</h3>
                         <TrendingUp className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ export default function ReportsPage() {
             <div className="overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="bg-gray-50 border-b border-gray-100">
+                        <tr className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-b border-gray-100">
                             {headers.map((h, i) => (
                                 <th key={i} className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-tight">{h}</th>
                             ))}
@@ -247,7 +247,7 @@ export default function ReportsPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                         {rows.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                            <tr key={i} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                 {Object.values(row).map((val: any, j) => (
                                     <td key={j} className="px-6 py-4 text-sm font-medium text-gray-700">
                                         {val}
@@ -292,7 +292,7 @@ export default function ReportsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Sales</p>
-                                <p className="text-xl font-black text-gray-900">{salesSummary.count}</p>
+                                <p className="text-xl font-black text-gray-900 dark:text-white">{salesSummary.count}</p>
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm border-l-4 border-l-primary-600">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
@@ -380,7 +380,7 @@ export default function ReportsPage() {
                 return (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
-                            <h3 className="text-xl font-bold text-gray-900 mb-8 border-b pb-4">Profit & Loss Statement</h3>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8 border-b pb-4">Profit & Loss Statement</h3>
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center group">
                                     <span className="text-gray-500 font-bold uppercase text-xs tracking-widest">Gross Revenue</span>
@@ -425,16 +425,16 @@ export default function ReportsPage() {
                             <div className="inline-flex p-3 bg-primary-50 rounded-2xl mb-4">
                                 <PieChart className="w-8 h-8 text-primary-900" />
                             </div>
-                            <h3 className="text-3xl font-black text-gray-900">Daily Reconciliation</h3>
+                            <h3 className="text-3xl font-black text-gray-900 dark:text-white">Daily Reconciliation</h3>
                             <p className="text-primary-600 font-bold text-sm tracking-tight mt-2">
                                 Period: {formatSafeDate(dateRange.start, "EEEE, MMMM dd, yyyy")}
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div className="p-6 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-2xl border border-gray-100">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Gross Sales Value</span>
-                                <span className="text-4xl font-black text-gray-900 font-mono">{formatCurrency(reportData.totalSales)}</span>
+                                <span className="text-4xl font-black text-gray-900 dark:text-white font-mono">{formatCurrency(reportData.totalSales)}</span>
                             </div>
                             <div className="p-6 bg-green-50 rounded-2xl border border-green-100">
                                 <span className="text-[10px] font-black text-green-600/60 uppercase tracking-[0.2em] block mb-2">Liquid Cash Collected</span>
@@ -446,7 +446,7 @@ export default function ReportsPage() {
                             {Object.entries(reportData.payments || {}).map(([method, amount]: any) => (
                                 <div key={method} className="bg-white border rounded-xl p-4 text-center">
                                     <span className="text-[10px] font-bold text-gray-400 uppercase block mb-1">{method}</span>
-                                    <span className="text-xl font-black text-gray-900">{formatCurrency(amount)}</span>
+                                    <span className="text-xl font-black text-gray-900 dark:text-white">{formatCurrency(amount)}</span>
                                 </div>
                             ))}
                         </div>
@@ -458,7 +458,7 @@ export default function ReportsPage() {
                             </div>
                             <div className="text-right">
                                 <span className="text-xs font-bold text-gray-400 uppercase block mb-1">Billings Count</span>
-                                <span className="text-2xl font-black text-gray-900">{reportData.invoiceCount || 0}</span>
+                                <span className="text-2xl font-black text-gray-900 dark:text-white">{reportData.invoiceCount || 0}</span>
                             </div>
                         </div>
                     </div>
@@ -467,7 +467,7 @@ export default function ReportsPage() {
                 return (
                     <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
                         <Shield className="w-16 h-16 text-primary-900 mb-4" />
-                        <h3 className="text-xl font-bold text-gray-900">System Activity Audit</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">System Activity Audit</h3>
                         <p className="text-gray-500 max-w-md text-center mt-2 mb-8">
                             Detailed logs of all user actions, security events, and system changes are stored in the dedicated audit module.
                         </p>
@@ -490,12 +490,12 @@ export default function ReportsPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between py-6 gap-6">
                         <div>
-                            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Financial Reports</h1>
+                            <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Financial Reports</h1>
                             <p className="text-sm text-gray-500 font-medium">Business health analytics and performance tracking</p>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
+                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-1.5 rounded-xl border border-gray-200">
                                 <button onClick={() => setPresetRange('thisMonth')} className="px-4 py-2 text-xs font-bold rounded-lg hover:bg-white hover:shadow-sm transition-all">Month</button>
                                 <button onClick={() => setPresetRange('last3Months')} className="px-4 py-2 text-xs font-bold rounded-lg hover:bg-white hover:shadow-sm transition-all">Quarter</button>
                                 {activeTab === 'daily' && <button onClick={() => setPresetRange('today')} className="px-4 py-2 text-xs font-bold rounded-lg bg-white shadow-sm transition-all">Today</button>}

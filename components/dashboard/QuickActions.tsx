@@ -19,7 +19,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
         <div className="space-y-6">
             {/* Quick Actions */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <Link href="#" className="flex flex-col items-center justify-center p-4 bg-primary-900 rounded-lg text-white hover:bg-primary-800 transition-colors">
                         <Plus className="w-6 h-6 mb-2" />
@@ -35,7 +35,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
             {/* Stock Alerts */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Low Stock Alerts</h3>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Low Stock Alerts</h3>
                     <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                         {lowStockItems.length} Items
                     </span>
@@ -51,7 +51,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
                                 <div className="flex items-center space-x-3">
                                     <AlertTriangle className="w-4 h-4 text-red-500" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</p>
                                         <p className="text-xs text-red-600">Only {item.stock} left (Alert: {item.alertLimit})</p>
                                     </div>
                                 </div>

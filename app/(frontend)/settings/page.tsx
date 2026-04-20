@@ -293,7 +293,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('general')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Store className="w-5 h-5 text-primary-900" />
@@ -358,7 +358,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('contact')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Phone className="w-5 h-5 text-primary-900" />
@@ -414,7 +414,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('booking')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Calendar className="w-5 h-5 text-primary-900" />
@@ -444,7 +444,7 @@ export default function SettingsPage() {
                                             const isChecked = currentDays.includes(day.value);
 
                                             return (
-                                                <label key={day.value} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-xl border transition-all ${isChecked ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800' : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700'
+                                                <label key={day.value} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-xl border transition-all ${isChecked ? 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800' : 'bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700'
                                                     }`}>
                                                     <input
                                                         type="checkbox"
@@ -478,7 +478,7 @@ export default function SettingsPage() {
                                 {/* Thiết lập Ca làm việc */}
                                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                                     {/* Ca 1 */}
-                                    <div className="p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 1 (Sáng)
@@ -522,7 +522,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     {/* Ca 2 */}
-                                    <div className="p-5 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 2 (Chiều/Tối)
@@ -574,7 +574,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('business')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <FileText className="w-5 h-5 text-primary-900" />
@@ -603,7 +603,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('financial')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <DollarSign className="w-5 h-5 text-primary-900" />
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('receipt')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <FileText className="w-5 h-5 text-primary-900" />
@@ -692,7 +692,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('qrcode')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <QrCode className="w-5 h-5 text-primary-900" />
@@ -704,7 +704,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.qrcode && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <QrCode className="w-5 h-5 text-primary-900" />
                                 Quản lý Mã QR Thanh Toán
                             </h2>
@@ -713,14 +713,14 @@ export default function SettingsPage() {
                             {settings.qrCodes && settings.qrCodes.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     {settings.qrCodes.map((qr, index) => (
-                                        <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-800 relative">
+                                        <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 relative">
                                             {qr.image ? (
                                                 <img src={qr.image} alt="QR" className="w-20 h-20 object-contain bg-white border rounded" />
                                             ) : (
                                                 <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-xs text-gray-500 rounded">No Image</div>
                                             )}
                                             <div>
-                                                <p className="font-bold text-gray-900">{qr.name}</p>
+                                                <p className="font-bold text-gray-900 dark:text-white">{qr.name}</p>
                                                 <p className="text-sm text-gray-600">{qr.bankName}</p>
                                                 <p className="text-sm font-mono text-gray-800">{qr.accountNumber}</p>
                                                 <p className="text-[10px] text-primary-600 font-mono mt-1 border border-primary-200 bg-primary-50 inline-block px-1 rounded">ID: {qr.qrId}</p>
@@ -783,7 +783,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('sms')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <MessageSquare className="w-5 h-5 text-primary-900" />
@@ -804,7 +804,7 @@ export default function SettingsPage() {
                                         onChange={(e) => setSettings({ ...settings, smsEnabled: e.target.checked })}
                                         className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
-                                    <label htmlFor="smsEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
+                                    <label htmlFor="smsEnabled" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
                                         Enable SMS Notifications
                                     </label>
                                 </div>
@@ -846,7 +846,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('email')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Send className="w-5 h-5 text-primary-900" />
@@ -867,7 +867,7 @@ export default function SettingsPage() {
                                         onChange={(e) => setSettings({ ...settings, emailEnabled: e.target.checked })}
                                         className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
-                                    <label htmlFor="emailEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
+                                    <label htmlFor="emailEnabled" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
                                         Enable Email Notifications
                                     </label>
                                 </div>
@@ -907,7 +907,7 @@ export default function SettingsPage() {
                                                 placeholder='"Your Salon" <noreply@yoursalon.com>'
                                             />
                                         </div>
-                                        <div className="md:col-span-2 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                        <div className="md:col-span-2 flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg">
                                             <input
                                                 type="checkbox"
                                                 id="smtpSecure"
@@ -936,7 +936,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('reminder')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Bell className="w-5 h-5 text-primary-900" />
@@ -980,7 +980,7 @@ export default function SettingsPage() {
                                                 }}
                                                 className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
-                                            <label htmlFor="reminder-sms" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                            <label htmlFor="reminder-sms" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer flex items-center gap-2">
                                                 <MessageSquare className="w-4 h-4 text-primary-600" />
                                                 SMS
                                             </label>
@@ -999,7 +999,7 @@ export default function SettingsPage() {
                                                 }}
                                                 className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
-                                            <label htmlFor="reminder-email" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                            <label htmlFor="reminder-email" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer flex items-center gap-2">
                                                 <Mail className="w-4 h-4 text-green-600" />
                                                 Email
                                             </label>
@@ -1018,7 +1018,7 @@ export default function SettingsPage() {
                                                 }}
                                                 className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                             />
-                                            <label htmlFor="reminder-zalo" className="text-sm font-medium text-gray-900 cursor-pointer flex items-center gap-2">
+                                            <label htmlFor="reminder-zalo" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer flex items-center gap-2">
                                                 <MessageSquare className="w-4 h-4 text-primary-500" />
                                                 Zalo ZNS
                                             </label>
@@ -1049,7 +1049,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('zalo')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <MessageSquare className="w-5 h-5 text-primary-900" />
@@ -1069,7 +1069,7 @@ export default function SettingsPage() {
                                     onChange={(e) => setSettings({ ...settings, zaloEnabled: e.target.checked })}
                                     className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                 />
-                                <label htmlFor="zaloEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
+                                <label htmlFor="zaloEnabled" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
                                     Enable Zalo ZNS Notifications
                                 </label>
                             </div>
@@ -1082,7 +1082,7 @@ export default function SettingsPage() {
                                             type="text"
                                             value={settings.zaloAppId}
                                             onChange={(e) => setSettings({ ...settings, zaloAppId: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 focus:bg-white transition-colors text-sm"
                                             placeholder="VD: 123456789012345678"
                                         />
                                     </div>
@@ -1092,7 +1092,7 @@ export default function SettingsPage() {
                                             type="password"
                                             value={settings.zaloSecretKey}
                                             onChange={(e) => setSettings({ ...settings, zaloSecretKey: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-sm"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 focus:bg-white transition-colors text-sm"
                                             placeholder="Chuỗi bí mật của ứng dụng"
                                         />
                                     </div>
@@ -1118,7 +1118,7 @@ export default function SettingsPage() {
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                                                <div className="p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-200 text-center">
                                                     <p className="text-sm text-gray-600">Không có mẫu tin nhắn nào</p>
                                                 </div>
                                             )}
@@ -1129,7 +1129,7 @@ export default function SettingsPage() {
                                         <textarea
                                             value={settings.zaloAccessToken}
                                             onChange={(e) => setSettings({ ...settings, zaloAccessToken: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 focus:bg-white transition-colors text-xs font-mono"
                                             rows={2}
                                             placeholder="Dán Access Token vào đây (Chỉ cần làm lần đầu tiên)"
                                         />
@@ -1139,7 +1139,7 @@ export default function SettingsPage() {
                                         <textarea
                                             value={settings.zaloRefreshToken}
                                             onChange={(e) => setSettings({ ...settings, zaloRefreshToken: e.target.value })}
-                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 focus:bg-white transition-colors text-xs font-mono text-red-600"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 focus:bg-white transition-colors text-xs font-mono text-red-600"
                                             rows={2}
                                             placeholder="Dán Refresh Token vào đây (Quan trọng: Dùng để hệ thống tự động gia hạn)"
                                         />
@@ -1156,7 +1156,7 @@ export default function SettingsPage() {
                     <button
                         type="button"
                         onClick={() => toggleTab('ai')}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors"
                     >
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-primary-900" />
@@ -1177,7 +1177,7 @@ export default function SettingsPage() {
                                         onChange={(e) => setSettings({ ...settings, aiEnabled: e.target.checked })}
                                         className="w-4 h-4 text-primary-900 rounded focus:ring-primary-900"
                                     />
-                                    <label htmlFor="aiEnabled" className="text-sm font-medium text-gray-900 cursor-pointer">
+                                    <label htmlFor="aiEnabled" className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
                                         Enable AI Powered Insights & Reporting
                                     </label>
                                 </div>
@@ -1214,15 +1214,15 @@ export default function SettingsPage() {
                 </div>
 
                 {/* System Management */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Save className="w-5 h-5 text-primary-900" />
                         System Management
                     </h2>
                     <div className="space-y-4">
-                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
-                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Database Backup</h3>
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-tight">Database Backup</h3>
                                 <p className="text-xs text-gray-500 mt-1">Export all your business data to a JSON file for safety.</p>
                             </div>
                             <button

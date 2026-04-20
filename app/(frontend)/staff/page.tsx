@@ -139,12 +139,12 @@ export default function StaffPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Staff Management</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
                         <p className="text-sm text-gray-500">Manage beauticians, employees and their access</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -161,15 +161,15 @@ export default function StaffPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden text-black">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-gray-700/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search by name, email or phone..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -186,14 +186,14 @@ export default function StaffPage() {
 
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Member</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role & Skills</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Salary</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Commission</th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Member</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role & Skills</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Salary</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Commission</th>
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
@@ -212,14 +212,14 @@ export default function StaffPage() {
                                     </tr>
                                 ) : (
                                     staffMembers.map((staff) => (
-                                        <tr key={staff._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={staff._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-primary-50 rounded-lg">
                                                         <User className="w-4 h-4 text-primary-600" />
                                                     </div>
                                                     <div>
-                                                        <span className="text-sm font-bold text-gray-900">{staff.name}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{staff.name}</span>
                                                         <div className="text-[10px] text-gray-400 font-medium uppercase">{staff.designation || "Staff"}</div>
                                                     </div>
                                                 </div>
@@ -248,15 +248,15 @@ export default function StaffPage() {
                                                         </span>
                                                     ))}
                                                     {staff.skills?.length > 3 && (
-                                                        <span className="text-[10px] text-gray-500 font-medium px-1.5 py-0.5">+{staff.skills.length - 3}</span>
+                                                        <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium px-1.5 py-0.5">+{staff.skills.length - 3}</span>
                                                     )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-bold text-gray-900">{settings.symbol}{staff.salary?.toLocaleString() || 0}</span>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{settings.symbol}{staff.salary?.toLocaleString() || 0}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="text-sm font-bold text-gray-900">{staff.commissionRate}%</span>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">{staff.commissionRate}%</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                                 <div className="relative flex justify-end dropdown-trigger">
@@ -306,15 +306,15 @@ export default function StaffPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-500 font-medium">
-                            Showing <span className="text-gray-900">{staffMembers.length}</span> of <span className="text-gray-900">{pagination.total}</span> staff members
+                            Showing <span className="text-gray-900 dark:text-white">{staffMembers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> staff members
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -347,7 +347,7 @@ export default function StaffPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -418,7 +418,7 @@ export default function StaffPage() {
                     </div>
 
                     <div className="flex justify-end space-x-3 mt-6">
-                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700">Cancel</button>
                         <FormButton type="submit" loading={submitting}>
                             {editingStaff ? "Update Staff" : "Add Staff"}
                         </FormButton>

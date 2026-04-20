@@ -140,14 +140,14 @@ export default function CreatePurchasePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 text-black">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 pb-20 text-black">
             <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-10 shadow-sm">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link href="/purchases" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                             <ArrowLeft className="w-5 h-5 text-gray-500" />
                         </Link>
-                        <h1 className="text-xl font-bold text-gray-900">Create Purchase Order</h1>
+                        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Create Purchase Order</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <FormButton
@@ -164,7 +164,7 @@ export default function CreatePurchasePage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* General Info */}
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                             <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                             General Information
                         </h2>
@@ -200,7 +200,7 @@ export default function CreatePurchasePage() {
                     {/* Items */}
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Order Items
                             </h2>
@@ -216,7 +216,7 @@ export default function CreatePurchasePage() {
 
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Product</th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase w-32">Quantity</th>
@@ -268,7 +268,7 @@ export default function CreatePurchasePage() {
                                                         required
                                                     />
                                                 </td>
-                                                <td className="p-3 text-right font-semibold text-gray-900">
+                                                <td className="p-3 text-right font-semibold text-gray-900 dark:text-white">
                                                     {settings.symbol}{(item.total || 0).toFixed(2)}
                                                 </td>
                                                 <td className="p-3 text-right">
@@ -291,7 +291,7 @@ export default function CreatePurchasePage() {
                     {/* Payment & Totals */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Payment Details
                             </h2>
@@ -330,7 +330,7 @@ export default function CreatePurchasePage() {
                         </div>
 
                         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-fit">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Order Summary
                             </h2>
@@ -367,7 +367,7 @@ export default function CreatePurchasePage() {
                                     />
                                 </div>
                                 <div className="h-px bg-gray-100 my-2" />
-                                <div className="flex justify-between text-lg font-bold text-gray-900">
+                                <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
                                     <span>Total</span>
                                     <span>{settings.symbol}{calculateTotal().toFixed(2)}</span>
                                 </div>

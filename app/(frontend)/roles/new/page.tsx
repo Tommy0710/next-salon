@@ -97,7 +97,7 @@ export default function NewRolePage() {
                     <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Create New Role</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Role</h1>
                     <p className="text-gray-500">Define access permissions for this role</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@ export default function NewRolePage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Shield className="w-5 h-5 text-primary-900" />
                         Role Details
                     </h2>
@@ -128,8 +128,8 @@ export default function NewRolePage() {
 
                 {/* Permissions Matrix */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-6 border-b border-gray-200 bg-gray-50">
-                        <h2 className="text-lg font-semibold text-gray-900">Access Permissions</h2>
+                    <div className="p-6 border-b border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Access Permissions</h2>
                         <p className="text-sm text-gray-500">Configure what users with this role can see and do.</p>
                     </div>
 
@@ -176,7 +176,7 @@ export default function NewRolePage() {
                     {/* Standard Resources Table */}
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                            <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-3 text-sm font-semibold text-gray-700 w-1/4">Feature</th>
                                     <th className="px-6 py-3 text-sm font-semibold text-gray-700 w-1/3">View Scope</th>
@@ -185,8 +185,8 @@ export default function NewRolePage() {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {RESOURCES.map((res) => (
-                                    <tr key={res.key} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-gray-900">
+                                    <tr key={res.key} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                                             {res.label}
                                         </td>
                                         <td className="px-6 py-4">
@@ -200,7 +200,7 @@ export default function NewRolePage() {
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'none')}
                                                         className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">None</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">None</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input
@@ -210,7 +210,7 @@ export default function NewRolePage() {
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'own')}
                                                         className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">Own Only</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">Own Only</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input
@@ -220,7 +220,7 @@ export default function NewRolePage() {
                                                         onChange={() => handlePermissionChange(res.key, 'view', 'all')}
                                                         className="w-4 h-4 text-primary-900 focus:ring-primary-900 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">All</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">All</span>
                                                 </label>
                                             </div>
                                         </td>
@@ -233,7 +233,7 @@ export default function NewRolePage() {
                                                         onChange={(e) => handlePermissionChange(res.key, 'create', e.target.checked)}
                                                         className="w-4 h-4 text-green-600 rounded focus:ring-green-600 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">Create</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">Create</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input
@@ -242,7 +242,7 @@ export default function NewRolePage() {
                                                         onChange={(e) => handlePermissionChange(res.key, 'edit', e.target.checked)}
                                                         className="w-4 h-4 text-amber-600 rounded focus:ring-amber-600 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">Edit</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">Edit</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input
@@ -251,7 +251,7 @@ export default function NewRolePage() {
                                                         onChange={(e) => handlePermissionChange(res.key, 'delete', e.target.checked)}
                                                         className="w-4 h-4 text-red-600 rounded focus:ring-red-600 border-gray-300"
                                                     />
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900">Delete</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 dark:text-white">Delete</span>
                                                 </label>
                                             </div>
                                         </td>
@@ -271,7 +271,7 @@ export default function NewRolePage() {
                 <div className="flex justify-end gap-3">
                     <Link
                         href="/roles"
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
                     >
                         Cancel
                     </Link>

@@ -110,7 +110,7 @@ export default function ProfilePage() {
     return (
         <div className="max-w-4xl mx-auto p-6">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
                 <p className="text-gray-500">Manage your account settings and preferences</p>
             </div>
 
@@ -133,7 +133,7 @@ export default function ProfilePage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <User className="w-5 h-5 text-primary-900" />
                         Personal Information
                     </h2>
@@ -157,7 +157,7 @@ export default function ProfilePage() {
 
                 {/* Security */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Shield className="w-5 h-5 text-primary-900" />
                         Security
                     </h2>

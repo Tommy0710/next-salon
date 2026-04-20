@@ -24,7 +24,17 @@ export const buildTemplateData = (eventType: string, data: any) => {
         return `${hours}:${minutes} ${day}/${month}/${year}`;
     };
     const now = new Date();
+    const buildServiceName = (services: any[]) => {
+        if (!services || services.length === 0) return "Dịch vụ Spa";
 
+        const names = services.map(s => s.name);
+
+        if (names.length <= 2) {
+            return names.join(', ');
+        }
+
+        return `${names[0]}, ${names[1]} +${names.length - 2} dịch vụ khác`;
+    };
     switch (eventType) {
         case ZALO_EVENTS.CHECKOUT:
             // Mẫu: Thanh toán thành công (Mẫu Dạ Spa đang dùng)
@@ -41,7 +51,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
                 customer_name: data.customerName || "Quý khách",
                 date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
-                services: data.serviceName || "",
+                services: buildServiceName(data.services),
                 status: data.status || "Đang chờ xác nhận",
             };
         case ZALO_EVENTS.APPOINTMENT_CONFIRMED:
@@ -50,7 +60,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
                 customer_name: data.customerName || "Quý khách",
                 date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
-                services: data.serviceName || "",
+                services: buildServiceName(data.services),
                 status: data.status || "Đã xác nhận"
             };
 
@@ -60,7 +70,7 @@ export const buildTemplateData = (eventType: string, data: any) => {
                 customer_name: data.customerName || "Quý khách",
                 date: data.appointmentDate,
                 booking_code: data.bookingCode || "",
-                services: data.serviceName || "",
+                services: buildServiceName(data.services),
                 status: data.status || "Đã bị hủy",
             };
         case ZALO_EVENTS.BIRTHDAY:

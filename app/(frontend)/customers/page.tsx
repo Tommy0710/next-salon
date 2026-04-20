@@ -138,7 +138,7 @@ export default function CustomersPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -162,7 +162,7 @@ export default function CustomersPage() {
                 {/* Main Card */}
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-950/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
@@ -185,7 +185,7 @@ export default function CustomersPage() {
 
                     <div className="overflow-x-auto text-black dark:text-white">
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
-                            <thead className="bg-gray-50 dark:bg-slate-900/50">
+                            <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
@@ -211,7 +211,7 @@ export default function CustomersPage() {
                                     </tr>
                                 ) : (
                                     customers.map((customer) => (
-                                        <tr key={customer._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <tr key={customer._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
@@ -251,7 +251,7 @@ export default function CustomersPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${customer.status === "active"
                                                     ? "bg-green-50 text-green-700 border-green-200"
-                                                    : "bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-slate-700"
+                                                    : "bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-slate-700"
                                                     }`}>
                                                     {customer.status}
                                                 </span>
@@ -307,7 +307,7 @@ export default function CustomersPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                             Showing <span className="text-gray-900 dark:text-white">{customers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> customers
                         </div>
@@ -315,7 +315,7 @@ export default function CustomersPage() {
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -348,7 +348,7 @@ export default function CustomersPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -416,7 +416,7 @@ export default function CustomersPage() {
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 font-medium transition-colors"
+                            className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800 font-medium transition-colors"
                         >
                             Cancel
                         </button>

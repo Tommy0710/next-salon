@@ -78,7 +78,7 @@ export default function PaymentHistory({ transactionId, transactionType, onUpdat
 
     if (deposits.length === 0) {
         return (
-            <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="text-center py-8 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-100">
                 <p className="text-gray-500 text-sm">No payments recorded yet.</p>
             </div>
         );
@@ -94,7 +94,7 @@ export default function PaymentHistory({ transactionId, transactionType, onUpdat
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{deposit.depositNumber}</span>
+                                <span className="font-medium text-gray-900 dark:text-white">{deposit.depositNumber}</span>
                                 <span className="text-xs text-gray-500">• {new Date(deposit.paymentDate).toLocaleDateString()}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 mt-0.5">
@@ -106,7 +106,7 @@ export default function PaymentHistory({ transactionId, transactionType, onUpdat
 
                     <div className="flex items-center gap-4">
                         <div className="text-right">
-                            <div className="font-bold text-gray-900">{settings.symbol}{deposit.amount.toFixed(2)}</div>
+                            <div className="font-bold text-gray-900 dark:text-white">{settings.symbol}{deposit.amount.toFixed(2)}</div>
                             <div className="text-xs text-gray-500">
                                 by {deposit.createdBy?.name || 'Unknown'}
                             </div>

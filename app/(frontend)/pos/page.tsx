@@ -574,7 +574,7 @@ export default function POSPage() {
 
     const filteredBills = bills.filter(b => b.name.toLowerCase().includes(billSearchQuery.toLowerCase()));
     return (
-        <div className="flex h-[100dvh] w-full bg-gray-50 dark:bg-slate-950 overflow-hidden flex-col md:flex-row text-black dark:text-white">
+        <div className="flex h-[100dvh] w-full bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 overflow-hidden flex-col md:flex-row text-black dark:text-white">
             {/* Left Side: Items Catalog */}
             <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
                 <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
@@ -597,7 +597,7 @@ export default function POSPage() {
                                         placeholder="Tìm sản phẩm..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg text-xs md:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                        className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg text-xs md:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                     />
                                 </div>
                             </div>
@@ -619,7 +619,7 @@ export default function POSPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 dark:bg-slate-950 pb-20 md:pb-4">
+                    <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 pb-20 md:pb-4">
                         {loading ? (
                             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-900 border-t-transparent"></div></div>
                         ) : (
@@ -655,7 +655,7 @@ export default function POSPage() {
             <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
 
                 {/* --- MỚI: THANH TÌM KIẾM BILL & TẠO BILL MỚI --- */}
-                <div className="p-2 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 flex items-center gap-2 flex-shrink-0">
+                <div className="p-2 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex items-center gap-2 flex-shrink-0">
                     <div className="relative flex-1">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
                         <input
@@ -704,7 +704,7 @@ export default function POSPage() {
                     <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
 
                         {/* Customer Selection & Bill Renaming */}
-                        <div className="p-3 md:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 flex-shrink-0 space-y-3">
+                        <div className="p-3 md:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex-shrink-0 space-y-3">
 
                             {/* --- MỚI: Ô ĐỔI TÊN BILL --- */}
                             <div className="flex items-center gap-2">
@@ -717,7 +717,7 @@ export default function POSPage() {
                                     className="flex-1 px-3 py-1.5 text-sm font-bold text-primary-900 dark:text-primary-400 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 transition-all shadow-sm"
                                 />
                             </div>
-                            <div className="bg-gray-50 dark:bg-slate-900 flex-shrink-0 space-y-3">
+                            <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex-shrink-0 space-y-3">
                                 <div className="flex items-center gap-2">
                                     <User className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                                     <SearchableSelect
@@ -819,7 +819,7 @@ export default function POSPage() {
                         </div>
 
                         {/* Summary Section */}
-                        <div className="flex-shrink-0 p-3 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                        <div className="flex-shrink-0 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="space-y-1 mb-3 text-[10px] md:text-xs">
                                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Tổng phụ</span>
@@ -881,7 +881,7 @@ export default function POSPage() {
                                         className="w-20 text-right text-[10px] md:text-xs border-2 border-primary-900/20 dark:border-primary-900/50 rounded px-1 py-0.5 focus:border-primary-900 bg-white dark:bg-slate-950 text-gray-900 dark:text-white outline-none font-bold"
                                     />
                                 </div>
-                                <div className="flex justify-between text-sm md:text-base font-black text-gray-900 dark:text-gray-100 pt-1 border-t border-gray-200 dark:border-slate-800">
+                                <div className="flex justify-between text-sm md:text-base font-black text-gray-900 dark:text-white dark:text-gray-100 pt-1 border-t border-gray-200 dark:border-slate-800">
                                     <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Còn nợ' : 'Tổng cộng'}</span>
                                     <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600 dark:text-red-400' : 'text-primary-900 dark:text-primary-400'}>
                                         {formatCurrency(((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total))}
@@ -1015,7 +1015,7 @@ export default function POSPage() {
                                     type="text"
                                     value={newCustomerName}
                                     onChange={(e) => setNewCustomerName(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
+                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
                                     placeholder="Nhập tên khách hàng..."
                                     autoFocus
                                 />
@@ -1028,7 +1028,7 @@ export default function POSPage() {
                                     type="text"
                                     value={newCustomerPhone}
                                     onChange={(e) => setNewCustomerPhone(e.target.value)}
-                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
+                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
                                     placeholder="Nhập số điện thoại..."
                                 />
                             </div>
@@ -1049,7 +1049,7 @@ export default function POSPage() {
                             >
                                 {isSubmittingCustomer ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <div className="w-4 h-4 border-2 border-white dark:border-gray-700/30 border-t-white rounded-full animate-spin"></div>
                                         Đang lưu...
                                     </>
                                 ) : (

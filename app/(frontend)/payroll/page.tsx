@@ -210,12 +210,12 @@ export default function PayrollPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Payroll & Commission</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Payroll & Commission</h1>
                         <p className="text-sm text-gray-500">Manage staff salaries, commissions, and tips</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -230,15 +230,15 @@ export default function PayrollPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden text-black">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-gray-700/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search by staff name..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -255,16 +255,16 @@ export default function PayrollPage() {
 
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Period</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Salary</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Commission</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tips</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Period</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Salary</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Commission</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tips</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
@@ -283,13 +283,13 @@ export default function PayrollPage() {
                                     </tr>
                                 ) : (
                                     payrolls.map((payroll) => (
-                                        <tr key={payroll._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={payroll._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
                                                         {payroll.staff.name.substring(0, 2).toUpperCase()}
                                                     </div>
-                                                    <span className="text-sm font-bold text-gray-900">{payroll.staff.name}</span>
+                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{payroll.staff.name}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -298,16 +298,16 @@ export default function PayrollPage() {
                                                     {MONTHS[payroll.month - 1]} {payroll.year}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                                 {settings.symbol}{payroll.baseSalary.toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-white">
                                                 {settings.symbol}{payroll.totalCommission.toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-600">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary-600 dark:text-white">
                                                 {settings.symbol}{payroll.totalTips.toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">
                                                 {settings.symbol}{payroll.totalAmount.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -390,15 +390,15 @@ export default function PayrollPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-500 font-medium">
-                            Showing <span className="text-gray-900">{payrolls.length}</span> of <span className="text-gray-900">{pagination.total}</span> records
+                            Showing <span className="text-gray-900 dark:text-white">{payrolls.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> records
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -431,7 +431,7 @@ export default function PayrollPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -466,7 +466,7 @@ export default function PayrollPage() {
                         />
                     </div>
                     <div className="flex justify-end space-x-3 mt-6">
-                        <button onClick={() => setIsGenerateModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button onClick={() => setIsGenerateModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700">Cancel</button>
                         <FormButton onClick={handleGeneratePayroll} loading={generating}>
                             Generate
                         </FormButton>
@@ -478,7 +478,7 @@ export default function PayrollPage() {
             {selectedPayroll && (
                 <Modal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} title={`Payroll Details - ${selectedPayroll.staff.name}`}>
                     <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg">
                             <div>
                                 <p className="text-xs text-gray-500">Period</p>
                                 <p className="font-semibold">{MONTHS[selectedPayroll.month - 1]} {selectedPayroll.year}</p>
@@ -537,7 +537,7 @@ export default function PayrollPage() {
                             </div>
 
                             <div className="flex justify-between py-3 bg-primary-50 px-3 rounded-lg mt-2">
-                                <span className="font-bold text-gray-900">Final Total</span>
+                                <span className="font-bold text-gray-900 dark:text-white">Final Total</span>
                                 <span className="font-bold text-primary-900 text-lg">
                                     {settings.symbol}{(selectedPayroll.baseSalary + selectedPayroll.totalCommission + selectedPayroll.totalTips + editPayrollData.bonuses - editPayrollData.deductions).toLocaleString()}
                                 </span>
@@ -555,7 +555,7 @@ export default function PayrollPage() {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setIsDetailModalOpen(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -581,7 +581,7 @@ export default function PayrollPage() {
                                         <span className="font-semibold text-gray-700">Direct Sales (POS):</span>
                                         <span className="text-gray-600">{selectedPayroll.breakdown.invoices.length}</span>
                                     </div>
-                                    <div className="bg-gray-50 p-3 rounded-lg text-xs space-y-2 max-h-40 overflow-y-auto">
+                                    <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-3 rounded-lg text-xs space-y-2 max-h-40 overflow-y-auto">
                                         {selectedPayroll.breakdown.invoices.map((inv: any) => (
                                             <div key={inv.invoiceId} className="flex justify-between items-center border-b border-gray-100 pb-1 last:border-0 last:pb-0">
                                                 <span className="text-gray-500">{inv.invoiceNumber} ({format(new Date(inv.date), "dd MMM")})</span>

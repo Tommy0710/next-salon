@@ -88,7 +88,7 @@ export default function PurchaseDetailsPage() {
     if (!purchase) return null;
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 text-black max-w-5xl mx-auto">
+        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black max-w-5xl mx-auto">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
@@ -99,7 +99,7 @@ export default function PurchaseDetailsPage() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                             {purchase.purchaseNumber}
                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${purchase.status === 'received' ? 'bg-green-50 text-green-700 border-green-200' :
                                 purchase.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
@@ -114,7 +114,7 @@ export default function PurchaseDetailsPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => window.print()}
-                        className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2 text-sm font-semibold text-gray-700 shadow-sm"
+                        className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all flex items-center gap-2 text-sm font-semibold text-gray-700 shadow-sm"
                     >
                         <Printer className="w-4 h-4" />
                         Print
@@ -138,13 +138,13 @@ export default function PurchaseDetailsPage() {
                         <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center">
                             <User className="w-5 h-5" />
                         </div>
-                        <h2 className="text-lg font-bold text-gray-900">Supplier Information</h2>
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">Supplier Information</h2>
                     </div>
 
                     <div className="space-y-4">
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Supplier Name</p>
-                            <p className="font-bold text-gray-900">{purchase.supplier?.name || "N/A"}</p>
+                            <p className="font-bold text-gray-900 dark:text-white">{purchase.supplier?.name || "N/A"}</p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -182,14 +182,14 @@ export default function PurchaseDetailsPage() {
                         <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
                             <FileText className="w-5 h-5" />
                         </div>
-                        <h2 className="text-lg font-bold text-gray-900">Overview</h2>
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">Overview</h2>
                     </div>
 
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Date</p>
-                                <div className="flex items-center gap-2 font-bold text-gray-900">
+                                <div className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
                                     <Calendar className="w-4 h-4 text-gray-400" />
                                     {format(new Date(purchase.date), "MMMM dd, yyyy")}
                                 </div>
@@ -219,7 +219,7 @@ export default function PurchaseDetailsPage() {
                         {purchase.notes && (
                             <div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Notes</p>
-                                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 italic text-sm text-gray-600">
+                                <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-3 rounded-lg border border-gray-100 italic text-sm text-gray-600">
                                     "{purchase.notes}"
                                 </div>
                             </div>
@@ -234,12 +234,12 @@ export default function PurchaseDetailsPage() {
                     <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
                         <Package className="w-5 h-5" />
                     </div>
-                    <h2 className="text-lg font-bold text-gray-900">Purchase Items</h2>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Purchase Items</h2>
                 </div>
 
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-gray-50/80">
+                        <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700/80">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Product</th>
                                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Quantity</th>
@@ -249,10 +249,10 @@ export default function PurchaseDetailsPage() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {purchase.items.map((item: any, idx: number) => (
-                                <tr key={idx} className="hover:bg-gray-50/30 transition-colors">
+                                <tr key={idx} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700/30 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="font-bold text-gray-900">{item.product?.name || "Deleted Product"}</span>
+                                            <span className="font-bold text-gray-900 dark:text-white">{item.product?.name || "Deleted Product"}</span>
                                             <span className="text-xs text-gray-400 font-medium tracking-wide">#{item.product?._id?.toString().slice(-6)}</span>
                                         </div>
                                     </td>
@@ -264,7 +264,7 @@ export default function PurchaseDetailsPage() {
                                     <td className="px-6 py-4 text-right font-medium text-gray-700">
                                         {settings.symbol}{item.costPrice.toFixed(2)}
                                     </td>
-                                    <td className="px-6 py-4 text-right font-bold text-gray-900">
+                                    <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white">
                                         {settings.symbol}{item.total.toFixed(2)}
                                     </td>
                                 </tr>
@@ -274,22 +274,22 @@ export default function PurchaseDetailsPage() {
                 </div>
 
                 {/* Summary Table */}
-                <div className="bg-gray-50/50 p-6 flex justify-end">
+                <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-6 flex justify-end">
                     <div className="w-full max-w-xs space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="font-medium text-gray-500">Subtotal</span>
-                            <span className="font-bold text-gray-900">{settings.symbol}{purchase.subtotal.toFixed(2)}</span>
+                            <span className="font-bold text-gray-900 dark:text-white">{settings.symbol}{purchase.subtotal.toFixed(2)}</span>
                         </div>
                         {purchase.tax > 0 && (
                             <div className="flex justify-between items-center text-sm">
                                 <span className="font-medium text-gray-500">Tax</span>
-                                <span className="font-bold text-gray-900">{settings.symbol}{purchase.tax.toFixed(2)}</span>
+                                <span className="font-bold text-gray-900 dark:text-white">{settings.symbol}{purchase.tax.toFixed(2)}</span>
                             </div>
                         )}
                         {purchase.shipping > 0 && (
                             <div className="flex justify-between items-center text-sm">
                                 <span className="font-medium text-gray-500">Shipping</span>
-                                <span className="font-bold text-gray-900">{settings.symbol}{purchase.shipping.toFixed(2)}</span>
+                                <span className="font-bold text-gray-900 dark:text-white">{settings.symbol}{purchase.shipping.toFixed(2)}</span>
                             </div>
                         )}
                         {purchase.discount > 0 && (
@@ -299,7 +299,7 @@ export default function PurchaseDetailsPage() {
                             </div>
                         )}
                         <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
-                            <span className="text-lg font-black text-gray-900 uppercase tracking-widest">Total</span>
+                            <span className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-widest">Total</span>
                             <span className="text-2xl font-black text-primary-900">{settings.symbol}{purchase.totalAmount.toFixed(2)}</span>
                         </div>
                         <div className="pt-2 flex justify-between items-center text-xs">
@@ -318,7 +318,7 @@ export default function PurchaseDetailsPage() {
                     .max-w-5xl { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
                     .shadow-sm, .shadow-xl { shadow: none !important; box-shadow: none !important; }
                     .border { border: 1px solid #eee !important; }
-                    .bg-gray-50 { background: white !important; }
+                    .bg-gray-50 dark:bg-slate-900 dark:border-gray-700 { background: white !important; }
                 }
             `}</style>
         </div>

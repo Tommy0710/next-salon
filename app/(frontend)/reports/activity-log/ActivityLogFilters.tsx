@@ -31,7 +31,7 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
     };
 
     return (
-        <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-800/50">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50">
             <div className="relative w-full md:w-96">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -39,7 +39,7 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
                     placeholder={initialTab === "zalo" ? "Search Zalo events by phone, template, or event type..." : "Search logs by action or resource..."}
                     defaultValue={initialSearch}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                    className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                 />
                 {isPending && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -61,7 +61,7 @@ export default function ActivityLogFilters({ initialSearch, initialLimit, initia
                                 router.push(`${pathname}?${params.toString()}`);
                             });
                         }}
-                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
+                        className="px-3 py-1.5 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                     >
                         <option value="10">10</option>
                         <option value="25">25</option>

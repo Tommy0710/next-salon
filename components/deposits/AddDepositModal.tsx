@@ -86,7 +86,7 @@ export default function AddDepositModal({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {transactionType.includes('return') ? 'Record Refund' : 'Add Payment'}
                     </h3>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -150,7 +150,7 @@ export default function AddDepositModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm font-medium"
                         >
                             Cancel
                         </button>
@@ -160,7 +160,7 @@ export default function AddDepositModal({
                             className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                         >
                             {loading ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white dark:border-gray-700 border-t-transparent rounded-full animate-spin" />
                             ) : (
                                 <DollarSign className="w-4 h-4" />
                             )}

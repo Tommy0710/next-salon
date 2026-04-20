@@ -34,7 +34,7 @@ export default function SalesChart({
     const { settings } = useSettings();
     if (!data || data.length === 0) {
         return (
-            <div className={`flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200`} style={{ height }}>
+            <div className={`flex items-center justify-center bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-200`} style={{ height }}>
                 <p className="text-gray-400">No data available</p>
             </div>
         );

@@ -80,7 +80,7 @@ export default function LoginPage() {
 
             <div className="w-full max-w-sm relative z-10">
                 {/* Login Card */}
-                <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/10">
+                <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white dark:border-gray-700/10">
                     {/* Logo & Title */}
                     <div className="text-center mb-6">
                         <div className="inline-flex items-center justify-center mb-4">
@@ -112,7 +112,7 @@ export default function LoginPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
+                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white dark:border-gray-700/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -131,7 +131,7 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
+                                    className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white dark:border-gray-700/10 rounded-lg text-sm text-white placeholder-primary-300/40 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -142,7 +142,7 @@ export default function LoginPage() {
                             <label className="flex items-center gap-2 text-xs text-primary-200/60 cursor-pointer hover:text-primary-200 transition-colors">
                                 <input
                                     type="checkbox"
-                                    className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500/50 focus:ring-offset-0 cursor-pointer"
+                                    className="w-3.5 h-3.5 rounded border-white dark:border-gray-700/20 bg-white/5 text-primary-500 focus:ring-primary-500/50 focus:ring-offset-0 cursor-pointer"
                                 />
                                 Remember me
                             </label>
@@ -164,7 +164,7 @@ export default function LoginPage() {
                         >
                             {loading ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-white dark:border-gray-700/30 border-t-white rounded-full animate-spin"></div>
                                     Signing in...
                                 </>
                             ) : (
@@ -177,7 +177,7 @@ export default function LoginPage() {
                     </form>
 
                     {/* Footer */}
-                    <p className="text-center text-primary-400/30 text-xs mt-6 pt-4 border-t border-white/5">
+                    <p className="text-center text-primary-400/30 text-xs mt-6 pt-4 border-t border-white dark:border-gray-700/5">
                         © {new Date().getFullYear()} {storeName}
                     </p>
                 </div>

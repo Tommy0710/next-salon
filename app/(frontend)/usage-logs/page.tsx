@@ -111,10 +111,10 @@ export default function UsageLogsPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 text-black">
+        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Product Usage Logs</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Usage Logs</h1>
                     <p className="text-gray-500 text-sm">Track internal consumption, damages, and service usage</p>
                 </div>
                 <button
@@ -126,14 +126,14 @@ export default function UsageLogsPage() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-gray-200 bg-gray-50/50">
+            <div className="bg-white rounded-xl border border-gray-200 dark:bg-slate-900 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Search by product..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -142,18 +142,18 @@ export default function UsageLogsPage() {
 
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Quantity</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Staff</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Product</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantity</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reason</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Notes</th>
+                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-100">
+                        <tbody className="bg-white dark:bg-slate-900 dark:border-gray-700 divide-y divide-gray-100">
                             {loading && logs.length === 0 ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
@@ -169,7 +169,7 @@ export default function UsageLogsPage() {
                                 </tr>
                             ) : (
                                 logs.map((log) => (
-                                    <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
+                                    <tr key={log._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-2 text-gray-500">
                                                 <Calendar className="w-4 h-4" />
@@ -182,7 +182,7 @@ export default function UsageLogsPage() {
                                                     <Archive className="w-3.5 h-3.5 text-primary-600" />
                                                 </div>
                                                 <div>
-                                                    <span className="text-sm font-bold text-gray-900">{log.product?.name || "Unknown Product"}</span>
+                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{log.product?.name || "Unknown Product"}</span>
                                                     <div className="text-[10px] text-gray-400">{log.product?.sku}</div>
                                                 </div>
                                             </div>
@@ -226,15 +226,15 @@ export default function UsageLogsPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
-                        Showing <span className="text-gray-900">{logs.length}</span> of <span className="text-gray-900">{pagination.total}</span> usage logs
+                        Showing <span className="text-gray-900 dark:text-white">{logs.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> usage logs
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => page > 1 && setPage(page - 1)}
                             disabled={page <= 1}
-                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -267,7 +267,7 @@ export default function UsageLogsPage() {
                         <button
                             onClick={() => page < pagination.pages && setPage(page + 1)}
                             disabled={page >= pagination.pages}
-                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>
@@ -322,7 +322,7 @@ export default function UsageLogsPage() {
                         />
                     </div>
                     <div className="flex justify-end gap-3 mt-6">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" disabled={submitting}>Cancel</button>
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700" disabled={submitting}>Cancel</button>
                         <FormButton type="submit" loading={submitting}>Save Record</FormButton>
                     </div>
                 </form>

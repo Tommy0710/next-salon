@@ -265,7 +265,7 @@ export default async function DashboardPage() {
                             </div>
                             <p className="text-3xl font-black text-green-900 dark:text-green-400">{apptStats.completed}</p>
                         </div>
-                        <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800/10 transition-all hover:shadow-md">
+                        <div className="p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800/10 transition-all hover:shadow-md">
                             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                                 <XCircle className="w-4 h-4" />
                                 <span className="text-sm font-semibold">Đã hủy</span>

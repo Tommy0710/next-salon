@@ -117,14 +117,14 @@ export default function EditUserPage() {
                     <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Edit User</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit User</h1>
                     <p className="text-gray-500">Update user details and role</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <UserIcon className="w-5 h-5 text-primary-900" />
                         User Details
                     </h2>
@@ -183,7 +183,7 @@ export default function EditUserPage() {
                 <div className="flex justify-end gap-3">
                     <Link
                         href="/users"
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
                     >
                         Cancel
                     </Link>

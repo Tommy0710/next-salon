@@ -197,7 +197,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                     )}
 
                     {/* Mobile Close Button */}
-                    <button onClick={toggleSidebar} className="md:hidden p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button onClick={toggleSidebar} className="md:hidden p-2 text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 rounded-lg transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -230,7 +230,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                                             className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
                                                 ${isActive
                                                     ? "bg-primary-900 text-white shadow-lg shadow-primary-900/20"
-                                                    : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white"
+                                                    : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800 hover:text-gray-900 dark:text-white dark:hover:text-white"
                                                 } ${isSidebarCollapsed ? "justify-center" : ""}`}
                                         >
                                             <item.icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110
@@ -253,7 +253,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
             </nav>
 
             {/* Footer with Toggle & Logout */}
-            <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900 flex flex-col gap-2">
+            <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-900 flex flex-col gap-2">
                 <button
                     onClick={toggleTheme}
                     className={`flex items-center w-full px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-200 ${isSidebarCollapsed ? "justify-center" : ""}`}

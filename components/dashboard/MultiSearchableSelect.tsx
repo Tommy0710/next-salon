@@ -99,7 +99,7 @@ export default function MultiSearchableSelect({
 
                 {isOpen && (
                     <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-hidden flex flex-col">
-                        <div className="p-2 border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+                        <div className="p-2 border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50">
                             <div className="relative">
                                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input

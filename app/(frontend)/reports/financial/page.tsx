@@ -43,11 +43,11 @@ export default function FinancialReportPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 text-black">
+        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Financial Report</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Report</h1>
                         <p className="text-gray-500 text-sm">Overview of income, expenses, and profitability</p>
                         <p className="text-xs text-primary-700 mt-1">Timezone: {settings.timezone}</p>
                     </div>
@@ -59,7 +59,7 @@ export default function FinancialReportPage() {
                                 type="date"
                                 value={dateRange.startDate}
                                 onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                                className="border-none bg-gray-50 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary-900/20 py-1.5 px-3"
+                                className="border-none bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary-900/20 py-1.5 px-3"
                             />
                         </div>
                         <div className="hidden sm:block w-px bg-gray-200" />
@@ -69,7 +69,7 @@ export default function FinancialReportPage() {
                                 type="date"
                                 value={dateRange.endDate}
                                 onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                                className="border-none bg-gray-50 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary-900/20 py-1.5 px-3"
+                                className="border-none bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-primary-900/20 py-1.5 px-3"
                             />
                         </div>
                         <div className="hidden sm:block w-px bg-gray-200" />
@@ -120,7 +120,7 @@ export default function FinancialReportPage() {
                                         <p className="text-sm font-medium text-emerald-600">Collected: {formatCurrency(data.sales.totalCollected)}</p>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.sales.totalSales)}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{formatCurrency(data.sales.totalSales)}</h3>
                                 <p className="text-sm text-gray-500">{data.sales.count} Invoices</p>
                             </div>
 
@@ -134,14 +134,14 @@ export default function FinancialReportPage() {
                                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Cash Flow</p>
                                     </div>
                                 </div>
-                                <h3 className={`text-2xl font-bold mb-1 ${data.cashFlow >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+                                <h3 className={`text-2xl font-bold mb-1 ${data.cashFlow >= 0 ? 'text-gray-900 dark:text-white' : 'text-red-600'}`}>
                                     {formatCurrency(data.cashFlow)}
                                 </h3>
                                 <p className="text-sm text-gray-500">Actual Cash In - Out</p>
                             </div>
                         </div>
 
-                        <h2 className="text-lg font-bold text-gray-900 pt-4">Expense Breakdown</h2>
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white pt-4">Expense Breakdown</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Purchases */}
@@ -156,7 +156,7 @@ export default function FinancialReportPage() {
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div>
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.purchases.totalPurchases)}</h3>
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{formatCurrency(data.purchases.totalPurchases)}</h3>
                                         <p className="text-sm text-gray-500">{data.purchases.count} Orders</p>
                                     </div>
                                     <div className="text-right">
@@ -176,7 +176,7 @@ export default function FinancialReportPage() {
                                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Operational Expenses</p>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(data.expenses.totalExpenses)}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{formatCurrency(data.expenses.totalExpenses)}</h3>
                                 <p className="text-sm text-gray-500">{data.expenses.count} Records</p>
                             </div>
                         </div>

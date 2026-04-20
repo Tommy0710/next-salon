@@ -130,7 +130,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                 <div className="flex items-center gap-3">
                     <Link
                         href="/reports/activity-log"
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium text-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors shadow-sm font-medium text-sm"
                     >
                         <RefreshCcw className="w-4 h-4" />
                         Refresh
@@ -166,7 +166,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden text-black">
                 {/* Search & Filters */}
                 <ActivityLogFilters initialSearch={search} initialLimit={limit} initialTab={tab} />
 
@@ -175,16 +175,16 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                     <table className="min-w-full divide-y divide-gray-200">
                         {tab === "action" ? (
                             <>
-                                <thead className="bg-gray-50 dark:bg-slate-800/50">
+                                <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Timestamp / Event</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">User / Identity</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Resource</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Timestamp / Event</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">User / Identity</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resource</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-100 dark:bg-slate-800/50">
+                                <tbody className="bg-white divide-y divide-gray-100 dark:text-white dark:bg-slate-800/50">
                                     {logs.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
@@ -194,14 +194,14 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         </tr>
                                     ) : (
                                         logs.map((log: any) => (
-                                            <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
+                                            <tr key={log._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
                                                         <div className="p-2 bg-primary-50 rounded-lg text-primary-900">
                                                             <Clock className="w-4 h-4" />
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-bold text-gray-900">{format(new Date(log.createdAt), "MMM dd, yyyy")}</div>
+                                                            <div className="text-sm font-bold text-gray-900 dark:text-white">{format(new Date(log.createdAt), "MMM dd, yyyy")}</div>
                                                             <div className="text-[10px] text-gray-400 font-medium uppercase">{format(new Date(log.createdAt), "hh:mm:ss a")}</div>
                                                         </div>
                                                     </div>
@@ -212,8 +212,8 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                             {log.user?.name?.[0] || <UserIcon className="w-4 h-4" />}
                                                         </div>
                                                         <div>
-                                                            <div className="text-xs font-bold text-gray-900">{log.user?.name || "System"}</div>
-                                                            <div className="text-[10px] text-gray-500">{log.user?.email || "internal@system"}</div>
+                                                            <div className="text-xs font-bold dark:text-white text-gray-900 dark:text-white">{log.user?.name || "System"}</div>
+                                                            <div className="text-[10px] text-gray-500 dark:text-gray-400">{log.user?.email || "internal@system"}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -227,10 +227,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                         {log.resource}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 max-w-xs">
+                                                <td className="px-6 py-4 max-w-xs dark:text-gray-400">
                                                     <div className="flex items-start gap-2">
                                                         <Info className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                                        <p className="text-xs text-gray-600" title={log.details}>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400" title={log.details}>
                                                             {log.details || "No additional information"}
                                                         </p>
                                                     </div>
@@ -242,14 +242,14 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                             </>
                         ) : (
                             <>
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Template</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sent Date</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Event Type</th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Details</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Template</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone Number</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sent Date</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Event Type</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
@@ -262,20 +262,20 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         </tr>
                                     ) : (
                                         logs.map((log: any) => (
-                                            <tr key={log._id} className="hover:bg-gray-50/50 transition-colors">
+                                            <tr key={log._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
                                                         <div className="p-2 bg-green-50 rounded-lg text-green-900">
                                                             <MessageSquare className="w-4 h-4" />
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-bold text-gray-900">{log.templateName || log.templateId}</div>
+                                                            <div className="text-sm font-bold text-gray-900 dark:text-white">{log.templateName || log.templateId}</div>
                                                             <div className="text-[10px] text-gray-400 font-medium">ID: {log.templateId}</div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-mono text-gray-900">{log.phone}</div>
+                                                    <div className="text-sm font-mono text-gray-900 dark:text-white">{log.phone}</div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                             <Clock className="w-4 h-4" />
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-bold text-gray-900">{format(new Date(log.sentAt), "MMM dd, yyyy")}</div>
+                                                            <div className="text-sm font-bold text-gray-900 dark:text-white">{format(new Date(log.sentAt), "MMM dd, yyyy")}</div>
                                                             <div className="text-[10px] text-gray-400 font-medium uppercase">{format(new Date(log.sentAt), "hh:mm:ss a")}</div>
                                                         </div>
                                                     </div>
@@ -302,10 +302,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                                         {log.eventType || "N/A"}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 max-w-xs">
+                                                <td className="px-6 py-4 max-w-xs dark:text-gray-400">
                                                     <div className="flex items-start gap-2">
                                                         <Info className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
-                                                        <p className="text-xs text-gray-600" title={log.errorMessage || log.trackingId}>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400" title={log.errorMessage || log.trackingId}>
                                                             {log.errorMessage || `Tracking: ${log.trackingId}`}
                                                         </p>
                                                     </div>
@@ -318,14 +318,14 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                         )}
                     </table>
                 </div>
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
-                        Showing <span className="text-gray-900">{logs.length}</span> of <span className="text-gray-900">{total}</span> records
+                        Showing <span className="text-gray-900 dark:text-white">{logs.length}</span> of <span className="text-gray-900 dark:text-white">{total}</span> records
                     </div>
                     <div className="flex items-center gap-2">
                         <Link
                             href={{ query: { ...sParams, page: (page - 1).toString(), limit: limit.toString(), tab } }}
-                            className={`p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-all ${page <= 1 ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                            className={`p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all ${page <= 1 ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </Link>
@@ -355,7 +355,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
 
                         <Link
                             href={{ query: { ...sParams, page: (page + 1).toString(), limit: limit.toString(), tab } }}
-                            className={`p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-all ${page >= totalPages ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                            className={`p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all ${page >= totalPages ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
                             <ChevronRight className="w-4 h-4" />
                         </Link>

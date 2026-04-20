@@ -522,7 +522,7 @@ export default function AppointmentsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col h-screen overflow-hidden">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col h-screen overflow-hidden">
             <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
@@ -581,7 +581,7 @@ export default function AppointmentsPage() {
                     ) : (
                         <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white">
                             {/* List View Filters */}
-                            <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50 dark:bg-slate-950/50">
+                            <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50">
                                 <div className="relative w-full md:w-96">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input
@@ -618,7 +618,7 @@ export default function AppointmentsPage() {
 
                             <div className="flex-1 overflow-auto text-black dark:text-white">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
-                                    <thead className="bg-gray-50 dark:bg-slate-900/50">
+                                    <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-colors" onClick={() => { setSortBy('appointment'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
                                                 <div className="flex items-center gap-2">
@@ -660,7 +660,7 @@ export default function AppointmentsPage() {
                                             </tr>
                                         ) : (
                                             appointments.map((apt) => (
-                                                <tr key={apt._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                                <tr key={apt._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800/50 transition-colors">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-3">
                                                             <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
@@ -814,7 +814,7 @@ export default function AppointmentsPage() {
                             </div>
 
                             {/* List View Pagination */}
-                            <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+                            <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
                                 <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                                     Showing <span className="text-gray-900 dark:text-white">{appointments.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> appointments
                                 </div>
@@ -836,7 +836,7 @@ export default function AppointmentsPage() {
                                     <button
                                         onClick={() => page > 1 && setPage(page - 1)}
                                         disabled={page <= 1}
-                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     >
                                         <ChevronLeft className="w-4 h-4" />
                                     </button>
@@ -869,7 +869,7 @@ export default function AppointmentsPage() {
                                     <button
                                         onClick={() => page < pagination.pages && setPage(page + 1)}
                                         disabled={page >= pagination.pages}
-                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     >
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
@@ -948,7 +948,7 @@ export default function AppointmentsPage() {
                     />
 
                     <div className="mt-6">
-                        <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-3 flex items-center gap-2">
                             <Clock className="w-4 h-4 text-primary-900 dark:text-primary-400" />
                             Select Available Time Slot
                             {formData.date && loadingSlots && (
@@ -958,7 +958,7 @@ export default function AppointmentsPage() {
 
                         {formData.date ? (
                             availableSlots.length > 0 ? (
-                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl max-h-48 overflow-y-auto shadow-inner">
+                                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl max-h-48 overflow-y-auto shadow-inner">
                                     {availableSlots.map((slot, idx) => (
                                         <button
                                             key={idx}
@@ -974,13 +974,13 @@ export default function AppointmentsPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                     {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
+                            <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                 <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                 Please select date to view availability
                             </div>
@@ -1032,7 +1032,7 @@ export default function AppointmentsPage() {
                     </div>
 
                     <div className="flex justify-end space-x-3 mt-6">
-                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800" disabled={isSubmitting}>Cancel</button>
+                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800" disabled={isSubmitting}>Cancel</button>
                         <FormButton type="submit" loading={isSubmitting}>
                             {editingAppointment ? "Update Appointment" : "Book Appointment"}
                         </FormButton>
@@ -1056,7 +1056,7 @@ export default function AppointmentsPage() {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-2">Tên Khách Hàng <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={newCustomerName}
@@ -1066,7 +1066,7 @@ export default function AppointmentsPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
                                 <input
                                     type="tel"
                                     value={newCustomerPhone}
@@ -1082,7 +1082,7 @@ export default function AppointmentsPage() {
                             <button
                                 type="button"
                                 onClick={() => setIsAddCustomerModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                                className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-slate-800"
                                 disabled={isSubmittingCustomer}
                             >
                                 Hủy
@@ -1138,7 +1138,7 @@ export default function AppointmentsPage() {
                             {/* Khách hàng */}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Khách hàng</label>
-                                <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
                                     <p className="font-medium text-gray-900 dark:text-white">{selectedAppointment.customer.name}</p>
                                     {selectedAppointment.customer.phone && <p className="text-sm text-gray-600 dark:text-gray-400">{selectedAppointment.customer.phone}</p>}
                                 </div>
@@ -1148,7 +1148,7 @@ export default function AppointmentsPage() {
                             {selectedAppointment.staff && (
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Staff</label>
-                                    <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                    <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
                                         <p className="font-medium text-gray-900 dark:text-white">{selectedAppointment.staff.name}</p>
                                     </div>
                                 </div>
@@ -1159,7 +1159,7 @@ export default function AppointmentsPage() {
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Dịch vụ</label>
                                 <div className="space-y-2">
                                     {selectedAppointment.services.map((service, idx) => (
-                                        <div key={idx} className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg flex justify-between items-center border border-transparent dark:border-slate-700">
+                                        <div key={idx} className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 p-3 rounded-lg flex justify-between items-center border border-transparent dark:border-slate-700">
                                             <div>
                                                 <p className="font-medium text-gray-900 dark:text-white">{service.name}</p>
                                                 <p className="text-sm text-gray-600 dark:text-gray-400">{service.duration} phút</p>
@@ -1212,7 +1212,7 @@ export default function AppointmentsPage() {
                             {selectedAppointment.notes && (
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ghi chú</label>
-                                    <div className="bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+                                    <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
                                         <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{selectedAppointment.notes}</p>
                                     </div>
                                 </div>

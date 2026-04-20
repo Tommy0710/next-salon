@@ -162,7 +162,7 @@ export default function PrintInvoicePage() {
                 <button
                     disabled={currentStatus !== 'pending' || actionLoading}
                     onClick={() => router.push(`/pos?edit=${id}`)}
-                    className={`flex items-center gap-2 text-sm transition-colors ${currentStatus !== 'pending' ? 'text-gray-300 cursor-not-allowed hidden' : 'text-gray-500 hover:text-gray-900'}`}
+                    className={`flex items-center gap-2 text-sm transition-colors ${currentStatus !== 'pending' ? 'text-gray-300 cursor-not-allowed hidden' : 'text-gray-500 hover:text-gray-900 dark:text-white'}`}
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Chỉnh sửa hóa đơn</span>
@@ -187,7 +187,7 @@ export default function PrintInvoicePage() {
                     <FormButton
                         onClick={handlePrint}
                         icon={<Printer className="w-4 h-4" />}
-                        className="w-full sm:w-auto justify-center gap-2 rounded-xl px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50"
+                        className="w-full sm:w-auto justify-center gap-2 rounded-xl px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700"
                     >
                         In biên lai
                     </FormButton>
@@ -281,7 +281,7 @@ export default function PrintInvoicePage() {
                                 </td>
 
                                 {/* Total */}
-                                <td className="py-3 text-right font-semibold text-gray-900">
+                                <td className="py-3 text-right font-semibold text-gray-900 dark:text-white">
                                     {formatCurrency(item.total)}
                                 </td>
 
@@ -325,7 +325,7 @@ export default function PrintInvoicePage() {
                 {/* Footer Section */}
                 <div className="mt-10 text-center space-y-4">
                     <div className="flex flex-col items-center gap-1">
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest">Phương thức thanh toán</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest">Phương thức thanh toán</p>
                         <p className="font-bold text-sm bg-gray-100 px-3 py-1 rounded-full uppercase">{invoice.paymentMethod || 'Tiền mặt'}</p>
                     </div>
 
@@ -347,7 +347,7 @@ export default function PrintInvoicePage() {
                     <div className="pt-2 relative">
                         <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div>
                         <Scissors className="w-4 h-4 text-gray-300 absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-1" />
-                        <p className="text-[11px] font-bold text-gray-900 mt-4 leading-relaxed">
+                        <p className="text-[11px] font-bold text-gray-900 dark:text-white mt-4 leading-relaxed">
                             CẢM ƠN BẠN ĐÃ CHỌN {settings?.storeName || "CHÚNG TÔI"}!<br />
                             HẸN GẶP LẠI.
                         </p>

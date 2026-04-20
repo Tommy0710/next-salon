@@ -110,10 +110,10 @@ export default function PurchasesPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 text-black">
+        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Purchase Orders</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Purchase Orders</h1>
                     <p className="text-gray-500 text-sm">Manage supplier purchases and stock intake</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -129,13 +129,13 @@ export default function PurchasesPage() {
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 {/* Filters */}
-                <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Search purchase # or supplier..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -159,15 +159,15 @@ export default function PurchasesPage() {
 
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Purchase #</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Supplier</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Purchase #</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Payment</th>
+                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -186,9 +186,9 @@ export default function PurchasesPage() {
                                 </tr>
                             ) : (
                                 purchases.map((purchase) => (
-                                    <tr key={purchase._id} className="hover:bg-gray-50/50 transition-colors">
+                                    <tr key={purchase._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm font-bold text-gray-900">{purchase.purchaseNumber}</span>
+                                            <span className="text-sm font-bold text-gray-900 dark:text-white">{purchase.purchaseNumber}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="text-sm font-medium text-gray-700">{purchase.supplier?.name || "Unknown"}</span>
@@ -200,7 +200,7 @@ export default function PurchasesPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm font-bold text-gray-900">{settings.symbol}{purchase.totalAmount.toFixed(2)}</span>
+                                            <span className="text-sm font-bold text-gray-900 dark:text-white">{settings.symbol}{purchase.totalAmount.toFixed(2)}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${purchase.status === 'received' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -230,7 +230,7 @@ export default function PurchasesPage() {
                                                     <div className="absolute right-0 mt-8 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
                                                         <Link
                                                             href={`/purchases/${purchase._id}`}
-                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
                                                         >
                                                             <Eye className="w-4 h-4 text-primary-600" />
                                                             View Details
@@ -242,7 +242,7 @@ export default function PurchasesPage() {
                                                                     setShowDepositModal(true);
                                                                     setActiveDropdown(null);
                                                                 }}
-                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
                                                             >
                                                                 <Wallet className="w-4 h-4 text-green-600" />
                                                                 Add Deposit
@@ -267,15 +267,15 @@ export default function PurchasesPage() {
                 </div>
 
                 {/* Pagination - Reuse logic from other pages */}
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
-                        Showing <span className="text-gray-900">{purchases.length}</span> of <span className="text-gray-900">{pagination.total}</span> purchases
+                        Showing <span className="text-gray-900 dark:text-white">{purchases.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> purchases
                     </div>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => page > 1 && setPage(page - 1)}
                             disabled={page <= 1}
-                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -283,7 +283,7 @@ export default function PurchasesPage() {
                         <button
                             onClick={() => page < pagination.pages && setPage(page + 1)}
                             disabled={page >= pagination.pages}
-                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>
@@ -307,9 +307,9 @@ export default function PurchasesPage() {
 
                         <div className="p-6 space-y-6">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <div className="p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-100">
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
-                                    <p className="text-lg font-black text-gray-900">{settings.symbol}{selectedPurchase.totalAmount.toFixed(2)}</p>
+                                    <p className="text-lg font-black text-gray-900 dark:text-white">{settings.symbol}{selectedPurchase.totalAmount.toFixed(2)}</p>
                                 </div>
                                 <div className="p-3 bg-red-50 rounded-xl border border-red-100">
                                     <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Due Amount</p>
@@ -327,7 +327,7 @@ export default function PurchasesPage() {
                                             value={depositAmount}
                                             onChange={(e) => setDepositAmount(e.target.value)}
                                             placeholder="0.00"
-                                            className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-bold text-lg"
+                                            className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-bold text-lg"
                                         />
                                     </div>
                                 </div>
@@ -337,7 +337,7 @@ export default function PurchasesPage() {
                                     <select
                                         value={paymentMethod}
                                         onChange={(e) => setPaymentMethod(e.target.value)}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-semibold text-gray-700"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all font-semibold text-gray-700"
                                     >
                                         <option value="Cash">Cash</option>
                                         <option value="Card">Bank Transfer / Card</option>
@@ -348,7 +348,7 @@ export default function PurchasesPage() {
                             </div>
                         </div>
 
-                        <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+                        <div className="p-6 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-100 flex gap-3">
                             <button
                                 onClick={() => setShowDepositModal(false)}
                                 className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-white transition-all"

@@ -121,12 +121,12 @@ export default function SuppliersPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Supplier Management</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Supplier Management</h1>
                         <p className="text-sm text-gray-500">Manage your product suppliers and vendors</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -143,15 +143,15 @@ export default function SuppliersPage() {
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden text-black">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden text-black">
                     {/* Filters Bar */}
-                    <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-gray-700/50">
                         <div className="relative w-full md:w-96">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search by name, email or phone..."
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:text-white dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 transition-all text-sm"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
@@ -168,13 +168,13 @@ export default function SuppliersPage() {
 
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Supplier</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Info</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact Info</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Address</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
@@ -193,14 +193,14 @@ export default function SuppliersPage() {
                                     </tr>
                                 ) : (
                                     suppliers.map((supplier) => (
-                                        <tr key={supplier._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <tr key={supplier._id} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-orange-50 rounded-lg">
                                                         <Truck className="w-4 h-4 text-orange-600" />
                                                     </div>
                                                     <div>
-                                                        <span className="text-sm font-bold text-gray-900">{supplier.name}</span>
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{supplier.name}</span>
                                                         <div className="text-[10px] text-gray-400 font-medium uppercase">{supplier.contactPerson || "N/A"}</div>
                                                     </div>
                                                 </div>
@@ -236,7 +236,7 @@ export default function SuppliersPage() {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${supplier.status === "active"
                                                     ? "bg-green-50 text-green-700 border-green-200"
-                                                    : "bg-gray-50 text-gray-600 border-gray-200"
+                                                    : "bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-gray-600 border-gray-200"
                                                     }`}>
                                                     {supplier.status}
                                                 </span>
@@ -289,15 +289,15 @@ export default function SuppliersPage() {
                     </div>
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-500 font-medium">
-                            Showing <span className="text-gray-900">{suppliers.length}</span> of <span className="text-gray-900">{pagination.total}</span> suppliers
+                            Showing <span className="text-gray-900 dark:text-white">{suppliers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> suppliers
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => page > 1 && setPage(page - 1)}
                                 disabled={page <= 1}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -330,7 +330,7 @@ export default function SuppliersPage() {
                             <button
                                 onClick={() => page < pagination.pages && setPage(page + 1)}
                                 disabled={page >= pagination.pages}
-                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
@@ -354,7 +354,7 @@ export default function SuppliersPage() {
                         options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]}
                     />
                     <div className="flex justify-end space-x-3 mt-6">
-                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors">Cancel</button>
+                        <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 font-medium transition-colors">Cancel</button>
                         <FormButton type="submit" loading={submitting}>
                             {editingSupplier ? "Update Supplier" : "Create Supplier"}
                         </FormButton>

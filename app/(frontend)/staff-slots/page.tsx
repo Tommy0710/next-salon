@@ -261,22 +261,22 @@ export default function StaffSlotsPage() {
 
     return (
         <PermissionGate resource="staffSlots" action="view">
-            <div className="min-h-screen bg-gray-50 p-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
                 <div className="max-w-6xl mx-auto space-y-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Staff Availability Slots</h1>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Availability Slots</h1>
                             <p className="text-sm text-gray-500">Create and manage available time slots for staff members</p>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                    <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
                         <div className="flex flex-col space-y-4">
                             <div className="flex border-b border-gray-100">
                                 <button
                                     onClick={() => setCreationType('date')}
                                     className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${creationType === 'date'
-                                        ? 'border-primary-900 text-primary-900'
+                                        ? 'border-primary-900 text-primary-900 dark:text-white'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                                 >
                                     Date-wise Slots
@@ -284,7 +284,7 @@ export default function StaffSlotsPage() {
                                 <button
                                     onClick={() => setCreationType('day')}
                                     className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${creationType === 'day'
-                                        ? 'border-primary-900 text-primary-900'
+                                        ? 'border-primary-900 text-primary-900 dark:text-white'
                                         : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                                 >
                                     Day-wise Slots (Recurring)
@@ -335,10 +335,10 @@ export default function StaffSlotsPage() {
                     </div>
 
                     {(selectedStaff && (creationType === 'date' ? selectedDate : selectedDay)) && (
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900">Time Slots</h2>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Time Slots</h2>
                                     <p className="text-sm text-gray-500">
                                         {creationType === 'date'
                                             ? format(new Date(selectedDate), "EEEE, MMMM d, yyyy")
@@ -380,13 +380,13 @@ export default function StaffSlotsPage() {
                                                 key={index}
                                                 className={`p-3 border rounded-lg transition-all ${slot.isAvailable
                                                     ? 'border-green-200 bg-green-50/50'
-                                                    : 'border-gray-200 bg-gray-50 opacity-60'
+                                                    : 'border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 opacity-60'
                                                     }`}
                                             >
                                                 <div className="flex items-start justify-between mb-2">
                                                     <div className="flex items-center gap-2">
                                                         <Clock className={`w-4 h-4 ${slot.isAvailable ? 'text-green-600' : 'text-gray-400'}`} />
-                                                        <span className="font-bold text-gray-900">
+                                                        <span className="font-bold text-gray-900 dark:text-white">
                                                             {slot.startTime} - {slot.endTime}
                                                         </span>
                                                     </div>
@@ -432,7 +432,7 @@ export default function StaffSlotsPage() {
                     )}
 
                     {!selectedStaff && (
-                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
                             <div className="text-center py-8 text-gray-500">
                                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                 <p>Please select a staff member and date/day to manage availability slots</p>
@@ -491,7 +491,7 @@ export default function StaffSlotsPage() {
                             <div className="flex justify-end gap-3 pt-4">
                                 <button
                                     onClick={closeModal}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700"
                                 >
                                     Cancel
                                 </button>
