@@ -91,18 +91,24 @@ export async function GET(request: NextRequest) {
         }
         // lọc Source
         if (source === 'appointment') {
-            query.appointment = { $exists: true, $ne: null }; // Chỉ lấy đơn có link với lịch hẹn
+            query.appointment = { $exists: true, $ne: null };
         } else if (source === 'pos') {
-            query.appointment = { $exists: false }; // Hoặc { $eq: null } tùy vào DB của bạn (Chỉ lấy đơn tạo thẳng từ POS)
+            query.appointment = { $exists: false };
         }
         if (search) {
             // Search in invoiceNumber
             const searchQueries: any[] = [
-                { invoiceNumber: { $regex: search, $options: "i" } }
+                { invoiceNumber: { $regex: search, $options: "i" } },
+                { bookingCode: { $regex: search, $options: "i" } },
             ];
 
             // Or search by customer name if we can find customer IDs
-            const customers = await Customer.find({ name: { $regex: search, $options: "i" } }).select('_id');
+            const customers = await Customer.find({
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { phone: { $regex: search, $options: "i" } },
+                ]
+            }).select('_id');
             if (customers.length > 0) {
                 searchQueries.push({ customer: { $in: customers.map(c => c._id) } });
             }

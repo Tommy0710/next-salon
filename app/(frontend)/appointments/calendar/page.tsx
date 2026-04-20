@@ -239,7 +239,8 @@ export default function CalendarPage() {
                 endTime,
                 totalDuration,
                 totalAmount,
-                discount: discountAmount,
+                discount: discount,
+                discountAmount: discountAmount,
                 commission,
                 status: formData.status,
                 notes: formData.notes
@@ -258,7 +259,9 @@ export default function CalendarPage() {
             const data = await res.json();
             if (data.success) {
                 const updatedApt = data.data; // Lấy dữ liệu trả về từ Backend
-
+                console.log("serviceIds:", formData.serviceIds);
+                console.log("services:", services);
+                console.log("selectedServices:", selectedServices);
                 // 👉 GỬI ZALO NẾU TRẠNG THÁI LÀ CONFIRMED HOẶC CANCELLED
                 if (updatedApt.status === 'confirmed' || updatedApt.status === 'cancelled') {
 

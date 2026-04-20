@@ -190,11 +190,8 @@ export async function POST(request: NextRequest) {
         const totalDuration = body.services.reduce((acc: number, s: any) => acc + (s.duration || 0), 0);
         const discount = parseFloat(body.discount) || 0;
         const tax = subtotal * (taxRate / 100);
-        // const discountValue = Number(body.discount) || 0;
-        // const discountAmount = subtotal * (discountValue / 100);
         const discountValue = Number(body.discount) || 0;
         const discountAmount = subtotal * (discountValue / 100);
-        // const totalAmount = Math.max(0, subtotal - discountAmount);
         const totalAmount = Math.max(0, subtotal - discountAmount + tax);
         const bookingCode = body.bookingCode || `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
@@ -262,7 +259,6 @@ export async function POST(request: NextRequest) {
                 if (servicesArray.length === 0) {
                     console.warn('⚠️ No services found for appointment', appointment._id);
                 }
-
                 const invoiceData = {
                     invoiceNumber,
                     customer: appointment.customer,

@@ -187,7 +187,7 @@ export default function AppointmentsPage() {
 
     useEffect(() => {
         fetchAppointments();
-    }, [page, statusFilter, itemsPerPage, sortBy, sortOrder]); // Re-fetch on filter change or items per page change
+    }, [page, statusFilter, itemsPerPage, sortBy, sortOrder]);
 
     // Debounce search
     useEffect(() => {
@@ -347,6 +347,7 @@ export default function AppointmentsPage() {
                 totalDuration,
                 totalAmount,
                 discount,
+                discountAmount,
                 commission,
                 status: formData.status,
                 notes: formData.notes
@@ -1180,7 +1181,7 @@ export default function AppointmentsPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Giảm giá</label>
-                                    <p className="text-sm text-gray-900 dark:text-white">{settings.symbol}{(selectedAppointment as any).discount?.toFixed(2) || '0.00'}</p>
+                                    <p className="text-sm text-gray-900 dark:text-white">{(selectedAppointment as any).discount || '0'} % | {formatCurrency((selectedAppointment as any).discountAmount || '0.00')}</p>
                                 </div>
                             </div>
 

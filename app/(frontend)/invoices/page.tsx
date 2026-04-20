@@ -60,6 +60,7 @@ export default function InvoicesPage() {
     const { settings } = useSettings();
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sourceFilter, setSourceFilter] = useState("all");
@@ -83,12 +84,12 @@ export default function InvoicesPage() {
     const [submitting, setSubmitting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const fetchInvoices = useCallback(async (page = 1, searchQuery = search, status = statusFilter, source = sourceFilter) => {
+    const fetchInvoices = useCallback(async (page = 1, searchQuery = search, status = statusFilter, source = sourceFilter, limit = itemsPerPage) => {
         setLoading(true);
         try {
             const params = new URLSearchParams({
                 page: page.toString(),
-                limit: "10",
+                limit: limit.toString(),
                 search: searchQuery,
                 status: status,
                 source: source
@@ -104,7 +105,7 @@ export default function InvoicesPage() {
         } finally {
             setLoading(false);
         }
-    }, [search, statusFilter, sourceFilter]);
+    }, [search, statusFilter, sourceFilter, itemsPerPage]);
 
     useEffect(() => {
         const delaySearch = setTimeout(() => {
@@ -122,7 +123,6 @@ export default function InvoicesPage() {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [activeDropdown]);
-
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= pagination.pages) {
             fetchInvoices(newPage);
@@ -147,6 +147,7 @@ export default function InvoicesPage() {
         setEditFormData({ status: inv.status, notes: inv.notes || "" });
         setIsEditModalOpen(true);
     };
+
 
     const handleEditSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -458,6 +459,21 @@ export default function InvoicesPage() {
                 <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
                     <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                         Showing <span className="text-gray-900 dark:text-white">{invoices.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> invoices
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <select
+                            value={itemsPerPage}
+                            onChange={(e) => {
+                                const newLimit = parseInt(e.target.value);
+                                setItemsPerPage(newLimit);
+                                fetchInvoices(1, search, statusFilter, sourceFilter);
+                            }}
+                            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
+                        >
+                            <option value="10">10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
                     </div>
                     <div className="flex items-center gap-2">
                         <button
