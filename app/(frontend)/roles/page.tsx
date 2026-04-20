@@ -140,7 +140,7 @@ export default function RolesPage() {
                                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-100">
+                            <tbody className="bg-white dark:bg-slate-900 dark:border-gray-700 divide-y divide-gray-100">
                                 {loading && roles.length === 0 ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">

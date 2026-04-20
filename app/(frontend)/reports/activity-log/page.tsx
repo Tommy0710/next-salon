@@ -184,7 +184,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-100 dark:text-white dark:bg-slate-800/50">
+                                <tbody className="bg-white dark:bg-slate-900 dark:border-gray-700 divide-y divide-gray-100 dark:text-white dark:bg-slate-800/50">
                                     {logs.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
@@ -252,7 +252,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-100">
+                                <tbody className="bg-white dark:bg-slate-900 dark:border-gray-700 divide-y divide-gray-100">
                                     {logs.length === 0 ? (
                                         <tr>
                                             <td colSpan={6} className="px-6 py-12 text-center text-gray-500">

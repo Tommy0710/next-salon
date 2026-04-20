@@ -214,7 +214,7 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
     };
 
     return (
-        <div className="h-[800px] bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col gap-4">
+        <div className="h-full bg-white dark:bg-slate-900 dark:border-gray-700 rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between mb-2">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">{view}ly Schedule</h2>

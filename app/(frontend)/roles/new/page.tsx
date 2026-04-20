@@ -104,7 +104,7 @@ export default function NewRolePage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Shield className="w-5 h-5 text-primary-900" />
                         Role Details

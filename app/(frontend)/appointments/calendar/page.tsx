@@ -201,7 +201,8 @@ export default function CalendarPage() {
             const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
             const subtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
 
-            const discountAmount = subtotal * ((formData.discount || 0) / 100);
+            const discount = Number(formData.discount) || 0;
+            const discountAmount = subtotal * (discount / 100);
             const tax = subtotal * (settings.taxRate / 100);
             const totalAmount = (subtotal + tax) - discountAmount;
 

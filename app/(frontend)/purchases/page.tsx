@@ -127,7 +127,7 @@ export default function PurchasesPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 dark:bg-slate-900 dark:border-gray-700 shadow-sm overflow-hidden">
                 {/* Filters */}
                 <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                     <div className="relative w-full md:w-96">
@@ -170,7 +170,7 @@ export default function PurchasesPage() {
                                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-100">
+                        <tbody className="bg-white dark:bg-slate-900 dark:border-gray-700 divide-y divide-gray-100">
                             {loading && purchases.length === 0 ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">

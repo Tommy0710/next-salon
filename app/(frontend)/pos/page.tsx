@@ -773,7 +773,7 @@ export default function POSPage() {
                                                 <button onClick={() => removeFromCart(item._id, item.type)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded ml-0.5"><Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" /></button>
                                             </div>
                                         </div>
-                                        {/* {item.type === 'Service' && (
+                                        {item.type === 'Service' && (
                                             <div className="pl-8 space-y-1.5">
                                                 <SearchableSelect
                                                     placeholder="Phân công nhân viên"
@@ -812,7 +812,7 @@ export default function POSPage() {
                                                     </div>
                                                 )}
                                             </div>
-                                        )} */}
+                                        )}
                                     </div>
                                 ))
                             )}

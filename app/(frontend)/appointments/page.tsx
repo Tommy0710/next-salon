@@ -307,12 +307,13 @@ export default function AppointmentsPage() {
             const subtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
 
             const discount = Number(formData.discount) || 0;
+            const discountAmount = subtotal * (discount / 100);
             const tax = subtotal * (settings.taxRate / 100);
-            const totalAmount = (subtotal + tax) - discount;
+            const totalAmount = (subtotal + tax) - discountAmount;
 
             // Calculate commission
-            // const staff = staffList.find(s => s._id === formData.staffId);
-            // const staffRate = staff?.commissionRate || 0;
+            const staff = staffList.find(s => s._id === formData.staffId);
+            const staffRate = staff?.commissionRate || 0;
 
             let commission = 0;
             selectedServices.forEach(svc => {
@@ -628,6 +629,7 @@ export default function AppointmentsPage() {
                                             </th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Booking Code</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Services</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
@@ -648,12 +650,12 @@ export default function AppointmentsPage() {
                                         {loading && appointments.length === 0 ? (
                                             Array.from({ length: 5 }).map((_, i) => (
                                                 <tr key={i} className="animate-pulse">
-                                                    <td colSpan={9} className="px-6 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded"></div></td>
+                                                    <td colSpan={10} className="px-6 py-4"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded"></div></td>
                                                 </tr>
                                             ))
                                         ) : appointments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={9} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
+                                                <td colSpan={10} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                                     <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                     <p>No appointments found</p>
                                                 </td>
@@ -681,12 +683,12 @@ export default function AppointmentsPage() {
                                                         <div className="text-sm font-semibold text-gray-900 dark:text-white">{apt.customer?.name}</div>
                                                         {apt.customer?.phone && <div className="text-[10px] text-gray-500 dark:text-gray-400">{apt.customer.phone}</div>}
                                                     </td>
-                                                    {/* <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center gap-2 text-sm text-gray-700">
                                                             <User className="w-3.5 h-3.5 text-gray-400" />
-                                                            {apt.staff.name}
+                                                            {apt.staff?.name}
                                                         </div>
-                                                    </td> */}
+                                                    </td>
                                                     <td className="px-6 py-4">
                                                         <div className="flex flex-col gap-2 max-w-xs">
                                                             <div className="flex flex-wrap gap-1 overflow-hidden">

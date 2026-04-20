@@ -154,7 +154,7 @@ export default function PrintInvoicePage() {
     const currencySymbol = getCurrencySymbol(settings?.currency || 'USD');
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 md:p-8 print:p-0 print:bg-white text-black">
+        <div className="min-h-screen bg-gray-100 py-4 md:p-8 print:p-0 print:bg-white dark:bg-slate-900 text-black">
             {/* Header / Controls */}
             <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 print:hidden px-2">
 
@@ -200,10 +200,10 @@ export default function PrintInvoicePage() {
             {/* Thermal Receipt Content */}
             <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0">
                 {/* Store Header */}
-                <div className="text-center mb-6">
+                <div className="text-center mb-4">
                     {settings?.logoUrl && (
                         <div className="mb-4">
-                            <img src={settings.logoUrl} alt="Store Logo" className="w-40 h-auto mx-auto object-contain" />
+                            <img src={settings.logoUrl} alt="Store Logo" className="w-32 h-auto mx-auto object-contain" />
                         </div>
                     )}
                     {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1> */}
@@ -215,7 +215,7 @@ export default function PrintInvoicePage() {
                 </div>
 
                 {/* Info Block */}
-                <div className="space-y-1 mb-6 text-[12px]">
+                <div className="space-y-1 mb-4 text-[12px]">
                     <div className="flex justify-between">
                         <span className="text-gray-500">Số biên lai:</span>
                         <span className="font-bold">{invoice.invoiceNumber}</span>
@@ -246,45 +246,45 @@ export default function PrintInvoicePage() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-gray-200 text-[11px] text-gray-500 uppercase">
-                            <th className="py-2 text-left font-semibold">Dịch vụ</th>
                             <th className="py-2 text-center font-semibold w-[50px]">SL</th>
-                            <th className="py-2 text-right font-semibold w-[90px]">Giá</th>
-                            <th className="py-2 text-right font-semibold w-[100px]">Tổng</th>
+                            <th className="py-2 text-right font-semibold w-[80px]">Giá</th>
+                            <th className="py-2 text-right font-semibold w-[90px]">Tổng</th>
                         </tr>
                     </thead>
 
                     <tbody className="divide-y divide-gray-100">
                         {invoice.items.map((item: any, idx: number) => (
                             <tr key={idx} className="align-top">
+                                <td colSpan={3} className="py-2">
 
-                                {/* Tên + discount */}
-                                <td className="py-3 pr-2">
-                                    <p className="text-xs text-gray-800 leading-snug">
+                                    {/* Row compact (3 cột) */}
+                                    <div className="flex justify-between items-center">
+                                        <span className="w-[50px] text-center text-gray-700">
+                                            {item.quantity}
+                                        </span>
+
+                                        <span className="w-[80px] text-right text-gray-600">
+                                            {formatCurrency(item.price)}
+                                        </span>
+
+                                        <span className="w-[90px] text-right font-semibold text-gray-900">
+                                            {formatCurrency(item.total)}
+                                        </span>
+                                    </div>
+
+                                    {/* Service name xuống dưới */}
+                                    <div className="mt-1 text-xs text-gray-800 leading-snug">
                                         {item.name}
-                                    </p>
+                                    </div>
 
+                                    {/* Discount nếu có */}
                                     {item.discount > 0 && (
-                                        <p className="text-[11px] text-red-500 mt-1">
+                                        <div className="text-[11px] text-red-500">
                                             -{formatCurrency(item.discount)}
-                                        </p>
+                                        </div>
                                     )}
-                                </td>
 
-                                {/* Quantity */}
-                                <td className="py-3 text-center text-gray-700">
-                                    {item.quantity}
                                 </td>
-
-                                {/* Price */}
-                                <td className="py-3 text-right text-gray-600">
-                                    {formatCurrency(item.price)}
-                                </td>
-
-                                {/* Total */}
-                                <td className="py-3 text-right font-semibold text-gray-900 dark:text-white">
-                                    {formatCurrency(item.total)}
-                                </td>
-
                             </tr>
                         ))}
                     </tbody>
@@ -306,7 +306,7 @@ export default function PrintInvoicePage() {
                             <span>-{formatCurrency(invoice.discount)}</span>
                         </div>
                     )}
-                    <div className="flex justify-between pt-2 border-t-2 border-double border-gray-900 text-lg font-black uppercase">
+                    <div className="flex justify-between text-md font-black uppercase">
                         <span>Tổng cộng</span>
                         <span>{formatCurrency(invoice.totalAmount)}</span>
                     </div>
@@ -323,16 +323,16 @@ export default function PrintInvoicePage() {
                 </div>
 
                 {/* Footer Section */}
-                <div className="mt-10 text-center space-y-4">
-                    <div className="flex flex-col items-center gap-1">
+                <div className="mt-4 text-center space-y-4">
+                    {/* <div className="flex flex-col items-center gap-1">
                         <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest">Phương thức thanh toán</p>
                         <p className="font-bold text-sm bg-gray-100 px-3 py-1 rounded-full uppercase">{invoice.paymentMethod || 'Tiền mặt'}</p>
-                    </div>
+                    </div> */}
 
                     {/* THÊM KHỐI NÀY ĐỂ HIỂN THỊ MÃ QR */}
                     {showQr && qrSource && (
-                        <div className="mt-4 flex flex-col items-center">
-                            <p className="text-[12px] font-black uppercase mb-2">Quét mã để thanh toán</p>
+                        <div className="mb-0 flex flex-col items-center">
+                            {/* <p className="text-[12px] font-black uppercase mb-2">Quét mã để thanh toán</p> */}
                             <img src={qrSource} alt="QR Code Payment" className="w-40 h-40 object-contain p-1 border border-gray-200 rounded-lg" />
                             {bankDetailsSource && (
                                 <div className="text-[10px] text-center mt-2 space-y-0.5">
@@ -344,15 +344,15 @@ export default function PrintInvoicePage() {
                         </div>
                     )}
 
-                    <div className="pt-2 relative">
+                    {/* <div className="pt-2 relative">
                         <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div>
                         <Scissors className="w-4 h-4 text-gray-300 absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-1" />
                         <p className="text-[11px] font-bold text-gray-900 dark:text-white mt-4 leading-relaxed">
                             CẢM ƠN BẠN ĐÃ CHỌN {settings?.storeName || "CHÚNG TÔI"}!<br />
                             HẸN GẶP LẠI.
                         </p>
-                        {/* <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p> */}
-                    </div>
+                        <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p>
+                    </div> */}
 
                     {/* <div className="pt-4 flex justify-center opacity-20">
                         <div className="flex gap-px h-8 bg-gray-900 w-full max-w-[200px]"></div>
