@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Calendar, Clock, CreditCard, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
+import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Calendar, Clock, CreditCard, User, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { getAllCurrencies } from "@/lib/currency";
@@ -55,6 +55,8 @@ interface Settings {
         workingDays: string[];
         shift1: { start: string; end: string };
         shift2: { start: string; end: string };
+        clientsPerSession: number;
+        avgSessionDuration: number;
     };
 }
 
@@ -113,7 +115,9 @@ export default function SettingsPage() {
         bookingRules: {
             workingDays: ['1', '2', '3', '4', '5', '6', '0'],
             shift1: { start: "08:00", end: "12:00" },
-            shift2: { start: "13:00", end: "17:00" }
+            shift2: { start: "13:00", end: "17:00" },
+            clientsPerSession: 1,
+            avgSessionDuration: 60
         }
     });
     const [loading, setLoading] = useState(true);
@@ -210,10 +214,12 @@ export default function SettingsPage() {
                     })(),
                     zaloAccessToken: data.data.zaloAccessToken || '',
                     zaloRefreshToken: data.data.zaloRefreshToken || '',
-                    bookingRules: data.data.bookingRules || {
-                        workingDays: ['1', '2', '3', '4', '5', '6', '0'],
-                        shift1: { start: "08:00", end: "12:00" },
-                        shift2: { start: "13:00", end: "17:00" }
+                    bookingRules: {
+                        workingDays: data.data.bookingRules?.workingDays || ['1', '2', '3', '4', '5', '6', '0'],
+                        shift1: data.data.bookingRules?.shift1 || { start: "08:00", end: "12:00" },
+                        shift2: data.data.bookingRules?.shift2 || { start: "13:00", end: "17:00" },
+                        clientsPerSession: data.data.bookingRules?.clientsPerSession || 1,
+                        avgSessionDuration: data.data.bookingRules?.avgSessionDuration || 60
                     }
                 });
             }
@@ -561,6 +567,107 @@ export default function SettingsPage() {
                                                     })}
                                                     className="w-full px-3 py-2.5 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
                                                 />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Khách hàng mỗi phiên & Phiên trung bình */}
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                    {/* Khách hàng mỗi phiên */}
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                        <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+                                            <User className="w-4 h-4 text-primary-600" />
+                                            Khách hàng mỗi phiên
+                                        </h4>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                            Có bao nhiêu người có thể tham gia trong một thời gian duy nhất/phiên?
+                                        </p>
+                                        <div className="flex items-center gap-4">
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max="1000"
+                                                value={settings.bookingRules?.clientsPerSession || 1}
+                                                onChange={(e) => setSettings({
+                                                    ...settings,
+                                                    bookingRules: {
+                                                        ...settings.bookingRules,
+                                                        clientsPerSession: parseInt(e.target.value) || 1
+                                                    }
+                                                })}
+                                                className="flex-1 h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                                            />
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="1000"
+                                                    value={settings.bookingRules?.clientsPerSession || 1}
+                                                    onChange={(e) => {
+                                                        let val = parseInt(e.target.value) || 1;
+                                                        if (val < 1) val = 1;
+                                                        if (val > 1000) val = 1000;
+                                                        setSettings({
+                                                            ...settings,
+                                                            bookingRules: {
+                                                                ...settings.bookingRules,
+                                                                clientsPerSession: val
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="w-20 px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-bold text-center focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">người</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Phiên trung bình thời gian */}
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                        <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+                                            <Clock className="w-4 h-4 text-primary-600" />
+                                            Phiên trung bình thời gian
+                                        </h4>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                            Lựa chọn này sẽ thay đổi tối thiểu giờ phần nhỏ của thời gian chọn.
+                                        </p>
+                                        <div className="flex items-center gap-4">
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max="240"
+                                                value={settings.bookingRules?.avgSessionDuration || 60}
+                                                onChange={(e) => setSettings({
+                                                    ...settings,
+                                                    bookingRules: {
+                                                        ...settings.bookingRules,
+                                                        avgSessionDuration: parseInt(e.target.value) || 60
+                                                    }
+                                                })}
+                                                className="flex-1 h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                                            />
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="240"
+                                                    value={settings.bookingRules?.avgSessionDuration || 60}
+                                                    onChange={(e) => {
+                                                        let val = parseInt(e.target.value) || 60;
+                                                        if (val < 1) val = 1;
+                                                        if (val > 240) val = 240;
+                                                        setSettings({
+                                                            ...settings,
+                                                            bookingRules: {
+                                                                ...settings.bookingRules,
+                                                                avgSessionDuration: val
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="w-20 px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg text-sm font-bold text-center focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all shadow-sm"
+                                                />
+                                                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">phút</span>
                                             </div>
                                         </div>
                                     </div>

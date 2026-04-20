@@ -1,29 +1,75 @@
-// Ví dụ logic cho app/api/appointments/slots/route.ts
+// app/api/appointments/slots/route.ts
 import { NextResponse } from 'next/server';
 import Appointment from "@/models/Appointment";
 import Settings from "@/models/Settings";
 import { connectToDB } from "@/lib/mongodb";
 
+/**
+ * Converts a "HH:MM" time string to total minutes since midnight.
+ */
+function timeToMinutes(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
+}
+
+/**
+ * Converts total minutes since midnight back to "HH:MM" string.
+ */
+function minutesToTime(minutes: number): string {
+    const h = Math.floor(minutes / 60).toString().padStart(2, '0');
+    const m = (minutes % 60).toString().padStart(2, '0');
+    return `${h}:${m}`;
+}
+
+/**
+ * Generates all time slots for a shift given a slot duration (in minutes).
+ */
+function generateSlotsForShift(
+    shift: { start: string; end: string },
+    slotDuration: number
+): string[] {
+    if (!shift?.start || !shift?.end) return [];
+
+    const startMin = timeToMinutes(shift.start);
+    const endMin = timeToMinutes(shift.end);
+    const slots: string[] = [];
+
+    for (let current = startMin; current + slotDuration <= endMin; current += slotDuration) {
+        slots.push(minutesToTime(current));
+    }
+
+    return slots;
+}
+
 export async function GET(request: Request) {
     try {
         await connectToDB();
+
         const { searchParams } = new URL(request.url);
         const date = searchParams.get('date');
 
-        // Lấy cấu hình Booking Rules
-        const settings = await Settings.findOne() || {};
-        const bookingRules = settings.bookingRules || {
-            workingDays: ['1', '2', '3', '4', '5', '6', '0'],
-            shift1: { start: "08:00", end: "12:00" },
-            shift2: { start: "13:00", end: "17:00" }
-        };
+        // ── 1. Load Settings ────────────────────────────────────────────────
+        const settings = await Settings.findOne().lean() as any || {};
+        const bookingRules = settings?.bookingRules || {};
 
-        // Xác định thứ trong tuần của ngày được chọn
-        let dayOfWeek = "";
+        const workingDays: string[] = bookingRules.workingDays ?? ['1', '2', '3', '4', '5', '6', '0'];
+        const shift1 = bookingRules.shift1 ?? { start: "08:00", end: "12:00" };
+        const shift2 = bookingRules.shift2 ?? { start: "13:00", end: "17:00" };
+
+        // 🔑 Dynamic settings
+        const clientsPerSession: number = Math.max(1, bookingRules.clientsPerSession ?? 1);
+        const avgSessionDuration: number = Math.max(5, bookingRules.avgSessionDuration ?? 60);
+
+        // ── 2. Determine day of week ────────────────────────────────────────
+        let dayOfWeek: string;
         if (date) {
             const parts = date.split('-');
             if (parts.length === 3) {
-                const localDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                const localDate = new Date(
+                    parseInt(parts[0]),
+                    parseInt(parts[1]) - 1,
+                    parseInt(parts[2])
+                );
                 dayOfWeek = localDate.getDay().toString();
             } else {
                 dayOfWeek = new Date(date).getDay().toString();
@@ -32,35 +78,28 @@ export async function GET(request: Request) {
             dayOfWeek = new Date().getDay().toString();
         }
 
+        // ── 3. Generate all slots for the day ──────────────────────────────
         const allSlots: string[] = [];
 
-        // Kiểm tra xem ngày đó có làm việc không
-        if (bookingRules.workingDays.includes(dayOfWeek)) {
-            // Hàm sinh slot cho 1 ca làm việc
-            const generateSlotsForShift = (shift: { start: string, end: string }) => {
-                if (!shift || !shift.start || !shift.end) return;
-                const [sh, sm] = shift.start.split(':').map(Number);
-                const [eh, em] = shift.end.split(':').map(Number);
-
-                let current = new Date();
-                current.setHours(sh, sm, 0, 0);
-
-                let end = new Date();
-                end.setHours(eh, em, 0, 0);
-
-                while (current < end) {
-                    allSlots.push(current.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }));
-                    current.setMinutes(current.getMinutes() + 30); // Mỗi slot 30 phút
-                }
-            };
-
-            generateSlotsForShift(bookingRules.shift1);
-            generateSlotsForShift(bookingRules.shift2);
+        if (workingDays.includes(dayOfWeek)) {
+            allSlots.push(...generateSlotsForShift(shift1, avgSessionDuration));
+            allSlots.push(...generateSlotsForShift(shift2, avgSessionDuration));
         }
 
-        if (!date) return NextResponse.json({ success: true, data: allSlots });
+        // If no date specified, return all theoretical slots (no capacity check)
+        if (!date) {
+            return NextResponse.json({
+                success: true,
+                data: allSlots,
+                meta: {
+                    slotDurationMinutes: avgSessionDuration,
+                    clientsPerSession,
+                    totalSlots: allSlots.length,
+                }
+            });
+        }
 
-        // 2. (Tùy chọn) Tìm các lịch đã đặt trong ngày này để loại trừ
+        // ── 4. Count booked appointments per slot ──────────────────────────
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date(date);
@@ -68,17 +107,45 @@ export async function GET(request: Request) {
 
         const bookedAppointments = await Appointment.find({
             date: { $gte: startOfDay, $lte: endOfDay },
-            status: { $in: ['pending', 'confirmed'] } // Chỉ lấy các lịch chưa hủy
-        }).select('startTime');
+            status: { $in: ['pending', 'confirmed'] },
+        }).select('startTime').lean() as { startTime: string }[];
 
-        const bookedTimes = bookedAppointments.map(app => app.startTime);
+        // Build a map: startTime → count of bookings
+        const bookingCountMap: Record<string, number> = {};
+        for (const appt of bookedAppointments) {
+            const t = appt.startTime;
+            bookingCountMap[t] = (bookingCountMap[t] ?? 0) + 1;
+        }
 
-        // Lọc bỏ những giờ đã bị đặt (Nếu Spa của bạn 1 giờ chỉ nhận 1 khách)
-        const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
+        // ── 5. Filter slots by remaining capacity ──────────────────────────
+        const availableSlots = allSlots
+            .map(slot => ({
+                time: slot,
+                booked: bookingCountMap[slot] ?? 0,
+                capacity: clientsPerSession,
+                available: clientsPerSession - (bookingCountMap[slot] ?? 0),
+            }))
+            .filter(slot => slot.available > 0);
 
-        return NextResponse.json({ success: true, data: availableSlots });
+        return NextResponse.json({
+            success: true,
+            // Trả về mảng time string để backward-compatible với các component đang dùng
+            data: availableSlots.map(s => s.time),
+            // Meta để FE có thể hiển thị thêm thông tin capacity nếu muốn
+            meta: {
+                slotDurationMinutes: avgSessionDuration,
+                clientsPerSession,
+                totalSlots: allSlots.length,
+                availableSlotsCount: availableSlots.length,
+                slots: availableSlots, // Chi tiết từng slot kèm capacity
+            }
+        });
 
     } catch (error) {
-        return NextResponse.json({ success: false, error: "Lỗi server" }, { status: 500 });
+        console.error('[SLOTS API ERROR]', error);
+        return NextResponse.json(
+            { success: false, error: "Lỗi server" },
+            { status: 500 }
+        );
     }
 }

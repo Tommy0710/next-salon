@@ -22,6 +22,18 @@ const SettingsSchema = new mongoose.Schema({
         shift2: {
             start: { type: String, default: "13:00" },
             end: { type: String, default: "17:00" }
+        },
+        clientsPerSession: {
+            type: Number,
+            default: 1,
+            min: 1,
+            max: 1000
+        },
+        avgSessionDuration: {
+            type: Number,
+            default: 60,
+            min: 1,
+            max: 240
         }
     },
     phone: {

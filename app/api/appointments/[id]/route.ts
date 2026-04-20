@@ -127,118 +127,122 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             const existingInvoice = await Invoice.findOne({ appointment: id });
             if (!existingInvoice) {
                 try {
-                    const settings = await Settings.findOne();
-                    const taxRate = settings?.taxRate || 0;
-                    // Use the appointment's already calculated values instead of recalculating
+                    const invoiceSettings = await Settings.findOne();
                     const subtotal = populatedAppointment.subtotal || 0;
                     const tax = populatedAppointment.tax || 0;
                     const totalAmount = populatedAppointment.totalAmount || 0;
                     const discount = populatedAppointment.discount || 0;
                     const commission = populatedAppointment.commission || 0;
 
-                    // Ensure services array exists and has proper structure
                     const servicesArray = Array.isArray(populatedAppointment.services) ? populatedAppointment.services : [];
 
                     if (servicesArray.length === 0) {
-                        console.warn('⚠️ No services found for appointment', id);
+                        console.warn('⚠️ [Invoice] No services found for appointment', id);
                     }
 
-                    const count = await Invoice.countDocuments();
-                    const invoiceNumber = `INV-${new Date().getFullYear()}-${(count + 1).toString().padStart(5, '0')}`;
+                    // Validate items: each must have a valid item (ObjectId)
+                    const invoiceItems = servicesArray
+                        .filter((s: any) => {
+                            const itemId = s.service?._id || s.service;
+                            if (!itemId) {
+                                console.warn('⚠️ [Invoice] Skipping service with null/undefined id:', s);
+                                return false;
+                            }
+                            return true;
+                        })
+                        .map((s: any) => ({
+                            item: s.service?._id || s.service,
+                            itemModel: 'Service',
+                            name: s.name || 'Unknown Service',
+                            price: s.price || 0,
+                            quantity: 1,
+                            discount: 0,
+                            total: s.price || 0,
+                        }));
 
-                    // Get staff rate for invoice
-                    const invoiceStaff = populatedAppointment.staff ? await Staff.findById(populatedAppointment.staff._id || populatedAppointment.staff) : null;
+                    // Get staff commission rate
+                    const invoiceStaff = populatedAppointment.staff
+                        ? await Staff.findById(populatedAppointment.staff._id || populatedAppointment.staff)
+                        : null;
                     const invoiceStaffRate = invoiceStaff?.commissionRate || 0;
 
-                    const invoiceData = {
-                        invoiceNumber,
-                        customer: populatedAppointment.customer?._id || populatedAppointment.customer,
-                        appointment: populatedAppointment._id,
-                        items: servicesArray.map((s: any) => {
-                            const serviceName = s.name || 'Unknown Service';
-                            const servicePrice = s.price || 0;
-                            return {
-                                item: s.service?._id || s.service,
-                                itemModel: 'Service',
-                                name: serviceName,
-                                price: servicePrice,
-                                quantity: 1,
-                                discount: 0,
-                                total: servicePrice
-                            };
-                        }),
-                        subtotal,
-                        tax,
-                        discount,
-                        totalAmount,
-                        amountPaid: 0,
-                        status: populatedAppointment.status === 'completed' ? 'paid' : 'pending',
-                        staff: populatedAppointment.staff?._id || populatedAppointment.staff,
-                        staffAssignments: populatedAppointment.staff ? [{
-                            staff: populatedAppointment.staff._id || populatedAppointment.staff,
-                            percentage: invoiceStaffRate,
-                            commission: commission
-                        }] : [],
-                        commission: commission,
-                        date: populatedAppointment.date
-                    };
+                    const invoiceStatus = populatedAppointment.status === 'completed' ? 'paid' : 'pending';
 
-                    console.log('📊 Creating invoice with data:', { invoiceNumber, appointmentId: id, itemsCount: servicesArray.length });
-                    await Invoice.create(invoiceData);
-                    console.log('✅ Invoice created successfully:', invoiceNumber);
+                    // Safe invoice number generation with retry loop (prevents E11000 duplicate key)
+                    const year = new Date().getFullYear();
+                    let createdInvoice = null;
+                    const MAX_RETRIES = 5;
+
+                    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+                        try {
+                            const lastInvoice = await Invoice.findOne().sort({ createdAt: -1 }).select('invoiceNumber').lean();
+                            let nextNum = 1;
+                            if (lastInvoice && (lastInvoice as any).invoiceNumber) {
+                                const parts = ((lastInvoice as any).invoiceNumber as string).split('-');
+                                const lastNum = parseInt(parts[parts.length - 1] || '0', 10);
+                                if (!isNaN(lastNum)) nextNum = lastNum + 1;
+                            }
+                            if (attempt > 0) nextNum += attempt; // offset on retry to avoid collision
+
+                            const invoiceNumber = `INV-${year}-${nextNum.toString().padStart(5, '0')}`;
+
+                            const invoiceData = {
+                                invoiceNumber,
+                                customer: populatedAppointment.customer?._id || populatedAppointment.customer,
+                                appointment: populatedAppointment._id,
+                                bookingCode: populatedAppointment.bookingCode,
+                                items: invoiceItems,
+                                subtotal,
+                                tax,
+                                discount,
+                                totalAmount,
+                                amountPaid: 0,
+                                status: invoiceStatus,
+                                staff: populatedAppointment.staff?._id || populatedAppointment.staff,
+                                staffAssignments: populatedAppointment.staff ? [{
+                                    staff: populatedAppointment.staff._id || populatedAppointment.staff,
+                                    percentage: invoiceStaffRate,
+                                    commission: commission
+                                }] : [],
+                                commission: commission,
+                                date: populatedAppointment.date
+                            };
+
+                            console.log('📊 [Invoice] Creating:', { invoiceNumber, appointmentId: id, itemsCount: invoiceItems.length, totalAmount, status: invoiceStatus });
+                            createdInvoice = await Invoice.create(invoiceData);
+                            console.log('✅ [Invoice] Created successfully:', invoiceNumber, '(attempt', attempt + 1, ')');
+                            break;
+                        } catch (dupErr: any) {
+                            if (dupErr?.code === 11000 && attempt < MAX_RETRIES - 1) {
+                                console.warn(`⚠️ [Invoice] Duplicate key on attempt ${attempt + 1}, retrying...`);
+                                continue;
+                            }
+                            throw dupErr;
+                        }
+                    }
+
+                    if (!createdInvoice) {
+                        console.error(`❌ [Invoice] Failed after ${MAX_RETRIES} attempts for appointment ${id}`);
+                    }
+
                 } catch (invoiceError: any) {
-                    console.error('❌ Error creating invoice:', invoiceError?.message || invoiceError);
+                    console.error('❌ [Invoice] Error creating invoice:', {
+                        message: invoiceError?.message,
+                        code: invoiceError?.code,
+                        errors: invoiceError?.errors ? JSON.stringify(invoiceError.errors) : undefined,
+                        appointmentId: id,
+                    });
                     // Don't fail the whole request if invoice creation fails
                 }
             } else if (populatedAppointment.status === 'completed' && existingInvoice.status !== 'paid') {
                 // Update existing invoice status to paid if appointment is completed
                 existingInvoice.status = 'paid';
                 await existingInvoice.save();
+                console.log(`✅ [Invoice] Updated ${existingInvoice.invoiceNumber} → paid`);
+            } else {
+                console.log(`ℹ️ [Invoice] Already exists (${existingInvoice.invoiceNumber}), skipping.`);
             }
         }
-        // ==========================================
-        // 2. TRIGGER GỬI ZALO ZNS (GỌI QUA API TRUNG TÂM - NON-BLOCKING)
-        // ==========================================
-        // if (sendZalo && isStatusChanged && populatedAppointment.customer?.phone) {
-        //     let eventType = '';
-
-        //     // Xác định loại sự kiện dựa trên trạng thái mới
-        //     if (newStatus === 'confirmed') {
-        //         eventType = 'appointment_confirmed';
-        //     } else if (newStatus === 'cancelled') {
-        //         eventType = 'appointment_cancelled';
-        //     }
-
-        //     if (eventType) {
-        //         // Gom tên các dịch vụ thành 1 chuỗi (VD: "Massage 60p, Gội đầu")
-        //         const servicesString = populatedAppointment.services.map((s: any) => s.name).join(', ');
-
-        //         // 👉 Lấy URL gốc của server để gọi chéo API trong Next.js
-        //         const baseUrl = new URL(request.url).origin;
-
-        //         // Gọi ngầm (Fire and Forget) - Không dùng await để app không bị treo
-        //         fetch(`${baseUrl}/api/zalo/zns`, {
-        //             method: "POST",
-        //             headers: { "Content-Type": "application/json" },
-        //             body: JSON.stringify({
-        //                 phone: populatedAppointment.customer.phone,
-        //                 eventType: eventType,
-        //                 payloadData: {
-        //                     customerName: populatedAppointment.customer.name || "Quý khách",
-        //                     appointmentDate: new Date(populatedAppointment.date).toLocaleDateString('vi-VN'),
-        //                     appointmentTime: populatedAppointment.startTime,
-        //                     serviceName: servicesString,
-        //                     bookingCode: populatedAppointment.bookingCode || populatedAppointment._id.toString().slice(-6).toUpperCase()
-        //                 }
-        //             })
-        //         })
-        //             .then(res => res.json())
-        //             .then(data => {
-        //                 if (!data.success) console.log("Cảnh báo API Zalo ZNS:", data.error || data.message);
-        //             })
-        //             .catch(err => console.error("Lỗi bất ngờ khi gọi API Zalo ZNS:", err));
-        //     }
-        // }
 
         return NextResponse.json({ success: true, data: populatedAppointment });
     } catch (error: any) {
