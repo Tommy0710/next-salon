@@ -9,7 +9,10 @@ export interface ICustomer extends Document {
     totalPurchases: number;
     loyaltyPoints: number;
     createdBy?: string;
-    status: 'active' | 'inactive';
+    gender?: 'male' | 'female' | 'other';
+    visitCount?: number;
+    dateOfBirth?: Date;
+    status: 1 | 0;
 }
 
 const customerSchema = new Schema<ICustomer>(
@@ -25,10 +28,17 @@ const customerSchema = new Schema<ICustomer>(
             type: Schema.Types.ObjectId,
             ref: 'User',
         },
-        status: {
+        gender: {
             type: String,
-            enum: ['active', 'inactive'],
-            default: 'active',
+            enum: ['male', 'female', 'other'],
+            default: 'other',
+        },
+        visitCount: { type: Number, default: 0, min: 0 },
+        dateOfBirth: { type: Date },
+        status: {
+            type: Number,
+            enum: [1, 0],
+            default: 1,
         },
     },
     { timestamps: true }

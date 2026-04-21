@@ -11,7 +11,7 @@ export interface IService extends Document {
     image?: string;
     commissionType: 'percentage' | 'fixed';
     commissionValue: number;
-    status: 'active' | 'inactive';
+    status: 1 | 0;
 }
 
 const serviceSchema = new Schema<IService>(
@@ -38,9 +38,9 @@ const serviceSchema = new Schema<IService>(
         },
         commissionValue: { type: Number, default: 0 },
         status: {
-            type: String,
-            enum: ['active', 'inactive'],
-            default: 'active',
+            type: Number,
+            enum: [1, 0],
+            default: 1,
         },
     },
     { timestamps: true }

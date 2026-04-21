@@ -17,7 +17,7 @@ export async function GET(request: Request) {
         const categoryId = searchParams.get("category");
         const search = searchParams.get("search");
 
-        const query: any = { status: "active" };
+        const query: any = { status: 1 };
         if (categoryId) query.category = categoryId;
         if (search) {
             query.name = { $regex: search, $options: "i" };

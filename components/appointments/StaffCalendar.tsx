@@ -46,14 +46,14 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
             const data = await res.json();
             if (data.success) {
                 setResources([
-                    ...data.data.map((s: any) => ({
-                        id: s._id,
-                        title: s.name
-                    })),
                     {
                         id: "unassigned",
                         title: "No Staff"
-                    }
+                    },
+                    ...data.data.map((s: any) => ({
+                        id: s._id,
+                        title: s.name
+                    }))
                 ]);
             }
         } catch (error) {

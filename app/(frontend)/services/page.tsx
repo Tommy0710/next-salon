@@ -23,7 +23,7 @@ interface Service {
     duration: number;
     price: number;
     gender: string;
-    status: string;
+    status: number;
     createdAt: string;
 }
 
@@ -42,7 +42,7 @@ export default function ServicesPage() {
         duration: 30,
         price: 0,
         gender: "unisex",
-        status: "active",
+        status: 1,
         commissionType: "percentage",
         commissionValue: 0
     });
@@ -193,7 +193,7 @@ export default function ServicesPage() {
                 duration: 30,
                 price: 0,
                 gender: "unisex",
-                status: "active",
+                status: 1,
                 commissionType: "percentage",
                 commissionValue: 0
             });
@@ -331,8 +331,8 @@ export default function ServicesPage() {
                                                 <span className="text-xs text-gray-600 dark:text-gray-400 capitalize font-medium">{service.gender}</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${service.status === 'active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}>
-                                                    {service.status}
+                                                <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${service.status === 1 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-slate-700'}`}>
+                                                    {service.status === 1 ? 'Active' : 'Inactive'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
@@ -489,8 +489,8 @@ export default function ServicesPage() {
                         value={serviceFormData.status}
                         onChange={(e: any) => setServiceFormData({ ...serviceFormData, status: e.target.value })}
                         options={[
-                            { value: "active", label: "Active" },
-                            { value: "inactive", label: "Inactive" }
+                            { value: 1, label: "Active" },
+                            { value: 0, label: "Inactive" }
                         ]}
                     />
 

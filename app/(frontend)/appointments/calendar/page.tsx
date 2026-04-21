@@ -68,6 +68,7 @@ export default function CalendarPage() {
     const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
     const [newCustomerName, setNewCustomerName] = useState("");
     const [newCustomerPhone, setNewCustomerPhone] = useState("");
+    const [newCustomerGender, setNewCustomerGender] = useState("other");
     const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -370,7 +371,8 @@ export default function CalendarPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: newCustomerName,
-                    phone: newCustomerPhone
+                    phone: newCustomerPhone,
+                    gender: newCustomerGender,
                 }),
             });
             const data = await res.json();
@@ -386,6 +388,7 @@ export default function CalendarPage() {
                 setIsAddCustomerModalOpen(false);
                 setNewCustomerName("");
                 setNewCustomerPhone("");
+                setNewCustomerGender("other");
             } else {
                 alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
@@ -601,7 +604,7 @@ export default function CalendarPage() {
                         <FormInput label="Notes" value={formData.notes} onChange={(e: any) => setFormData({ ...formData, notes: e.target.value })} placeholder="Optional notes" />
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 gap-4">
+                    <div className="flex items-center justify-between gap-4">
                         {editingAppointment && (
                             <button
                                 type="button"
@@ -678,6 +681,18 @@ export default function CalendarPage() {
                                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập số điện thoại"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Giới Tính</label>
+                                <select
+                                    value={newCustomerGender}
+                                    onChange={(e) => setNewCustomerGender(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 text-sm bg-white dark:bg-slate-950 text-gray-900 dark:text-white dark:border-slate-700"
+                                >
+                                    <option value="other">Không xác định</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="male">Nam</option>
+                                </select>
                             </div>
                         </div>
 

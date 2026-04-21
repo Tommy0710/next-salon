@@ -24,7 +24,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     try {
         await connectToDB();
         const { id } = await params;
-        const service = await Service.findByIdAndUpdate(id, { status: "inactive" }, { new: true });
+        const service = await Service.findByIdAndUpdate(id, { status: 0 }, { new: true });
 
         if (!service) {
             return NextResponse.json({ success: false, error: "Service not found" }, { status: 404 });

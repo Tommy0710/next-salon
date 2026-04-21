@@ -89,6 +89,7 @@ export default function POSPage() {
     const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
     const [newCustomerName, setNewCustomerName] = useState("");
     const [newCustomerPhone, setNewCustomerPhone] = useState("");
+    const [newCustomerGender, setNewCustomerGender] = useState("other");
     const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
     // THÊM DÒNG NÀY: State để lưu ID của bill đang chuẩn bị xóa (mở modal)
     const [billToDelete, setBillToDelete] = useState<string | null>(null);
@@ -232,7 +233,8 @@ export default function POSPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: newCustomerName,
-                    phone: newCustomerPhone
+                    phone: newCustomerPhone,
+                    gender: newCustomerGender,
                 }),
             });
             const data = await res.json();
@@ -248,6 +250,7 @@ export default function POSPage() {
                 setIsAddCustomerModalOpen(false);
                 setNewCustomerName("");
                 setNewCustomerPhone("");
+                setNewCustomerGender("other");
             } else {
                 alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
@@ -1031,6 +1034,20 @@ export default function POSPage() {
                                     className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 transition-shadow bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
                                     placeholder="Nhập số điện thoại..."
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide">
+                                    Giới Tính
+                                </label>
+                                <select
+                                    value={newCustomerGender}
+                                    onChange={(e) => setNewCustomerGender(e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-slate-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-primary-900 bg-gray-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900"
+                                >
+                                    <option value="other">Không xác định</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="male">Nam</option>
+                                </select>
                             </div>
                         </div>
 

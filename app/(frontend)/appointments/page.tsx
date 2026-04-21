@@ -96,6 +96,7 @@ export default function AppointmentsPage() {
     const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
     const [newCustomerName, setNewCustomerName] = useState("");
     const [newCustomerPhone, setNewCustomerPhone] = useState("");
+    const [newCustomerGender, setNewCustomerGender] = useState("other");
     const [isSubmittingCustomer, setIsSubmittingCustomer] = useState(false);
 
     // THÊM STATE CHO MODAL CHI TIẾT APPOINTMENT
@@ -485,7 +486,8 @@ export default function AppointmentsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: newCustomerName,
-                    phone: newCustomerPhone
+                    phone: newCustomerPhone,
+                    gender: newCustomerGender,
                 }),
             });
             const data = await res.json();
@@ -501,6 +503,7 @@ export default function AppointmentsPage() {
                 setIsAddCustomerModalOpen(false);
                 setNewCustomerName("");
                 setNewCustomerPhone("");
+                setNewCustomerGender("other");
             } else {
                 alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
@@ -1078,6 +1081,18 @@ export default function AppointmentsPage() {
                                     className="w-full px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900"
                                     placeholder="Nhập số điện thoại"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-2">Giới Tính</label>
+                                <select
+                                    value={newCustomerGender}
+                                    onChange={(e) => setNewCustomerGender(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white dark:bg-slate-950 text-gray-900 dark:text-white border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 text-sm"
+                                >
+                                    <option value="other">Không xác định</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="male">Nam</option>
+                                </select>
                             </div>
                         </div>
 
