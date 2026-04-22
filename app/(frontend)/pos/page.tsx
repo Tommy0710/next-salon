@@ -48,6 +48,7 @@ interface Bill {
     selectedCustomer: string;
     serviceStaffAssignments: Record<string, StaffAssignment[]>;
     discount: number;
+    discountType: 'percentage' | 'fixed';
     paymentMethod: string;
     selectedQrIndex: number;
     amountPaid: number | string;
@@ -63,6 +64,7 @@ const createEmptyBill = (): Bill => {
         selectedCustomer: "",
         serviceStaffAssignments: {},
         discount: 0,
+        discountType: 'percentage',
         paymentMethod: "Tiền mặt",
         selectedQrIndex: 0,
         amountPaid: "",
@@ -126,7 +128,8 @@ export default function POSPage() {
                             })),
                             selectedCustomer: inv.customer?._id || "",
                             serviceStaffAssignments: {},
-                            discount: inv.subtotal > 0 ? Math.round(((inv.discount || 0) / inv.subtotal) * 100) : 0,
+                            discount: inv.discount || 0,
+                            discountType: 'fixed',
                             paymentMethod: inv.paymentMethod || "Tiền mặt",
                             selectedQrIndex: 0,
                             amountPaid: inv.amountPaid === 0 ? "" : inv.amountPaid,
@@ -405,17 +408,24 @@ export default function POSPage() {
         if (!activeBill) return { subtotal: 0, tax: 0, total: 0, discountAmount: 0, commission: 0, assignments: [] };
         const subtotal = activeBill.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const tax = subtotal * (settings.taxRate / 100);
-        const discountAmount = subtotal * ((activeBill.discount || 0) / 100);
+        const discountVal = activeBill.discount || 0;
+        const discountAmount = activeBill.discountType === 'fixed'
+            ? Math.min(discountVal, subtotal)
+            : subtotal * (discountVal / 100);
         const total = subtotal + tax - discountAmount;
 
         // Commission calculation aggregated per staff from per-service assignments
+        // Use subtotalAfterDiscount (exclude tax) to apportion discount fairly per item
+        const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
+
         let totalCommission = 0;
         const perStaff: Record<string, { staffId: string; commission: number }> = {};
 
         const serviceNetBase = activeBill.cart.reduce((sum, item) => {
             if (item.type !== 'Service') return sum;
             const itemTotal = item.price * item.quantity;
-            const serviceNet = subtotal > 0 ? (total * (itemTotal / subtotal)) : 0;
+            // Each service's net = its share of subtotalAfterDiscount
+            const serviceNet = subtotal > 0 ? (subtotalAfterDiscount * (itemTotal / subtotal)) : 0;
             return sum + serviceNet;
         }, 0);
 
@@ -423,7 +433,7 @@ export default function POSPage() {
             if (item.type !== 'Service') return;
             const key = getCartItemKey(item._id, item.type);
             const itemTotal = item.price * item.quantity;
-            const serviceNet = subtotal > 0 ? (total * (itemTotal / subtotal)) : 0;
+            const serviceNet = subtotal > 0 ? (subtotalAfterDiscount * (itemTotal / subtotal)) : 0;
             const serviceAssignments = activeBill.serviceStaffAssignments[key] || [];
 
             serviceAssignments.forEach(assignment => {
@@ -828,10 +838,10 @@ export default function POSPage() {
                                     <span>Tổng phụ</span>
                                     <span>{formatCurrency(subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                                {/* <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Thuế ({settings.taxRate}%)</span>
                                     <span>{formatCurrency(tax)}</span>
-                                </div>
+                                </div> */}
                                 {commission > 0 && (
                                     <div className="space-y-1 bg-indigo-50 dark:bg-indigo-900/10 px-2 py-1.5 rounded border border-indigo-100/50 dark:border-indigo-900/30">
                                         <div className="flex justify-between text-indigo-600 dark:text-indigo-400 font-bold mb-1 border-b border-indigo-200/50 dark:border-indigo-900/50 pb-0.5">
@@ -843,7 +853,7 @@ export default function POSPage() {
                                             return (
                                                 <div key={idx} className="flex justify-between text-[9px] text-indigo-500 dark:text-indigo-300 font-medium pl-1">
                                                     <span className="truncate pr-2">{staff?.name}</span>
-                                                    <span className="flex-shrink-0">{settings.symbol}{(assignment.commission || 0).toFixed(2)}</span>
+                                                    <span className="flex-shrink-0">{formatCurrency(assignment.commission || 0)}</span>
                                                 </div>
                                             );
                                         })}
@@ -854,25 +864,45 @@ export default function POSPage() {
                                         <span>Giảm giá</span>
                                         {activeBill.discount > 0 && (
                                             <span className="text-[9px] font-bold text-red-500">
-                                                -{formatCurrency(subtotal * (activeBill.discount / 100))}
+                                                -{formatCurrency(
+                                                    activeBill.discountType === 'fixed'
+                                                        ? Math.min(activeBill.discount, subtotal)
+                                                        : subtotal * (activeBill.discount / 100)
+                                                )}
                                             </span>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-1">
+                                        {/* Toggle % / ₫ */}
+                                        <div className="flex rounded overflow-hidden border border-gray-300 dark:border-slate-700 text-[10px] font-bold">
+                                            <button
+                                                onClick={() => updateActiveBill({ discountType: 'percentage', discount: 0 })}
+                                                className={`px-1.5 py-0.5 transition-colors ${(activeBill.discountType ?? 'percentage') === 'percentage'
+                                                    ? 'bg-primary-900 text-white'
+                                                    : 'bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
+                                                    }`}
+                                            >%</button>
+                                            <button
+                                                onClick={() => updateActiveBill({ discountType: 'fixed', discount: 0 })}
+                                                className={`px-1.5 py-0.5 transition-colors ${activeBill.discountType === 'fixed'
+                                                    ? 'bg-primary-900 text-white'
+                                                    : 'bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
+                                                    }`}
+                                            >₫</button>
+                                        </div>
                                         <input
                                             type="number"
                                             value={activeBill.discount || ""}
                                             onChange={(e) => {
                                                 let val = parseFloat(e.target.value) || 0;
-                                                if (val > 100) val = 100;
+                                                if ((activeBill.discountType ?? 'percentage') === 'percentage' && val > 100) val = 100;
                                                 updateActiveBill({ discount: val });
                                             }}
-                                            className="w-12 text-right text-[10px] md:text-xs border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-white rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
+                                            className="w-16 text-right text-[10px] md:text-xs border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-white rounded px-1 py-0.5 focus:ring-1 focus:ring-primary-900 outline-none"
                                             min="0"
-                                            max="100"
+                                            max={activeBill.discountType === 'percentage' ? 100 : undefined}
                                             placeholder="0"
                                         />
-                                        <span className="text-[10px] text-gray-400 font-bold">%</span>
                                     </div>
                                 </div>                                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 pt-1.5 mt-1">
                                     <span className="text-[10px] font-bold">Đã thanh toán</span>

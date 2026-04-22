@@ -51,8 +51,12 @@ export function getCurrencySymbol(code: string): string {
 
 export function formatCurrency(amount: number, currencyCode: string = 'VND'): string {
     if (currencyCode === 'VND') {
-        const formattedNumber = new Intl.NumberFormat('vi-VN').format(amount);
-        return `${formattedNumber}₫`;
+        const rounded = Math.round(amount);
+        const formattedNumber = new Intl.NumberFormat('vi-VN', {
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(rounded);
+        return `${formattedNumber} ₫`;
     }
     // Các loại tiền tệ khác (USD, EUR...) giữ nguyên định dạng quốc tế
     return new Intl.NumberFormat('en-US', {
