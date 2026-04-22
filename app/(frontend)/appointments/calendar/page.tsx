@@ -43,7 +43,10 @@ interface Appointment {
     startTime: string;
     endTime: string;
     totalAmount: number;
-    discount: number;
+    discount: {
+        type: 'percentage' | 'fixed';
+        value: number;
+    };
     commission: number;
     status: string;
     notes?: string;
@@ -77,7 +80,7 @@ export default function CalendarPage() {
         serviceIds: [] as string[],
         startTime: "",
         date: format(new Date(), "yyyy-MM-dd"),
-        discount: 0,
+        discount: { type: 'percentage' as 'percentage' | 'fixed', value: 0 },
         notes: "",
         status: "confirmed"
     });
@@ -202,10 +205,13 @@ export default function CalendarPage() {
             const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration, 0);
             const subtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
 
-            const discount = Number(formData.discount) || 0;
-            const discountAmount = subtotal * (discount / 100);
+            const discountType = formData.discount.type;
+            const discountVal = Math.max(0, Number(formData.discount.value) || 0);
+            const discountAmount = discountType === 'fixed'
+                ? Math.min(discountVal, subtotal)
+                : subtotal * (discountVal / 100);
             const tax = subtotal * (settings.taxRate / 100);
-            const totalAmount = (subtotal + tax) - discountAmount;
+            const totalAmount = Math.max(0, subtotal + tax - discountAmount);
 
             const staff = staffList.find(s => s._id === formData.staffId);
             const staffRate = staff?.commissionRate || 0;
@@ -240,8 +246,7 @@ export default function CalendarPage() {
                 endTime,
                 totalDuration,
                 totalAmount,
-                discount: discount,
-                discountAmount: discountAmount,
+                discount: { type: discountType, value: discountVal },
                 commission,
                 status: formData.status,
                 notes: formData.notes
@@ -339,7 +344,9 @@ export default function CalendarPage() {
             serviceIds: serviceIds,
             startTime: apt.startTime || "",
             date: apt.date ? format(new Date(apt.date), "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
-            discount: apt.services ? Math.round(((apt.discount || 0) / apt.services.reduce((sum, s) => sum + (s.price || 0), 0)) * 100) : 0,
+            discount: apt.discount && typeof apt.discount === 'object'
+                ? { type: apt.discount.type || 'percentage', value: apt.discount.value || 0 }
+                : { type: 'percentage', value: 0 },
             notes: apt.notes || "",
             status: apt.status || "confirmed"
         });
@@ -353,7 +360,9 @@ export default function CalendarPage() {
         setFormError("");
         setFormData({
             customerId: "", staffId: "", serviceIds: [], startTime: "",
-            date: format(new Date(), "yyyy-MM-dd"), discount: 0, notes: "", status: "confirmed"
+            date: format(new Date(), "yyyy-MM-dd"),
+            discount: { type: 'percentage', value: 0 },
+            notes: "", status: "confirmed"
         });
     };
 
@@ -465,11 +474,32 @@ export default function CalendarPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <FormInput label="Date" type="date" required value={formData.date} onChange={(e: any) => setFormData({ ...formData, date: e.target.value })} />
-                        <FormInput label="Giảm giá (%)" type="number" min="0" max="100" value={formData.discount?.toString() || "0"} onChange={(e: any) => {
-                            let val = parseFloat(e.target.value) || 0;
-                            if (val > 100) val = 100;
-                            setFormData({ ...formData, discount: val });
-                        }} />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Giảm giá</label>
+                            <div className="flex gap-2">
+                                <select
+                                    value={formData.discount.type}
+                                    onChange={(e: any) => setFormData({ ...formData, discount: { ...formData.discount, type: e.target.value } })}
+                                    className="px-2 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 w-28"
+                                >
+                                    <option value="percentage">% Phần trăm</option>
+                                    <option value="fixed">Tiền cố định</option>
+                                </select>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max={formData.discount.type === 'percentage' ? 100 : undefined}
+                                    value={formData.discount.value}
+                                    onChange={(e: any) => {
+                                        let val = parseFloat(e.target.value) || 0;
+                                        if (formData.discount.type === 'percentage' && val > 100) val = 100;
+                                        setFormData({ ...formData, discount: { ...formData.discount, value: val } });
+                                    }}
+                                    className="flex-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                    placeholder={formData.discount.type === 'percentage' ? "0–100" : "0"}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -580,8 +610,11 @@ export default function CalendarPage() {
                                         {(() => {
                                             const subtotal = services.filter(s => formData.serviceIds.includes(s._id)).reduce((a, b) => a + b.price, 0);
                                             const tax = subtotal * (settings.taxRate / 100);
-                                            const discountAmount = subtotal * ((formData.discount || 0) / 100);
-                                            return formatCurrency((subtotal + tax) - discountAmount);
+                                            const discountVal = formData.discount.value || 0;
+                                            const discountAmt = formData.discount.type === 'fixed'
+                                                ? Math.min(discountVal, subtotal)
+                                                : subtotal * (discountVal / 100);
+                                            return formatCurrency(Math.max(0, subtotal + tax - discountAmt));
                                         })()}
                                     </span>
                                 </div>

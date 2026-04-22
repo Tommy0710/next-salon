@@ -5,7 +5,7 @@ import { checkPermission } from '@/lib/rbac';
 import { auth } from '@/auth';
 import { logActivity } from '@/lib/logger';
 
-const MAX_ROWS = 1000;
+const MAX_ROWS = 5000;
 
 // ──────────────────────────────────────────────
 // Minimal CSV parser (handles quoted fields)
@@ -153,9 +153,47 @@ export async function POST(request: NextRequest) {
             const phone = getValue(col('phone'));
             const address = getValue(col('address'));
             const notes = getValue(col('notes'));
+
+            // Validate phone: skip if provided but has fewer than 7 digits
+            if (phone) {
+                const digitsOnly = phone.replace(/\D/g, '');
+                if (digitsOnly.length < 7) {
+                    results.errors.push({ row: rowNum, reason: `Phone "${phone}" is too short (min 7 digits)` });
+                    results.skipped++;
+                    continue;
+                }
+            }
+
+            // gender: accept male/female/other (default 'other')
+            const genderRaw = getValue(col('gender')).toLowerCase();
+            const gender = ['male', 'female', 'other'].includes(genderRaw) ? genderRaw : 'other';
+
+            // dateOfBirth: accept ISO date string (YYYY-MM-DD); aliases: dateofbirth, date_of_birth, birthday
+            const dobIdx = col('dateofbirth') !== -1 ? col('dateofbirth')
+                : col('date_of_birth') !== -1 ? col('date_of_birth')
+                    : col('birthday');
+            const dobRaw = getValue(dobIdx);
+            const dateOfBirth = dobRaw && !isNaN(Date.parse(dobRaw)) ? new Date(dobRaw) : undefined;
+
+            // visitCount: non-negative integer; aliases: visitcount, visit_count
+            const vcIdx = col('visitcount') !== -1 ? col('visitcount') : col('visit_count');
+            const visitCountRaw = getValue(vcIdx);
+            const visitCount = visitCountRaw !== '' && !isNaN(Number(visitCountRaw))
+                ? Math.max(0, Math.floor(Number(visitCountRaw))) as number
+                : undefined;
+
+            // totalSpent → totalPurchases: non-negative number; aliases: totalspent, total_spent, totalpurchases, total_purchases
+            const tsIdx = col('totalspent') !== -1 ? col('totalspent')
+                : col('total_spent') !== -1 ? col('total_spent')
+                    : col('totalpurchases') !== -1 ? col('totalpurchases')
+                        : col('total_purchases');
+            const totalSpentRaw = getValue(tsIdx);
+            const totalPurchases = totalSpentRaw !== '' && !isNaN(Number(totalSpentRaw))
+                ? Math.max(0, Number(totalSpentRaw)) as number
+                : undefined;
+
             const statusRaw = getValue(col('status')).toLowerCase();
-            const status =
-                statusRaw === '0' || statusRaw === 'inactive' ? 0 : 1;
+            const status = statusRaw === '0' || statusRaw === 'inactive' ? 0 : 1;
 
             try {
                 // Upsert logic: match by phone OR email if provided
@@ -172,6 +210,10 @@ export async function POST(request: NextRequest) {
                             ...(phone && { phone }),
                             ...(address && { address }),
                             ...(notes && { notes }),
+                            gender,
+                            ...(dateOfBirth !== undefined && { dateOfBirth }),
+                            ...(visitCount !== undefined && { visitCount: Number(visitCount) }),
+                            ...(totalPurchases !== undefined && { totalPurchases: Number(totalPurchases) }),
                             status,
                         });
                         results.updated++;
@@ -186,6 +228,10 @@ export async function POST(request: NextRequest) {
                     phone: phone || undefined,
                     address: address || undefined,
                     notes: notes || undefined,
+                    gender,
+                    ...(dateOfBirth !== undefined && { dateOfBirth }),
+                    ...(visitCount !== undefined && { visitCount: Number(visitCount) }),
+                    ...(totalPurchases !== undefined && { totalPurchases: Number(totalPurchases) }),
                     status,
                     createdBy: createdById,
                 });
@@ -225,9 +271,9 @@ export async function POST(request: NextRequest) {
 // GET /api/customers/import — trả về CSV template
 export async function GET() {
     const template = [
-        'name,email,phone,address,notes,status',
-        'Nguyễn Văn A,a@example.com,0901234567,Hà Nội,,1',
-        'Trần Thị B,b@example.com,0912345678,TP.HCM,Khách VIP,1',
+        'name,email,phone,address,notes,gender,birthday,visitCount,totalSpent,status',
+        'Nguy\u1ec5n V\u0103n A,a@example.com,0901234567,H\u00e0 N\u1ed9i,,male,1990-01-15,5,1500000,1',
+        'Tr\u1ea7n Th\u1ecb B,b@example.com,0912345678,TP.HCM,Kh\u00e1ch VIP,female,1985-06-20,12,3200000,1',
     ].join('\n');
 
     return new NextResponse(template, {

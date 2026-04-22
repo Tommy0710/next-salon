@@ -188,10 +188,17 @@ export async function POST(request: NextRequest) {
 
         const subtotal = body.services.reduce((acc: number, s: any) => acc + (s.price || 0), 0);
         const totalDuration = body.services.reduce((acc: number, s: any) => acc + (s.duration || 0), 0);
-        const discount = parseFloat(body.discount) || 0;
+
+        // Discount object: { type: 'percentage' | 'fixed', value: number }
+        const discountInput = body.discount || {};
+        const discountType: 'percentage' | 'fixed' = discountInput.type === 'fixed' ? 'fixed' : 'percentage';
+        const discountValue = Math.max(0, Number(discountInput.value) || 0);
+        const discount = { type: discountType, value: discountValue };
+
         const tax = subtotal * (taxRate / 100);
-        const discountValue = Number(body.discount) || 0;
-        const discountAmount = subtotal * (discountValue / 100);
+        const discountAmount = discountType === 'fixed'
+            ? Math.min(discountValue, subtotal)
+            : subtotal * (discountValue / 100);
         const totalAmount = Math.max(0, subtotal - discountAmount + tax);
         const bookingCode = body.bookingCode || `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 

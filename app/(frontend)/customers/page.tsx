@@ -164,12 +164,14 @@ export default function CustomersPage() {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            // Revoke sau 1 giây để browser kịp xử lý download
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
         } catch (err) {
             console.error(err);
             alert("Export failed. Please try again.");
         } finally {
-            setExporting(false);
+            // Đảm bảo loading luôn tắt dù download dialog có làm gián đoạn hay không
+            setTimeout(() => setExporting(false), 500);
         }
     };
 
@@ -718,7 +720,7 @@ export default function CustomersPage() {
                                 <div>
                                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Drag & drop your CSV file here</p>
                                     <p className="text-xs text-gray-400 mt-1">or click to browse</p>
-                                    <p className="text-xs text-gray-400 mt-2">Max 1,000 rows per import</p>
+                                    <p className="text-xs text-gray-400 mt-2">Max 5,000 rows per import</p>
                                 </div>
                             )}
                         </div>
@@ -727,7 +729,7 @@ export default function CustomersPage() {
                         <div className="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
                             <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Required columns:</p>
                             <div className="flex flex-wrap gap-1.5">
-                                {["name (required)", "email", "phone (required)", "address", "notes", "status"].map((col) => (
+                                {["name (required)", "email", "phone (required)", "address", "notes", "status", "gender", "birthday", "visitCount", "totalSpent"].map((col) => (
                                     <span key={col} className={`px-2 py-0.5 rounded text-[10px] font-semibold ${col.includes("required")
                                         ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                                         : "bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300"

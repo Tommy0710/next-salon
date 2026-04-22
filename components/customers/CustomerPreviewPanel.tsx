@@ -215,6 +215,12 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                     </span>
                                 </div>
                             )}
+                            {/* {c.notes && (
+                                <div className="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-400">
+                                    <Note className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                    <span className="truncate">{c.notes}</span>
+                                </div>
+                            )} */}
                             <div className="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-400">
                                 <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                                 <span>Tham gia: {new Date(c.createdAt).toLocaleDateString("vi-VN")}</span>

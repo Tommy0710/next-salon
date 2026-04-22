@@ -64,7 +64,26 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         const services = cleanBody.services || existingAppointment.services;
         const staffId = cleanBody.staff || existingAppointment.staff;
-        const discount = cleanBody.discount !== undefined ? cleanBody.discount : (existingAppointment.discount || 0);
+
+        // Normalize discount: support both old (number) and new ({ type, value }) format
+        let discount: { type: 'percentage' | 'fixed'; value: number };
+        if (cleanBody.discount !== undefined) {
+            if (typeof cleanBody.discount === 'object' && cleanBody.discount !== null) {
+                discount = {
+                    type: cleanBody.discount.type === 'fixed' ? 'fixed' : 'percentage',
+                    value: Math.max(0, Number(cleanBody.discount.value) || 0),
+                };
+            } else {
+                // Legacy: number sent as percentage value
+                discount = { type: 'percentage', value: Math.max(0, Number(cleanBody.discount) || 0) };
+            }
+        } else {
+            const ex = existingAppointment.discount as any;
+            discount = typeof ex === 'object' && ex !== null
+                ? { type: ex.type || 'percentage', value: ex.value || 0 }
+                : { type: 'percentage', value: Number(ex) || 0 };
+        }
+
         const bookingCode = cleanBody.bookingCode || existingAppointment.bookingCode || `BOOK-${new Date().getFullYear()}-${existingAppointment._id.toString().slice(-6).toUpperCase()}`;
 
         // Only recalculate financial breakdown if services, discount, or staff changed
@@ -74,14 +93,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         let totalCommission = existingAppointment.commission || 0;
 
         const servicesChanged = cleanBody.services && JSON.stringify(cleanBody.services) !== JSON.stringify(existingAppointment.services);
-        const discountChanged = cleanBody.discount !== undefined && cleanBody.discount !== (existingAppointment.discount || 0);
+        const exDiscount = existingAppointment.discount as any;
+        const exDiscountStr = JSON.stringify(typeof exDiscount === 'object' ? exDiscount : { type: 'percentage', value: exDiscount || 0 });
+        const discountChanged = cleanBody.discount !== undefined && JSON.stringify(discount) !== exDiscountStr;
         const staffChanged = cleanBody.staff && cleanBody.staff !== existingAppointment.staff;
 
         if (servicesChanged || discountChanged || staffChanged) {
             // Recalculate financial breakdown only when relevant fields change
             subtotal = services.reduce((acc: number, s: any) => acc + s.price, 0);
             tax = subtotal * (taxRate / 100);
-            totalAmount = (subtotal + tax) - discount;
+            const discountAmount = discount.type === 'fixed'
+                ? Math.min(discount.value, subtotal)
+                : subtotal * (discount.value / 100);
+            totalAmount = Math.max(0, subtotal + tax - discountAmount);
 
             // Commission logic
             const staff = await Staff.findById(staffId);
@@ -109,6 +133,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         const appointment = await Appointment.findByIdAndUpdate(id, {
             ...cleanBody,
+            discount,   // always persist as object
             bookingCode,
             ...(servicesChanged || discountChanged || staffChanged ? {
                 subtotal,
@@ -131,8 +156,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                     const subtotal = populatedAppointment.subtotal || 0;
                     const tax = populatedAppointment.tax || 0;
                     const totalAmount = populatedAppointment.totalAmount || 0;
-                    const discount = populatedAppointment.discount || 0;
                     const commission = populatedAppointment.commission || 0;
+
+                    // Compute discountAmount from the discount object
+                    const apptDiscount = populatedAppointment.discount as any;
+                    const apptDiscountType = apptDiscount?.type || 'percentage';
+                    const apptDiscountValue = apptDiscount?.value || 0;
+                    const discountAmount = apptDiscountType === 'fixed'
+                        ? Math.min(apptDiscountValue, subtotal)
+                        : subtotal * (apptDiscountValue / 100);
 
                     const servicesArray = Array.isArray(populatedAppointment.services) ? populatedAppointment.services : [];
 
@@ -194,7 +226,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                                 items: invoiceItems,
                                 subtotal,
                                 tax,
-                                discount,
+                                discount: discountAmount,  // Invoice stores the monetary amount
                                 totalAmount,
                                 amountPaid: 0,
                                 status: invoiceStatus,

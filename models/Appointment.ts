@@ -17,7 +17,10 @@ export interface IAppointment extends Document {
     subtotal: number;
     tax: number;
     totalAmount: number;
-    discount: number;
+    discount: {
+        type: 'percentage' | 'fixed';
+        value: number;
+    };
     commission: number;
     tips: number;
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no-show';
@@ -47,7 +50,10 @@ const appointmentSchema = new Schema<IAppointment>(
         subtotal: { type: Number, default: 0 },
         tax: { type: Number, default: 0 },
         totalAmount: { type: Number, required: true },
-        discount: { type: Number, default: 0 },
+        discount: {
+            type: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
+            value: { type: Number, default: 0, min: 0 },
+        },
         commission: { type: Number, default: 0 },
         tips: { type: Number, default: 0 },
         status: {
