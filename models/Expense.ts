@@ -26,4 +26,8 @@ const expenseSchema = new Schema<IExpense>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+expenseSchema.index({ date: -1, category: 1 });
+expenseSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Expense || mongoose.model<IExpense>('Expense', expenseSchema);

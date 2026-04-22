@@ -28,7 +28,8 @@ export async function GET(request: Request) {
             .populate("category", "name")
             .sort({ name: 1 })
             .skip((page - 1) * limit)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         return NextResponse.json({
             success: true,
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
                 limit,
                 pages: Math.ceil(total / limit)
             }
-        });
+        }, { headers: { 'Cache-Control': 'private, max-age=30' } });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ success: false, error: "Failed to fetch services" }, { status: 500 });

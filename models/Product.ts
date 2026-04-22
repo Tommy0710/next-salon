@@ -46,4 +46,9 @@ const productSchema = new Schema<IProduct>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+productSchema.index({ category: 1, name: 1 });
+productSchema.index({ status: 1, createdAt: -1 });
+productSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);

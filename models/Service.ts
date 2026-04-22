@@ -46,4 +46,9 @@ const serviceSchema = new Schema<IService>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+serviceSchema.index({ category: 1, name: 1 });
+serviceSchema.index({ isActive: 1 });
+serviceSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Service || mongoose.model<IService>('Service', serviceSchema);

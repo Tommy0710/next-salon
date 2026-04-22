@@ -8,11 +8,6 @@ if (!MONGODB_URI) {
   );
 }
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -34,29 +29,29 @@ async function dbConnect(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
+    // ── Optimized connection pool for production ───────────────────────────
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 10,          // Tối đa 10 connections song song
+      minPoolSize: 2,           // Giữ sẵn ít nhất 2 connections
+      serverSelectionTimeoutMS: 5000,  // Fail fast nếu không tìm được server
+      socketTimeoutMS: 45000,   // Timeout sau 45s không hoạt động
+      connectTimeoutMS: 10000,  // Timeout khi connect lần đầu
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((m) => m);
   }
 
   try {
     cached.conn = await cached.promise;
-    console.log('✅ MongoDB connected successfully');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ MongoDB connected');
+    }
   } catch (e: any) {
     cached.promise = null;
     console.error('❌ MongoDB connection failed:', e.message);
-    console.error('Connection string format check:', {
-      hasUri: !!MONGODB_URI,
-      startsWithMongodb: MONGODB_URI?.startsWith('mongodb'),
-      length: MONGODB_URI?.length,
-    });
     throw e;
   }
-
 
   return cached.conn;
 }

@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
         const customers = await Customer.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         const total = await Customer.countDocuments(query);
 

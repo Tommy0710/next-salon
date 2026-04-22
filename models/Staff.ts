@@ -44,4 +44,8 @@ const staffSchema = new Schema<IStaff>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+staffSchema.index({ status: 1, createdAt: -1 });
+staffSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Staff || mongoose.model<IStaff>('Staff', staffSchema);

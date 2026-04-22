@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
         const products = await Product.find(query)
             .sort({ name: 1 })
             .skip((page - 1) * limit)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         return NextResponse.json({
             success: true,

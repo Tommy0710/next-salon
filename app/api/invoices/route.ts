@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
                     { name: { $regex: search, $options: "i" } },
                     { phone: { $regex: search, $options: "i" } },
                 ]
-            }).select('_id');
+            }).select('_id').lean();
             if (customers.length > 0) {
                 searchQueries.push({ customer: { $in: customers.map(c => c._id) } });
             }
@@ -123,7 +123,8 @@ export async function GET(request: NextRequest) {
             .populate('staffAssignments.staff', 'name')
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .lean();
 
         return NextResponse.json({
             success: true,

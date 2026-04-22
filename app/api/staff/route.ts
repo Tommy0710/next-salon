@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         }
 
         const [staffMembers, total] = await Promise.all([
-            Staff.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+            Staff.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
             Staff.countDocuments(query)
         ]);
 

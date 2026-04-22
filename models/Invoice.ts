@@ -87,4 +87,16 @@ if (process.env.NODE_ENV === 'development') {
     delete mongoose.models.Invoice;
 }
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+// Sort mặc định tất cả list queries
+invoiceSchema.index({ createdAt: -1 });
+// Filter by status + sort
+invoiceSchema.index({ status: 1, createdAt: -1 });
+// Customer invoice history
+invoiceSchema.index({ customer: 1, createdAt: -1 });
+// Lọc source: appointment vs POS
+invoiceSchema.index({ appointment: 1 });
+// Search by invoice number (unique lookup)
+invoiceSchema.index({ invoiceNumber: 1 }, { unique: true, sparse: true });
+
 export default mongoose.models.Invoice || mongoose.model<IInvoice>('Invoice', invoiceSchema);

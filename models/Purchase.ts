@@ -58,4 +58,8 @@ const purchaseSchema = new Schema<IPurchase>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+purchaseSchema.index({ createdAt: -1, status: 1 });
+purchaseSchema.index({ supplier: 1, createdAt: -1 });
+
 export default mongoose.models.Purchase || mongoose.model<IPurchase>('Purchase', purchaseSchema);

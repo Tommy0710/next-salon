@@ -44,8 +44,14 @@ const customerSchema = new Schema<ICustomer>(
     { timestamps: true }
 );
 
-// Index for faster searches
+// Index for faster searches (text search)
 customerSchema.index({ name: 'text', email: 'text', phone: 'text' });
+// Phone lookup (unique customers)
+customerSchema.index({ phone: 1 }, { sparse: true });
+// Status filter + sort
+customerSchema.index({ status: 1, createdAt: -1 });
+// Default sort
+customerSchema.index({ createdAt: -1 });
 
 export default mongoose.models.Customer || mongoose.model<ICustomer>('Customer', customerSchema);
 

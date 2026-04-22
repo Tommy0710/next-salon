@@ -70,4 +70,14 @@ const appointmentSchema = new Schema<IAppointment>(
     { timestamps: true }
 );
 
+// ── Production Indexes ─────────────────────────────────────────────────────
+// Calendar queries: date range filter + status
+appointmentSchema.index({ date: 1, status: 1 });
+// Sort mặc định
+appointmentSchema.index({ createdAt: -1 });
+// Customer appointment history
+appointmentSchema.index({ customer: 1, date: -1 });
+// Staff schedule view
+appointmentSchema.index({ staff: 1, date: -1 });
+
 export default mongoose.models.Appointment || mongoose.model<IAppointment>('Appointment', appointmentSchema);

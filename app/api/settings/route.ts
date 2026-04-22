@@ -3,50 +3,72 @@ import connectDB from '@/lib/mongodb';
 import Settings from '@/models/Settings';
 import { auth } from '@/auth';
 import { checkPermission } from '@/lib/rbac';
+import { serverCache, CACHE_TTL } from '@/lib/cache';
+
+const SETTINGS_CACHE_KEY = 'api:settings:full';
+const SETTINGS_PUBLIC_CACHE_KEY = 'api:settings:public';
 
 // GET /api/settings - Get store settings
 export async function GET(request: NextRequest) {
     try {
         await connectDB();
 
-        // Check if user is authenticated for full settings access
         const session = await auth();
 
-        // Find the first settings document
-        let settings = await Settings.findOne();
-
-        if (!settings) {
-            settings = await Settings.create({
-                storeName: 'SalonNext',
-                currency: 'USD',
-                timezone: 'UTC',
-                taxRate: 0
-            });
-        }
-
-        // If not authenticated, only return basic public info
         if (!session) {
-            return NextResponse.json({
-                success: true,
-                data: {
-                    storeName: settings.storeName,
-                    logoUrl: settings.logoUrl,
-                    address: settings.address,
-                    phone: settings.phone,
-                    email: settings.email,
-                    website: settings.website,
-                    businessHours: settings.businessHours,
-                    currency: settings.currency,
-                    timezone: settings.timezone
-                }
+            // Public cache
+            const cached = serverCache.get<any>(SETTINGS_PUBLIC_CACHE_KEY);
+            if (cached) {
+                return NextResponse.json({ success: true, data: cached }, {
+                    headers: { 'Cache-Control': 'private, max-age=60' }
+                });
+            }
+
+            let settings = await Settings.findOne().lean() as any;
+            if (!settings) {
+                settings = await Settings.create({ storeName: 'SalonNext', currency: 'USD', timezone: 'UTC', taxRate: 0 });
+            }
+
+            const publicData = {
+                storeName: settings.storeName,
+                logoUrl: settings.logoUrl,
+                logoUrlDark: settings.logoUrlDark,
+                address: settings.address,
+                phone: settings.phone,
+                email: settings.email,
+                website: settings.website,
+                businessHours: settings.businessHours,
+                currency: settings.currency,
+                timezone: settings.timezone,
+            };
+            serverCache.set(SETTINGS_PUBLIC_CACHE_KEY, publicData, CACHE_TTL.SETTINGS);
+
+            return NextResponse.json({ success: true, data: publicData }, {
+                headers: { 'Cache-Control': 'private, max-age=60' }
             });
         }
 
-        // If authenticated, check for settings view permission before returning full data
+        // Authenticated — return full settings
         const permissionError = await checkPermission(request, 'settings', 'view');
         if (permissionError) return permissionError;
 
-        return NextResponse.json({ success: true, data: settings });
+        const cached = serverCache.get<any>(SETTINGS_CACHE_KEY);
+        if (cached) {
+            return NextResponse.json({ success: true, data: cached }, {
+                headers: { 'Cache-Control': 'private, max-age=60' }
+            });
+        }
+
+        let settings = await Settings.findOne().lean() as any;
+        if (!settings) {
+            settings = await Settings.create({ storeName: 'SalonNext', currency: 'USD', timezone: 'UTC', taxRate: 0 });
+        }
+
+        serverCache.set(SETTINGS_CACHE_KEY, settings, CACHE_TTL.SETTINGS);
+
+        return NextResponse.json({ success: true, data: settings }, {
+            headers: { 'Cache-Control': 'private, max-age=60' }
+        });
     } catch (error: any) {
         console.error('Error fetching settings:', error);
         return NextResponse.json(
@@ -69,8 +91,6 @@ export async function PUT(request: NextRequest) {
 
         await connectDB();
 
-        // Check Permissions
-        // Settings edit uses 'edit' permission
         const permissionError = await checkPermission(request, 'settings', 'edit');
         if (permissionError) return permissionError;
 
@@ -83,24 +103,25 @@ export async function PUT(request: NextRequest) {
             );
         }
 
-        // Ensure all QR codes have qrId (for backward compatibility)
         if (body.qrCodes && Array.isArray(body.qrCodes)) {
             body.qrCodes = body.qrCodes.map((qr: any) => {
                 if (!qr.qrId) {
                     qr.qrId = qr.id || `qr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 }
-                delete qr.id; // Remove old id field
+                delete qr.id;
                 return qr;
             });
         }
 
-        // Update the first document found (singleton pattern)
-        // $set ensures we don't accidentally replace the entire document if new fields are missing.
         const settings = await Settings.findOneAndUpdate(
             {},
             { $set: body },
             { new: true, upsert: true, runValidators: true }
         );
+
+        // Invalidate cache so next GET fetches fresh data
+        serverCache.invalidate(SETTINGS_CACHE_KEY);
+        serverCache.invalidate(SETTINGS_PUBLIC_CACHE_KEY);
 
         return NextResponse.json({ success: true, data: settings });
     } catch (error: any) {
