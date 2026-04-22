@@ -70,7 +70,7 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
     }, []);
 
     return (
-        <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-3 md:px-6 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors">
             <div className="flex items-center">
                 {/* Mobile menu button */}
                 <button

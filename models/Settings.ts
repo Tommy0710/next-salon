@@ -68,6 +68,10 @@ const SettingsSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    logoUrlDark: {
+        type: String,
+        default: ''
+    },
     businessHours: {
         type: String,
         default: 'Mon-Fri: 9:00 AM - 6:00 PM'

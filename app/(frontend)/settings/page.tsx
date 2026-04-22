@@ -20,6 +20,7 @@ interface Settings {
     timezone: string;
     taxRate: number;
     logoUrl: string;
+    logoUrlDark: string;
     businessHours: string;
     receiptFooter: string;
     termsAndConditions: string;
@@ -81,6 +82,7 @@ export default function SettingsPage() {
         timezone: "UTC",
         taxRate: 0,
         logoUrl: "",
+        logoUrlDark: "",
         businessHours: "Mon-Fri: 9:00 AM - 6:00 PM",
         receiptFooter: "Thank you for your business!",
         termsAndConditions: "",
@@ -166,6 +168,7 @@ export default function SettingsPage() {
                     timezone: data.data.timezone || "UTC",
                     taxRate: data.data.taxRate || 0,
                     logoUrl: data.data.logoUrl || "",
+                    logoUrlDark: data.data.logoUrlDark || "",
                     businessHours: data.data.businessHours || "Mon-Fri: 9:00 AM - 6:00 PM",
                     receiptFooter: data.data.receiptFooter || "Thank you for your business!",
                     termsAndConditions: data.data.termsAndConditions || "",
@@ -319,41 +322,109 @@ export default function SettingsPage() {
                                     required
                                     placeholder="e.g. PosNext"
                                 />
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                {/* Logo Upload — Light & Dark */}
+                                <div className="space-y-4">
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                                         Logo cửa hàng
                                     </label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                    setSettings({ ...settings, logoUrl: reader.result as string });
-                                                };
-                                                reader.readAsDataURL(file);
-                                            }
-                                        }}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-900 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                                    />
-                                </div>
-                                {settings.logoUrl && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Xem trước logo</label>
-                                        <div className="flex items-center gap-4">
-                                            <img src={settings.logoUrl} alt="Store Logo" className="h-20 object-contain border rounded p-2" />
-                                            <button
-                                                type="button"
-                                                onClick={() => setSettings({ ...settings, logoUrl: "" })}
-                                                className="text-sm text-red-600 hover:text-red-700"
-                                            >
-                                                Xóa logo
-                                            </button>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Light Mode Logo */}
+                                        <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                                            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <span className="inline-block w-3 h-3 rounded-full bg-amber-400"></span>
+                                                Light Mode Logo
+                                            </p>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => setSettings({ ...settings, logoUrl: reader.result as string });
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-400"
+                                            />
+                                            {settings.logoUrl && (
+                                                <div className="mt-3 flex items-center gap-3">
+                                                    <div className="h-16 w-32 bg-white border border-gray-200 rounded-lg p-2 flex items-center justify-center">
+                                                        <img src={settings.logoUrl} alt="Light Logo" className="h-full object-contain" />
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSettings({ ...settings, logoUrl: "" })}
+                                                        className="text-xs text-red-500 hover:text-red-700 font-medium"
+                                                    >
+                                                        Xóa
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {!settings.logoUrl && (
+                                                <div className="mt-3 h-16 w-32 bg-white border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center">
+                                                    <span className="text-xs text-gray-400">Chưa có logo</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Dark Mode Logo */}
+                                        <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-slate-800">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <span className="inline-block w-3 h-3 rounded-full bg-slate-400"></span>
+                                                Dark Mode Logo
+                                                <span className="text-slate-500 normal-case font-normal">(tuỳ chọn)</span>
+                                            </p>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => setSettings({ ...settings, logoUrlDark: reader.result as string });
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="w-full px-3 py-2 border border-slate-600 rounded-lg text-sm bg-slate-900 text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-slate-300 hover:file:bg-slate-600"
+                                            />
+                                            {(settings.logoUrlDark || settings.logoUrl) && (
+                                                <div className="mt-3 flex items-center gap-3">
+                                                    <div className="h-16 w-32 bg-slate-900 border border-slate-700 rounded-lg p-2 flex items-center justify-center relative">
+                                                        <img
+                                                            src={settings.logoUrlDark || settings.logoUrl}
+                                                            alt="Dark Logo"
+                                                            className="h-full object-contain"
+                                                        />
+                                                        {!settings.logoUrlDark && (
+                                                            <span className="absolute bottom-0.5 right-1 text-[9px] text-slate-500">fallback</span>
+                                                        )}
+                                                    </div>
+                                                    {settings.logoUrlDark && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setSettings({ ...settings, logoUrlDark: "" })}
+                                                            className="text-xs text-red-400 hover:text-red-300 font-medium"
+                                                        >
+                                                            Xóa
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {!settings.logoUrlDark && !settings.logoUrl && (
+                                                <div className="mt-3 h-16 w-32 bg-slate-900 border-2 border-dashed border-slate-700 rounded-lg flex items-center justify-center">
+                                                    <span className="text-xs text-slate-500">Chưa có logo</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                )}
+
+                                    <p className="text-xs text-gray-400 dark:text-slate-500">
+                                        💡 Nếu không có Dark logo, hệ thống sẽ tự dùng Light logo làm fallback.
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
                     )}

@@ -579,8 +579,8 @@ export default function POSPage() {
     return (
         <div className="flex h-[100dvh] w-full bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 overflow-hidden flex-col md:flex-row text-black dark:text-white">
             {/* Left Side: Items Catalog */}
-            <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
-                <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
+            <div className={`flex-1 md:flex-none md:w-[60%] flex flex-col min-w-0 min-h-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 ${mobileTab === 'cart' ? 'hidden md:flex' : 'flex'}`}>
+                <div className="bg-white dark:bg-slate-900 flex flex-col h-full min-h-0">
                     {/* Header/Tabs */}
                     <div className="px-4 py-3 md:px-6 md:py-4 border-b border-gray-200 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-900 z-10">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -622,7 +622,7 @@ export default function POSPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 pb-20 md:pb-4">
+                    <div className="flex-1 min-h-0 overflow-y-auto p-3 md:p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 pb-20 md:pb-4">
                         {loading ? (
                             <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-900 border-t-transparent"></div></div>
                         ) : (
@@ -655,7 +655,7 @@ export default function POSPage() {
             </div>
 
             {/* Right Side: Cart */}
-            <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
+            <div className={`w-full md:w-[40%] flex-1 md:flex-none flex flex-col min-h-0 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 ${mobileTab === 'catalog' ? 'hidden md:flex' : 'flex'} h-full`}>
 
                 {/* --- MỚI: THANH TÌM KIẾM BILL & TẠO BILL MỚI --- */}
                 <div className="p-2 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex items-center gap-2 flex-shrink-0">
@@ -704,7 +704,7 @@ export default function POSPage() {
 
                 {/* 2. ACTIVE BILL CONTENT */}
                 {isMounted && activeBill && (
-                    <div className="bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 flex flex-col flex-1 min-h-0">
 
                         {/* Customer Selection & Bill Renaming */}
                         <div className="p-3 md:p-4 border-b border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex-shrink-0 space-y-3">
@@ -742,7 +742,7 @@ export default function POSPage() {
                         </div>
 
                         {/* Cart Items */}
-                        <div className="flex-grow overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
+                        <div className="flex-1 min-h-0 overflow-y-auto p-2 md:p-3 space-y-2 pb-24 md:pb-2">
                             {activeBill.cart.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-slate-600 py-10">
                                     <ShoppingCart className="w-8 h-8 md:w-10 md:h-10 mb-2 opacity-30" />
@@ -822,7 +822,7 @@ export default function POSPage() {
                         </div>
 
                         {/* Summary Section */}
-                        <div className="flex-shrink-0 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 overflow-y-auto md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                        <div className="flex-shrink-0 p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 overflow-y-auto max-h-[50vh] md:max-h-[45%] pb-20 md:pb-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                             <div className="space-y-1 mb-3 text-[10px] md:text-xs">
                                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                                     <span>Tổng phụ</span>

@@ -9,6 +9,7 @@ interface Settings {
     timezone: string;
     taxRate: number;
     logoUrl: string;
+    logoUrlDark: string;
     symbol: string;
     qrCodes: {
         qrId: string;
@@ -36,6 +37,7 @@ const defaultSettings: Settings = {
     timezone: 'UTC',
     taxRate: 0,
     logoUrl: '',
+    logoUrlDark: '',
     symbol: '₫',
     qrCodes: [],
     bookingRules: {
@@ -66,6 +68,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                     timezone: data.data.timezone || 'UTC',
                     taxRate: data.data.taxRate || 0,
                     logoUrl: data.data.logoUrl || '',
+                    logoUrlDark: data.data.logoUrlDark || '',
                     symbol: symbol,
                     qrCodes: data.data.qrCodes || []
                 });

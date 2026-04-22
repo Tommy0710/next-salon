@@ -7,6 +7,7 @@ import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormIn
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import CustomerPreviewPanel from "@/components/customers/CustomerPreviewPanel";
+import { formatCurrency } from "@/lib/currency";
 
 interface Customer {
     _id: string;
@@ -317,9 +318,9 @@ export default function CustomersPage() {
                     </div>
                 </div>
 
-                {/* Main Card — 2-column layout when panel open */}
-                <div className={`flex gap-4 transition-all duration-300`}>
-                    <div className={`${selectedCustomerId ? 'flex-1 min-w-0' : 'w-full'} bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white`}>
+                {/* Main Card — side panel on desktop, popup on mobile */}
+                <div className="flex gap-4 transition-all duration-300">
+                    <div className={`${selectedCustomerId ? 'lg:flex-1 lg:min-w-0' : 'w-full'} w-full bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden text-black dark:text-white`}>
                         {/* Filters Bar */}
                         <div className="p-4 border-b border-gray-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50">
                             <div className="relative w-full md:w-96">
@@ -409,7 +410,7 @@ export default function CustomersPage() {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{settings.symbol}{customer.totalPurchases.toFixed(2)}</span>
+                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(customer.totalPurchases)}</span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${customer.status === 1
@@ -522,13 +523,24 @@ export default function CustomersPage() {
                     </div>
 
                     {/* ── Customer Preview Panel ── */}
+                    {/* Desktop: sticky side panel | Mobile: fixed bottom sheet (handled inside component) */}
                     {selectedCustomerId && (
-                        <div className="w-80 shrink-0 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden" style={{ maxHeight: 'calc(100vh - 220px)', position: 'sticky', top: '24px' }}>
-                            <CustomerPreviewPanel
-                                customerId={selectedCustomerId}
-                                onClose={() => setSelectedCustomerId(null)}
-                            />
-                        </div>
+                        <>
+                            {/* Desktop wrapper */}
+                            <div className="hidden lg:block shrink-0 overflow-scroll rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm" style={{ width: '380px', maxHeight: 'calc(100vh - 220px)', position: 'sticky', top: '24px', alignSelf: 'flex-start' }}>
+                                <CustomerPreviewPanel
+                                    customerId={selectedCustomerId}
+                                    onClose={() => setSelectedCustomerId(null)}
+                                />
+                            </div>
+                            {/* Mobile: rendered by CustomerPreviewPanel as fixed overlay */}
+                            <div className="lg:hidden">
+                                <CustomerPreviewPanel
+                                    customerId={selectedCustomerId}
+                                    onClose={() => setSelectedCustomerId(null)}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

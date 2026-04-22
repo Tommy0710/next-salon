@@ -92,32 +92,24 @@ const apptStatusBadge = (status: string) => {
 
 type Tab = "overview" | "invoices" | "appointments";
 
-export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
-    const { settings } = useSettings();
-    const [profile, setProfile] = useState<CustomerProfile | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [tab, setTab] = useState<Tab>("overview");
-
-    useEffect(() => {
-        if (!customerId) return;
-        setProfile(null);
-        setError("");
-        setLoading(true);
-        setTab("overview");
-        fetch(`/api/customers/${customerId}/profile`)
-            .then((r) => r.json())
-            .then((data) => {
-                if (data.success) setProfile(data.data);
-                else setError(data.error || "Failed to load profile");
-            })
-            .catch(() => setError("Network error"))
-            .finally(() => setLoading(false));
-    }, [customerId]);
-
-    if (!customerId) return null;
-
-    // ─── Derived data (only computed when profile is loaded) ───────────────
+// ─── Inner panel content (reused for both mobile modal and desktop panel) ─────
+function PanelContent({
+    profile,
+    loading,
+    error,
+    tab,
+    setTab,
+    onClose,
+    settings,
+}: {
+    profile: CustomerProfile | null;
+    loading: boolean;
+    error: string;
+    tab: Tab;
+    setTab: (t: Tab) => void;
+    onClose: () => void;
+    settings: any;
+}) {
     const c = profile?.customer;
     const stats = profile?.stats;
     const chartData = stats
@@ -215,12 +207,6 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                     </span>
                                 </div>
                             )}
-                            {/* {c.notes && (
-                                <div className="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-400">
-                                    <Note className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                    <span className="truncate">{c.notes}</span>
-                                </div>
-                            )} */}
                             <div className="flex items-center gap-2.5 text-xs text-gray-600 dark:text-gray-400">
                                 <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                                 <span>Tham gia: {new Date(c.createdAt).toLocaleDateString("vi-VN")}</span>
@@ -268,15 +254,12 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                         {/* OVERVIEW TAB */}
                         {tab === "overview" && (
                             <>
-                                {/* Notes */}
                                 {c.notes && (
                                     <div className="p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-xl">
                                         <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">Ghi chú</p>
                                         <p className="text-xs text-amber-800 dark:text-amber-300 whitespace-pre-wrap">{c.notes}</p>
                                     </div>
                                 )}
-
-                                {/* Monthly Spend Chart */}
                                 {stats!.monthlySpend.length > 0 && (
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
@@ -285,7 +268,6 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                                 Chi tiêu 6 tháng gần nhất
                                             </p>
                                         </div>
-
                                         <div className="w-full h-32">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <AreaChart data={chartData}>
@@ -295,29 +277,15 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                                         </linearGradient>
                                                     </defs>
-
                                                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                                                     <YAxis hide />
-                                                    <Tooltip
-                                                        formatter={(value) =>
-                                                            formatCurrency(Number(value), settings.currency)
-                                                        }
-                                                    />
-
-                                                    <Area
-                                                        type="monotone"
-                                                        dataKey="amount"
-                                                        stroke="#6366f1"
-                                                        fillOpacity={1}
-                                                        fill="url(#colorSpend)"
-                                                    />
+                                                    <Tooltip formatter={(value) => formatCurrency(Number(value), settings.currency)} />
+                                                    <Area type="monotone" dataKey="amount" stroke="#6366f1" fillOpacity={1} fill="url(#colorSpend)" />
                                                 </AreaChart>
                                             </ResponsiveContainer>
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Top Services */}
                                 {stats!.topServices.length > 0 && (
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
@@ -340,7 +308,6 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                         </div>
                                     </div>
                                 )}
-
                                 {stats!.topServices.length === 0 && stats!.monthlySpend.length === 0 && (
                                     <div className="text-center py-8 text-gray-400 dark:text-gray-600">
                                         <ShoppingBag className="w-10 h-10 mx-auto mb-2 opacity-30" />
@@ -364,7 +331,7 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                                             <div className="flex items-center justify-between mb-1.5">
                                                 <span className="text-xs font-mono font-bold text-primary-900 dark:text-primary-400">#{inv.invoiceNumber}</span>
                                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadge(inv.status)}`}>
-                                                    {inv.status === 'paid' ? 'Đã thanh toán' : inv.status === 'partially_paid' ? 'TT 1 phần' : inv.status === 'pending' ? 'Chờ' : 'Hủy'}
+                                                    {inv.status === 'paid' ? 'Đã thanh toán' : inv.status === 'partially_paid' ? 'TT 1 phần' : inv.status === 'pending' ? 'Chờ thanh toán' : 'Hủy bỏ'}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between">
@@ -434,6 +401,113 @@ export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+// ─── Main export ───────────────────────────────────────────────────────────────
+export default function CustomerPreviewPanel({ customerId, onClose }: Props) {
+    const { settings } = useSettings();
+    const [profile, setProfile] = useState<CustomerProfile | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [tab, setTab] = useState<Tab>("overview");
+    const [isMobile, setIsMobile] = useState(false);
+    const [isVisible, setIsVisible] = useState(false); // for animation
+
+    // Detect mobile breakpoint
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024); // lg breakpoint
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    // Fetch profile data
+    useEffect(() => {
+        if (!customerId) return;
+        setProfile(null);
+        setError("");
+        setLoading(true);
+        setTab("overview");
+        fetch(`/api/customers/${customerId}/profile`)
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.success) setProfile(data.data);
+                else setError(data.error || "Failed to load profile");
+            })
+            .catch(() => setError("Network error"))
+            .finally(() => setLoading(false));
+    }, [customerId]);
+
+    // Animate in when customerId changes on mobile
+    useEffect(() => {
+        if (!customerId) {
+            setIsVisible(false);
+            return;
+        }
+        // Small delay to trigger CSS transition
+        const t = setTimeout(() => setIsVisible(true), 10);
+        return () => clearTimeout(t);
+    }, [customerId]);
+
+    // Handle close with animation on mobile
+    const handleClose = () => {
+        if (isMobile) {
+            setIsVisible(false);
+            setTimeout(onClose, 300); // wait for slide-down animation
+        } else {
+            onClose();
+        }
+    };
+
+    if (!customerId) return null;
+
+    const panelContent = (
+        <PanelContent
+            profile={profile}
+            loading={loading}
+            error={error}
+            tab={tab}
+            setTab={setTab}
+            onClose={handleClose}
+            settings={settings}
+        />
+    );
+
+    // ── MOBILE: Bottom sheet modal ─────────────────────────────────────────────
+    if (isMobile) {
+        return (
+            <>
+                {/* Backdrop */}
+                <div
+                    className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${isVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                    onClick={handleClose}
+                />
+
+                {/* Bottom Sheet */}
+                <div
+                    className={`fixed inset-x-0 bottom-0 z-50 flex flex-col bg-white dark:bg-slate-900 rounded-t-2xl shadow-2xl lg:hidden transition-transform duration-300 ease-out`}
+                    style={{
+                        height: "85dvh",
+                        transform: isVisible ? "translateY(0)" : "translateY(100%)",
+                    }}
+                >
+                    {/* Drag handle */}
+                    <div className="flex justify-center pt-3 pb-1 shrink-0">
+                        <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-slate-600" />
+                    </div>
+
+                    {panelContent}
+                </div>
+            </>
+        );
+    }
+
+    // ── DESKTOP: Side panel ────────────────────────────────────────────────────
+    return (
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 min-w-[360px] max-w-[420px]">
+            {panelContent}
         </div>
     );
 }

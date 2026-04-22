@@ -628,7 +628,7 @@ export default function AppointmentsPage() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-auto text-black dark:text-white">
+                            <div className="flex-1 overflow-auto overflow-x-auto text-black dark:text-white">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
                                     <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                         <tr>

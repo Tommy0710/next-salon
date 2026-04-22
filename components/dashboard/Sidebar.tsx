@@ -99,6 +99,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
     const { theme, toggleTheme } = useTheme();
     const [storeName, setStoreName] = useState("SalonNext");
     const [logoUrl, setLogoUrl] = useState("");
+    const [logoUrlDark, setLogoUrlDark] = useState("");
 
     useEffect(() => {
         fetchSettings();
@@ -109,12 +110,9 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
             const res = await fetch("/api/settings");
             const data = await res.json();
             if (data.success && data.data) {
-                if (data.data.storeName) {
-                    setStoreName(data.data.storeName);
-                }
-                if (data.data.logoUrl) {
-                    setLogoUrl(data.data.logoUrl);
-                }
+                if (data.data.storeName) setStoreName(data.data.storeName);
+                if (data.data.logoUrl) setLogoUrl(data.data.logoUrl);
+                if (data.data.logoUrlDark) setLogoUrlDark(data.data.logoUrlDark);
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
@@ -174,8 +172,21 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                         <div className="flex items-center gap-3">
                             <div className="relative">
                                 <div className="w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden">
-                                    {logoUrl ? (
-                                        <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                                    {(logoUrl || logoUrlDark) ? (
+                                        <>
+                                            {/* Light mode logo */}
+                                            <img
+                                                src={logoUrl}
+                                                alt="Logo"
+                                                className="w-full h-full object-contain dark:hidden"
+                                            />
+                                            {/* Dark mode logo (fallback to light) */}
+                                            <img
+                                                src={logoUrlDark || logoUrl}
+                                                alt="Logo"
+                                                className="w-full h-full object-contain hidden dark:block"
+                                            />
+                                        </>
                                     ) : (
                                         <Sparkles className="w-5 h-5 text-white" />
                                     )}
@@ -183,13 +194,16 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                             </div>
                             <div>
                                 <h1 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">{storeName}</h1>
-                                <p className="text-[10px] text-gray-500 dark:text-slate-400 font-medium uppercase tracking-wider">Business Suite</p>
+                                {/* <p className="text-[10px] text-gray-500 dark:text-slate-400 font-medium uppercase tracking-wider">Business Suite</p> */}
                             </div>
                         </div>
                     ) : (
                         <div className="w-20 h-20 items-center justify-center overflow-hidden">
-                            {logoUrl ? (
-                                <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                            {(logoUrl || logoUrlDark) ? (
+                                <>
+                                    <img src={logoUrl} alt="Logo" className="w-full h-full object-contain dark:hidden" />
+                                    <img src={logoUrlDark || logoUrl} alt="Logo" className="w-full h-full object-contain hidden dark:block" />
+                                </>
                             ) : (
                                 <Sparkles className="w-5 h-5 text-white" />
                             )}
