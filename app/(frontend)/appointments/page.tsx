@@ -900,32 +900,65 @@ export default function AppointmentsPage() {
                             {formError}
                         </div>
                     )}
-                    <div className="grid grid-cols-2 gap-4">
-                        <FormInput label="Date" type="date" required value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <FormInput
+                            label="Date"
+                            type="date"
+                            required
+                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        />
+
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Giảm giá</label>
-                            <div className="flex gap-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Giảm giá
+                            </label>
+
+                            <div className="flex flex-row gap-2">
+                                {/* Type */}
                                 <select
                                     value={formData.discount.type}
-                                    onChange={(e) => setFormData({ ...formData, discount: { ...formData.discount, type: e.target.value as 'percentage' | 'fixed' } })}
-                                    className="px-2 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900 w-28"
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            discount: {
+                                                ...formData.discount,
+                                                type: e.target.value as 'percentage' | 'fixed',
+                                                value: 0, // reset để tránh lỗi logic
+                                            },
+                                        })
+                                    }
+                                    className="w-auto px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                 >
-                                    <option value="percentage">% Phần trăm</option>
-                                    <option value="fixed">Tiền cố định</option>
+                                    <option value="percentage">%</option>
+                                    <option value="fixed">₫</option>
                                 </select>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max={formData.discount.type === 'percentage' ? 100 : undefined}
-                                    value={formData.discount.value}
-                                    onChange={(e) => {
-                                        let val = parseFloat(e.target.value) || 0;
-                                        if (formData.discount.type === 'percentage' && val > 100) val = 100;
-                                        setFormData({ ...formData, discount: { ...formData.discount, value: val } });
-                                    }}
-                                    className="flex-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
-                                    placeholder={formData.discount.type === 'percentage' ? "0–100" : "0"}
-                                />
+
+                                {/* Value */}
+                                <div className="relative flex-1">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max={formData.discount.type === 'percentage' ? 100 : undefined}
+                                        value={formData.discount.value}
+                                        onChange={(e) => {
+                                            let val = parseFloat(e.target.value) || 0;
+                                            if (formData.discount.type === 'percentage' && val > 100) val = 100;
+
+                                            setFormData({
+                                                ...formData,
+                                                discount: { ...formData.discount, value: val },
+                                            });
+                                        }}
+                                        className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                        placeholder={formData.discount.type === 'percentage' ? "0–100" : "Nhập số tiền"}
+                                    />
+
+                                    {/* Unit */}
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                                        {formData.discount.type === 'percentage' ? "%" : "₫"}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
