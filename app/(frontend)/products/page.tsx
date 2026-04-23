@@ -197,7 +197,7 @@ export default function ProductsPage() {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto text-black dark:text-white">
+                        <div className="hidden md:block overflow-x-auto text-black dark:text-white">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
                                 <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                     <tr>
@@ -303,6 +303,89 @@ export default function ProductsPage() {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Mobile Card List */}
+                        <div className="md:hidden">
+                            {loading && products.length === 0 ? (
+                                <div className="p-3 space-y-2.5">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="space-y-2"><div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-3/4" /><div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/2" /></div>
+                                                <div className="space-y-2"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-2/3" /><div className="h-5 bg-gray-100 dark:bg-slate-800 rounded-full w-16" /></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : products.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400">
+                                    <Package className="w-14 h-14 mb-3 opacity-20" />
+                                    <p className="text-sm font-medium">No products found</p>
+                                </div>
+                            ) : (
+                                <div className="p-3 space-y-2.5">
+                                    {products.map((product) => {
+                                        const isOpen = activeDropdown === product._id;
+                                        const isLowStock = product.stock <= 5;
+                                        const isRetail = product.type === 'retail';
+                                        return (
+                                            <div key={product._id} className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                                                <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${isLowStock ? 'bg-red-400' : 'bg-orange-400'}`} style={{borderRadius:'4px 0 0 4px'}} />
+                                                <div className="absolute right-1 top-1 z-20 dropdown-trigger">
+                                                    <button onClick={(e) => { e.stopPropagation(); setActiveDropdown(isOpen ? null : product._id); }} className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
+                                                        <MoreVertical className="w-4 h-4" />
+                                                    </button>
+                                                    {isOpen && (
+                                                        <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
+                                                            <PermissionGate resource="products" action="edit">
+                                                                <button onClick={() => { openModal(product); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors">
+                                                                    <Edit className="w-4 h-4 text-blue-500" /> Edit Product
+                                                                </button>
+                                                            </PermissionGate>
+                                                            <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
+                                                            <PermissionGate resource="products" action="delete">
+                                                                <button onClick={() => { handleDelete(product._id); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                                                    <Trash2 className="w-4 h-4" /> Delete
+                                                                </button>
+                                                            </PermissionGate>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
+                                                    {/* Col 1: Name + Brand + Category */}
+                                                    <div className="px-3 py-3 pr-6 flex flex-col gap-2 min-w-0">
+                                                        <div className="flex items-start gap-2">
+                                                            <div className="mt-0.5 p-1.5 bg-orange-50 dark:bg-orange-900/20 rounded-lg shrink-0">
+                                                                <Package className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white truncate">{product.name}</div>
+                                                                <div className="text-[10px] text-gray-400">{product.brand || 'No Brand'}</div>
+                                                            </div>
+                                                        </div>
+                                                        <span className="self-start inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 truncate max-w-full">
+                                                            {product.category || 'Uncategorized'}
+                                                        </span>
+                                                    </div>
+                                                    {/* Col 2: Stock + Price + Type */}
+                                                    <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
+                                                        <div className="flex items-center gap-1.5">
+                                                            {isLowStock && <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+                                                            <span className={`text-[14px] font-black ${isLowStock ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>{product.stock} units</span>
+                                                        </div>
+                                                        <div className="text-[13px] font-bold text-gray-700 dark:text-gray-200">{formatCurrency(product.price, settings.currency)}</div>
+                                                        <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${isRetail ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-primary-50 text-primary-700 border-primary-200'}`}>
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${isRetail ? 'bg-emerald-400' : 'bg-primary-400'}`} />
+                                                            {product.type}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         {/* Pagination */}

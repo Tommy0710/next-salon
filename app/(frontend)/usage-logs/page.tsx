@@ -140,7 +140,7 @@ export default function UsageLogsPage() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="hidden md:block overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                             <tr>
@@ -223,6 +223,72 @@ export default function UsageLogsPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card List — 1 column (info-dense) */}
+                <div className="md:hidden">
+                    {loading && logs.length === 0 ? (
+                        <div className="p-3 space-y-2.5">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4 space-y-2">
+                                    <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-1/2" />
+                                    <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-3/4" />
+                                    <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/3" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : logs.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400">
+                            <History className="w-14 h-14 mb-3 opacity-20" />
+                            <p className="text-sm font-medium">No usage logs found</p>
+                        </div>
+                    ) : (
+                        <div className="p-3 space-y-2.5">
+                            {logs.map((log) => (
+                                <div key={log._id} className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
+                                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-red-400" style={{ borderRadius: '4px 0 0 4px' }} />
+                                    {/* Delete button — top right */}
+                                    <button
+                                        onClick={() => handleDelete(log._id)}
+                                        className="absolute right-2 top-2 p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                        title="Delete & Revert Stock"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                    <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                        {/* Product */}
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                <Archive className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                                            </div>
+                                            <div>
+                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white">{log.product?.name || 'Unknown Product'}</div>
+                                                {log.product?.sku && <div className="text-[10px] text-gray-400">{log.product.sku}</div>}
+                                            </div>
+                                        </div>
+                                        {/* Meta row */}
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                                                <Calendar className="w-3 h-3" />
+                                                {format(new Date(log.date), 'dd MMM yyyy')}
+                                            </span>
+                                            <span className="text-[12px] font-black text-red-600 dark:text-red-400">-{log.quantity}</span>
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300">
+                                                {log.reason}
+                                            </span>
+                                            {log.staff && (
+                                                <span className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400">
+                                                    <User className="w-3 h-3" />
+                                                    {log.staff.name}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {log.notes && <div className="text-[11px] text-gray-400 dark:text-gray-500 italic truncate">{log.notes}</div>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Pagination */}
