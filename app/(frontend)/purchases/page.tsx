@@ -292,7 +292,7 @@ export default function PurchasesPage() {
                                 const paymentDot: Record<string, string> = { paid: 'bg-emerald-400', partially_paid: 'bg-blue-400', unpaid: 'bg-orange-400' };
                                 return (
                                     <div key={purchase._id} className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-                                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${statusDot[purchase.status] ?? 'bg-gray-400'}`} style={{borderRadius:'4px 0 0 4px'}} />
+                                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${statusDot[purchase.status] ?? 'bg-gray-400'}`} style={{ borderRadius: '4px 0 0 4px' }} />
                                         <div className="absolute right-1 top-1 z-20 dropdown-trigger">
                                             <button onClick={(e) => { e.stopPropagation(); setActiveDropdown(isOpen ? null : purchase._id); }} className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
                                                 <MoreVertical className="w-4 h-4" />

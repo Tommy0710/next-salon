@@ -295,7 +295,7 @@ export default function InvoicesPage() {
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Paid</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due</th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff (Comm)</th> */}
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff (Comm)</th>
                                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -365,23 +365,23 @@ export default function InvoicesPage() {
                                                 {inv.status?.replace('_', ' ') || 'N/A'}
                                             </span>
                                         </td>
-                                        {/* <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap">
                                             {inv.staffAssignments && inv.staffAssignments.length > 0 ? (
                                                 <div className="space-y-1">
                                                     {inv.staffAssignments.map((assignment: any, idx: number) => (
                                                         <div key={idx} className="flex flex-col">
                                                             <span className="text-xs font-medium text-gray-900 dark:text-white leading-tight">{assignment.staff?.name || "Staff"}</span>
-                                                            <span className="text-[10px] text-green-600 font-bold leading-tight">{settings.symbol}{(assignment.commission || 0).toFixed(2)}</span>
+                                                            <span className="text-[10px] text-green-600 font-bold leading-tight">{formatCurrency(assignment.commission || 0)}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             ) : (
                                                 <>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-white">{inv.staff?.name || "N/A"}</div>
-                                                    <div className="text-xs text-green-600 font-bold">{settings.symbol}{(inv.commission || 0).toFixed(2)}</div>
+                                                    <div className="text-xs text-green-600 font-bold">{formatCurrency(inv.commission || 0)}</div>
                                                 </>
                                             )}
-                                        </td> */}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <div className="relative flex justify-end dropdown-trigger">
                                                 <button
@@ -537,6 +537,7 @@ export default function InvoicesPage() {
                                                 <span className={`self-start text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${inv.appointment ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
                                                     {inv.appointment ? 'Appointment' : 'POS'}
                                                 </span>
+
                                             </div>
                                             {/* Col 2: Amounts + Status */}
                                             <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
@@ -544,6 +545,12 @@ export default function InvoicesPage() {
                                                     <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total</div>
                                                     <div className="text-[14px] font-black text-gray-900 dark:text-white">{formatCurrency(inv.totalAmount)}</div>
                                                 </div>
+                                                {!inv.appointment && inv.staff && (
+                                                    <div className="flex flex-col items-start">
+                                                        <div className="text-[12px] font-medium text-gray-500 dark:text-gray-400">{inv.staff?.name}</div>
+                                                        <div className="text-[10px] text-green-600">{formatCurrency(inv.commission)}</div>
+                                                    </div>
+                                                )}
                                                 <div className="grid grid-cols-2 gap-1">
                                                     <div>
                                                         <div className="text-[9px] text-gray-400 uppercase font-semibold">Paid</div>
