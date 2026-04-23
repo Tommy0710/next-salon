@@ -8,6 +8,7 @@ import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormIn
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect";
 import StaffCalendar from "@/components/appointments/StaffCalendar";
+import AppointmentCard from "@/components/appointments/AppointmentCard";
 import { formatAppointmentDateTime } from '@/lib/zaloDate';
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatCurrency } from "@/lib/currency";
@@ -534,8 +535,8 @@ export default function AppointmentsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <div className="p-4 bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col">
+            <div className="p-4 rounded-lg bg-white dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
                     <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
@@ -575,8 +576,8 @@ export default function AppointmentsPage() {
                 </button>
             </div>
 
-            <div className="h-full flex-1 overflow-auto bg-white dark:bg-slate-950 flex flex-col">
-                <div className="h-full p-4 space-y-6">
+            <div className="flex-1 overflow-auto bg-gray-50 dark:bg-slate-950 flex flex-col">
+                <div className="flex-1 pt-4">
                     {view === 'calendar' ? (
                         <StaffCalendar
                             refreshTrigger={refreshTrigger}
@@ -628,7 +629,8 @@ export default function AppointmentsPage() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-auto overflow-x-auto text-black dark:text-white">
+                            {/* ── DESKTOP TABLE (hidden on mobile) ── */}
+                            <div className="hidden md:block flex-1 overflow-auto overflow-x-auto text-black dark:text-white">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
                                     <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                         <tr>
@@ -824,6 +826,50 @@ export default function AppointmentsPage() {
                                         )}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* ── MOBILE CARD LIST (hidden on md+) ── */}
+                            <div className="md:hidden flex-1 overflow-y-auto">
+                                {loading && appointments.length === 0 ? (
+                                    <div className="p-4 space-y-3">
+                                        {Array.from({ length: 4 }).map((_, i) => (
+                                            <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4">
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-2/3" />
+                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/2" />
+                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-3/4" />
+                                                    </div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-full" />
+                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-2/3" />
+                                                        <div className="h-5 bg-gray-100 dark:bg-slate-800 rounded-full w-20 mt-2" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : appointments.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400 dark:text-slate-500">
+                                        <CalendarIcon className="w-14 h-14 mb-3 opacity-20" />
+                                        <p className="text-sm font-medium">No appointments found</p>
+                                    </div>
+                                ) : (
+                                    <div className="p-3 space-y-2.5 flex flex-col gap-4">
+                                        {appointments.map((apt) => (
+                                            <AppointmentCard
+                                                key={apt._id}
+                                                apt={apt}
+                                                activeDropdown={activeDropdown}
+                                                onToggleDropdown={setActiveDropdown}
+                                                onOpenDetail={openDetailModal}
+                                                onStatusUpdate={handleStatusUpdate}
+                                                onEdit={openEditModal}
+                                                onDelete={handleDelete}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* List View Pagination */}
