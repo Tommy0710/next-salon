@@ -37,8 +37,8 @@ export default function AIInsight() {
     }, []);
 
     return (
-        <div className="bg-gradient-to-r from-primary-900 to-indigo-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
+        <div className="bg-gradient-to-r from-primary-900 to-indigo-900 rounded-xl p-4 text-white shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 md:p-8 opacity-10 group-hover:rotate-12 transition-transform">
                 <BrainCircuit className="w-32 h-32" />
             </div>
 

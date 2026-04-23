@@ -85,7 +85,7 @@ export default function AddDepositModal({
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between p-4 border-b border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {transactionType.includes('return') ? 'Record Refund' : 'Add Payment'}
                     </h3>
@@ -94,7 +94,7 @@ export default function AddDepositModal({
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-4 space-y-4">
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
                             {error}

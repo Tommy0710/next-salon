@@ -153,7 +153,7 @@ export default function ReportsPage() {
 
     const renderSummary = () => (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title="Total Revenue"
                     value={formatCurrency(reportData?.totalRevenue)}
@@ -188,8 +188,8 @@ export default function ReportsPage() {
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900 dark:text-white">Platform Growth</h3>
                         <Users className="w-5 h-5 text-primary-600" />
@@ -199,7 +199,7 @@ export default function ReportsPage() {
                         <span className="text-sm text-gray-500 mb-1">Total Customers</span>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900 dark:text-white">Inventory Status</h3>
                         <Package className="w-5 h-5 text-orange-600" />
@@ -211,7 +211,7 @@ export default function ReportsPage() {
                         </span>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-900 dark:text-white">Profit Margin</h3>
                         <TrendingUp className="w-5 h-5 text-primary-600" />
@@ -378,8 +378,8 @@ export default function ReportsPage() {
                 );
             case 'profit':
                 return (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white p-4 md:p-8 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8 border-b pb-4">Profit & Loss Statement</h3>
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center group">
@@ -399,20 +399,20 @@ export default function ReportsPage() {
                                     <span className="text-2xl font-black text-amber-600">-{formatCurrency(reportData?.totalPurchases)}</span>
                                 </div>
                                 <div className="pt-8 mt-8 border-t-2 border-dashed border-gray-100">
-                                    <div className="flex justify-between items-center p-6 bg-primary-900 rounded-2xl text-white shadow-xl">
+                                    <div className="flex justify-between items-center p-4 bg-primary-900 rounded-xl text-white shadow-xl">
                                         <div>
                                             <span className="text-xs font-bold uppercase tracking-[0.2em] opacity-80">Final Net Profit</span>
                                             <p className="text-4xl font-black mt-1">{formatCurrency(reportData?.netProfit)}</p>
                                         </div>
-                                        <div className="p-4 bg-white/10 rounded-2xl">
+                                        <div className="p-4 bg-white/10 rounded-xl">
                                             {reportData?.netProfit >= 0 ? <ArrowUpRight className="w-10 h-10" /> : <ArrowDownRight className="w-10 h-10" />}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gray-900 p-8 rounded-xl shadow-lg text-white flex flex-col justify-center items-center text-center">
-                            <TrendingUp className="w-16 h-16 text-primary-400 mb-6 animate-pulse" />
+                        <div className="bg-gray-900 p-4 md:p-8 rounded-xl shadow-lg text-white flex flex-col justify-center items-center text-center">
+                            <TrendingUp className="w-16 h-16 text-primary-400 mb-4 animate-pulse" />
                             <h4 className="text-xl font-bold mb-2">Growth Forecast</h4>
                             <p className="text-gray-400 text-sm">Our AI models are processing your salon's patterns to provide next month's projections.</p>
                         </div>
@@ -420,9 +420,9 @@ export default function ReportsPage() {
                 );
             case 'daily':
                 return (
-                    <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-2xl p-10">
+                    <div className="max-w-3xl mx-auto bg-white rounded-xl border border-gray-100 shadow-2xl p-10">
                         <div className="text-center mb-10 pb-8 border-b border-gray-50">
-                            <div className="inline-flex p-3 bg-primary-50 rounded-2xl mb-4">
+                            <div className="inline-flex p-3 bg-primary-50 rounded-xl mb-4">
                                 <PieChart className="w-8 h-8 text-primary-900" />
                             </div>
                             <h3 className="text-3xl font-black text-gray-900 dark:text-white">Daily Reconciliation</h3>
@@ -431,12 +431,12 @@ export default function ReportsPage() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                            <div className="p-6 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-2xl border border-gray-100">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                            <div className="p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-100">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Gross Sales Value</span>
                                 <span className="text-4xl font-black text-gray-900 dark:text-white font-mono">{formatCurrency(reportData.totalSales)}</span>
                             </div>
-                            <div className="p-6 bg-green-50 rounded-2xl border border-green-100">
+                            <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                                 <span className="text-[10px] font-black text-green-600/60 uppercase tracking-[0.2em] block mb-2">Liquid Cash Collected</span>
                                 <span className="text-4xl font-black text-green-700 font-mono">{formatCurrency(reportData.totalCollected)}</span>
                             </div>
@@ -451,7 +451,7 @@ export default function ReportsPage() {
                             ))}
                         </div>
 
-                        <div className="flex items-center justify-between p-6 bg-red-50 rounded-2xl border border-red-100">
+                        <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-100">
                             <div>
                                 <span className="text-xs font-bold text-red-600 uppercase block mb-1">Today's Outflow (Expenses)</span>
                                 <span className="text-2xl font-black text-red-700">-{formatCurrency(reportData.totalExpenses)}</span>
@@ -465,7 +465,7 @@ export default function ReportsPage() {
                 );
             case 'activity-log':
                 return (
-                    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+                    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-gray-200">
                         <Shield className="w-16 h-16 text-primary-900 mb-4" />
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">System Activity Audit</h3>
                         <p className="text-gray-500 max-w-md text-center mt-2 mb-8">
@@ -473,7 +473,7 @@ export default function ReportsPage() {
                         </p>
                         <a
                             href="/reports/activity-log"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-900 text-white rounded-xl font-bold shadow-lg hover:bg-primary-800 transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-900 text-white rounded-xl font-bold shadow-lg hover:bg-primary-800 transition-all"
                         >
                             <FileText className="w-5 h-5" />
                             Access Security Logs
@@ -488,7 +488,7 @@ export default function ReportsPage() {
             {/* Top Bar Navigation */}
             <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between py-6 gap-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between py-6 gap-4">
                         <div>
                             <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Financial Reports</h1>
                             <p className="text-sm text-gray-500 font-medium">Business health analytics and performance tracking</p>
@@ -527,7 +527,7 @@ export default function ReportsPage() {
 
                 {/* Tab Strip */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex overflow-x-auto no-scrollbar gap-8">
+                    <div className="flex overflow-x-auto no-scrollbar gap-4 md:p-8">
                         {reportTabs.map((tab) => (
                             <button
                                 key={tab.id}

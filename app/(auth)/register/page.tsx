@@ -78,7 +78,7 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Register Card */}
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white dark:border-gray-700/20">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl p-4 md:p-8 border border-white dark:border-gray-700/20">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name Field */}
                         <div>

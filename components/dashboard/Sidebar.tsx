@@ -211,7 +211,7 @@ export default function Sidebar({ isSidebarOpen, isSidebarCollapsed, toggleSideb
                     )}
 
                     {/* Mobile Close Button */}
-                    <button onClick={toggleSidebar} className="md:hidden p-2 text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 rounded-lg transition-colors">
+                    <button onClick={toggleSidebar} className="md:hidden p-2 text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>

@@ -111,8 +111,8 @@ export default function UsageLogsPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="p-4 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Usage Logs</h1>
                     <p className="text-gray-500 text-sm">Track internal consumption, damages, and service usage</p>

@@ -79,8 +79,8 @@ export default function NewUserPage() {
     }));
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
-            <div className="flex items-center gap-4 mb-6">
+        <div className="p-4 max-w-2xl mx-auto">
+            <div className="flex items-center gap-4 mb-4">
                 <Link href="/users" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
@@ -91,7 +91,7 @@ export default function NewUserPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <UserIcon className="w-5 h-5 text-primary-900" />
                         User Details

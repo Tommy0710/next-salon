@@ -284,14 +284,14 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-4">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cài đặt cửa hàng</h1>
                 <p className="text-gray-500 dark:text-gray-400">Quản lý chi tiết và cấu hình cửa hàng của bạn</p>
             </div>
 
             {message.text && (
-                <div className={`p-4 rounded-lg mb-6 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                <div className={`p-4 rounded-lg mb-4 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
                     {message.text}
                 </div>
             )}
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.general && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <div className="grid grid-cols-1 gap-6">
+                            <div className="grid grid-cols-1 gap-4">
                                 <FormInput
                                     label="Tên cửa hàng"
                                     value={settings.storeName}
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                                         Logo cửa hàng
                                     </label>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* Light Mode Logo */}
                                         <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-800/50">
                                             <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -447,7 +447,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.contact && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
                                     label="Số điện thoại"
                                     value={settings.phone}
@@ -553,9 +553,9 @@ export default function SettingsPage() {
                                 </div>
 
                                 {/* Thiết lập Ca làm việc */}
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                                     {/* Ca 1 */}
-                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 1 (Sáng)
@@ -599,7 +599,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     {/* Ca 2 */}
-                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800/50 rounded-xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Ca làm việc 2 (Chiều/Tối)
@@ -644,9 +644,9 @@ export default function SettingsPage() {
                                 </div>
 
                                 {/* Khách hàng mỗi phiên & Phiên trung bình */}
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                                     {/* Khách hàng mỗi phiên */}
-                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
                                             <User className="w-4 h-4 text-primary-600" />
                                             Khách hàng mỗi phiên
@@ -695,7 +695,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     {/* Phiên trung bình thời gian */}
-                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-2xl border border-gray-200/60 dark:border-slate-700/60">
+                                    <div className="p-5 bg-gray-50 dark:bg-slate-900 dark:bg-slate-800/50 rounded-xl border border-gray-200/60 dark:border-slate-700/60">
                                         <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-primary-600" />
                                             Phiên trung bình thời gian
@@ -764,7 +764,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.business && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <div className="grid grid-cols-1 gap-6">
+                            <div className="grid grid-cols-1 gap-4">
                                 <FormInput
                                     label="Mã số thuế / Số đăng ký"
                                     value={settings.taxId}
@@ -793,7 +793,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.financial && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormSelect
                                     label="Tiền tệ"
                                     value={settings.currency}
@@ -889,7 +889,7 @@ export default function SettingsPage() {
 
                             {/* Danh sách QR đã thêm */}
                             {settings.qrCodes && settings.qrCodes.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     {settings.qrCodes.map((qr, index) => (
                                         <div key={index} className="flex items-start gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-800 relative">
                                             {qr.image ? (
@@ -1126,7 +1126,7 @@ export default function SettingsPage() {
                     </button>
                     {openTabs.reminder && (
                         <div className="px-6 pb-6 border-t border-gray-200 dark:border-slate-800 pt-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
                                     label="Send Reminders (Hours Before)"
                                     type="number"
@@ -1392,7 +1392,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* System Management */}
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-6">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Save className="w-5 h-5 text-primary-900" />
                         System Management

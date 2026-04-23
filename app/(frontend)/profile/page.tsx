@@ -108,19 +108,19 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-4">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
                 <p className="text-gray-500">Manage your account settings and preferences</p>
             </div>
 
             {message.text && (
-                <div className={`p-4 rounded-lg mb-6 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                <div className={`p-4 rounded-lg mb-4 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
                     {message.text}
                 </div>
             )}
 
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 flex items-start gap-3">
                 <Shield className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <div>
                     <p className="font-medium">Security Notice</p>
@@ -132,12 +132,12 @@ export default function ProfilePage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
-                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <User className="w-5 h-5 text-primary-900" />
                         Personal Information
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput
                             label="Full Name"
                             value={profile.name}
@@ -156,12 +156,12 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Security */}
-                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-4">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Shield className="w-5 h-5 text-primary-900" />
                         Security
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput
                             label="New Password"
                             value={profile.password || ""}

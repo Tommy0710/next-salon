@@ -160,15 +160,15 @@ export default function CreatePurchasePage() {
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto p-6 space-y-6">
+            <div className="max-w-5xl mx-auto p-4 space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* General Info */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                             <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                             General Information
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <SearchableSelect
                                 label="Supplier"
                                 required
@@ -198,7 +198,7 @@ export default function CreatePurchasePage() {
                     </div>
 
                     {/* Items */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
@@ -289,8 +289,8 @@ export default function CreatePurchasePage() {
                     </div>
 
                     {/* Payment & Totals */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Payment Details
@@ -329,7 +329,7 @@ export default function CreatePurchasePage() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-fit">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm h-fit">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <span className="w-1 h-6 bg-primary-900 rounded-full"></span>
                                 Order Summary

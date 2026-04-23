@@ -77,9 +77,9 @@ export default function PurchaseDetailsPage() {
 
     if (loading) {
         return (
-            <div className="p-6 md:p-12 animate-pulse">
-                <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-                <div className="h-64 bg-white rounded-xl border border-gray-100 mb-6"></div>
+            <div className="p-4 md:p-12 animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+                <div className="h-64 bg-white rounded-xl border border-gray-100 mb-4"></div>
                 <div className="h-96 bg-white rounded-xl border border-gray-100"></div>
             </div>
         );
@@ -88,7 +88,7 @@ export default function PurchaseDetailsPage() {
     if (!purchase) return null;
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black max-w-5xl mx-auto">
+        <div className="p-4 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black max-w-5xl mx-auto">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
@@ -131,10 +131,10 @@ export default function PurchaseDetailsPage() {
             </div>
 
             {/* Info Cards */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
                 {/* Supplier Info */}
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center">
                             <User className="w-5 h-5" />
                         </div>
@@ -177,8 +177,8 @@ export default function PurchaseDetailsPage() {
                 </div>
 
                 {/* Purchase Info */}
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
+                <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
                             <FileText className="w-5 h-5" />
                         </div>
@@ -229,8 +229,8 @@ export default function PurchaseDetailsPage() {
             </div>
 
             {/* Items Table */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
-                <div className="p-6 border-b border-gray-100 flex items-center gap-3">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+                <div className="p-4 border-b border-gray-100 flex items-center gap-3">
                     <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
                         <Package className="w-5 h-5" />
                     </div>
@@ -274,7 +274,7 @@ export default function PurchaseDetailsPage() {
                 </div>
 
                 {/* Summary Table */}
-                <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-6 flex justify-end">
+                <div className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-4 flex justify-end">
                     <div className="w-full max-w-xs space-y-3">
                         <div className="flex justify-between items-center text-sm">
                             <span className="font-medium text-gray-500">Subtotal</span>

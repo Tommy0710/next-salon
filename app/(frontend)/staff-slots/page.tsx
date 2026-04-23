@@ -261,7 +261,7 @@ export default function StaffSlotsPage() {
 
     return (
         <PermissionGate resource="staffSlots" action="view">
-            <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-4 md:p-8">
                 <div className="max-w-6xl mx-auto space-y-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
@@ -270,7 +270,7 @@ export default function StaffSlotsPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
+                    <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-4">
                         <div className="flex flex-col space-y-4">
                             <div className="flex border-b border-gray-100">
                                 <button
@@ -335,7 +335,7 @@ export default function StaffSlotsPage() {
                     </div>
 
                     {(selectedStaff && (creationType === 'date' ? selectedDate : selectedDay)) && (
-                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Time Slots</h2>
@@ -432,7 +432,7 @@ export default function StaffSlotsPage() {
                     )}
 
                     {!selectedStaff && (
-                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-200 shadow-sm p-4">
                             <div className="text-center py-8 text-gray-500">
                                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                 <p>Please select a staff member and date/day to manage availability slots</p>

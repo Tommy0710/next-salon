@@ -35,7 +35,7 @@ export default function ServiceChart({ data }: ServiceChartProps) {
     const remainingCount = Math.max(0, data.length - displayData.length);
 
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 h-full">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 h-full">
             <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Phân bổ doanh thu dịch vụ</h3>

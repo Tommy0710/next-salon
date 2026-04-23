@@ -56,16 +56,16 @@ export default function AIReportsPage() {
 
     if (!aiEnabled) {
         return (
-            <div className="max-w-4xl mx-auto p-8 text-center">
-                <div className="bg-primary-50 border border-primary-100 rounded-2xl p-12 shadow-sm">
-                    <Sparkles className="w-16 h-16 text-primary-600 mx-auto mb-6" />
+            <div className="max-w-4xl mx-auto p-4 md:p-8 text-center">
+                <div className="bg-primary-50 border border-primary-100 rounded-xl p-12 shadow-sm">
+                    <Sparkles className="w-16 h-16 text-primary-600 mx-auto mb-4" />
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">AI Reporting is Disabled</h1>
                     <p className="text-gray-600 mb-8">
                         Experience the power of business intelligence with AI. Enable OpenAI integration in your settings to get started.
                     </p>
                     <a
                         href="/settings"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
                     >
                         Go to Settings
                     </a>
@@ -75,7 +75,7 @@ export default function AIReportsPage() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto p-6 space-y-8">
+        <div className="max-w-6xl mx-auto p-4 space-y-8">
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -106,15 +106,15 @@ export default function AIReportsPage() {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:p-8">
                 {/* Left: Interactive AI Chat */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 overflow-hidden relative group">
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 overflow-hidden relative group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Lightbulb className="w-12 h-12 text-primary-600" />
                         </div>
                         <h3 className="font-bold text-gray-900 dark:text-white mb-4">Strategic Assistant</h3>
-                        <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                        <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                             Ask specific questions about your salon performance, inventory levels, or revenue trends.
                         </p>
                         <form onSubmit={generateAnalysis} className="space-y-4">
@@ -150,15 +150,15 @@ export default function AIReportsPage() {
                 {/* Right: AI Analysis Output */}
                 <div className="lg:col-span-2">
                     {loading ? (
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
-                            <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-6" />
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
+                            <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-4" />
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Analyzing Business Data...</h3>
                             <p className="text-gray-500 max-w-sm">
                                 AI is crunching your numbers and generating strategic recommendations. This may take a few seconds.
                             </p>
                         </div>
                     ) : analysis ? (
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full">
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full">
                             <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <PieChart className="w-4 h-4 text-primary-600" />
@@ -172,7 +172,7 @@ export default function AIReportsPage() {
                                 <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                                     {/* Report Header */}
                                     <div className="bg-white border-b border-gray-300 px-12 py-8">
-                                        <div className="text-center mb-6">
+                                        <div className="text-center mb-4">
                                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">BUSINESS INTELLIGENCE REPORT</h1>
                                             <div className="w-24 h-1 bg-gray-400 mx-auto mb-4"></div>
                                             <p className="text-gray-600 text-lg">Generated Analysis for {timeRange} Days</p>
@@ -195,7 +195,7 @@ export default function AIReportsPage() {
 
                                                     return (
                                                         <div key={paraIndex} className="mb-10">
-                                                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b-2 border-gray-300 pb-2">{title}</h2>
+                                                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-b-2 border-gray-300 pb-2">{title}</h2>
                                                             <div className="space-y-3 ml-2">
                                                                 {content.split('\n').map((line, lineIndex) => {
                                                                     const cleanLine = line.trim();
@@ -232,7 +232,7 @@ export default function AIReportsPage() {
 
                                                 // Regular paragraph
                                                 return (
-                                                    <div key={paraIndex} className="mb-6">
+                                                    <div key={paraIndex} className="mb-4">
                                                         <p className="text-gray-700 leading-relaxed">{trimmedParagraph}</p>
                                                     </div>
                                                 );
@@ -251,12 +251,12 @@ export default function AIReportsPage() {
                             </div>
                         </div>
                     ) : error ? (
-                        <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
-                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
+                        <div className="bg-white rounded-xl border border-red-200 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
+                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
                                 <AlertTriangle className="w-8 h-8 text-red-600" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Analysis Failed</h3>
-                            <p className="text-red-500 max-w-sm mb-6">{error}</p>
+                            <p className="text-red-500 max-w-sm mb-4">{error}</p>
                             <button
                                 onClick={() => generateAnalysis()}
                                 className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors"
@@ -265,8 +265,8 @@ export default function AIReportsPage() {
                             </button>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-2xl border border-dashed border-gray-300 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
-                            <Sparkles className="w-16 h-16 text-gray-200 mb-6" />
+                        <div className="bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-12 h-full flex flex-col items-center justify-center text-center">
+                            <Sparkles className="w-16 h-16 text-gray-200 mb-4" />
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready for Analysis</h3>
                             <p className="text-gray-500 max-w-sm mb-8">
                                 Click the button below to generate a comprehensive business health report powered by AI.

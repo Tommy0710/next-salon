@@ -214,22 +214,22 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
     };
 
     return (
-        <div className="h-full bg-white dark:bg-slate-900 dark:border-gray-700 rounded-2xl shadow-xl border border-gray-100 p-6 flex flex-col gap-4">
+        <div className="h-full bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-gray-100 dark:border-slate-800 p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between mb-2">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">{view}ly Schedule</h2>
-                    <p className="text-sm text-gray-500">Manage appointments across staff members</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage appointments across staff members</p>
                 </div>
                 <button
                     onClick={() => fetchAppointments(date, view)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
                     title="Refresh Data"
                 >
                     <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
                 </button>
             </div>
 
-            <div className="flex-1 relative overflow-hidden rounded-xl border border-gray-100">
+            <div className="flex-1 relative overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800">
                 <Calendar
                     localizer={localizer}
                     events={events}
@@ -259,27 +259,28 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                 />
             </div>
 
-            <div className="flex items-center gap-6 text-xs font-semibold py-2 px-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-lg border border-gray-100">
-                <span className="text-gray-400 uppercase tracking-wider">Legend:</span>
+            <div className="flex items-center gap-4 text-xs font-semibold py-2 px-4 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700">
+                <span className="text-gray-400 dark:text-gray-500 uppercase tracking-wider">Legend:</span>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-amber-500"></span>
-                    <span className="text-gray-600">Pending</span>
+                    <span className="text-gray-600 dark:text-gray-300">Pending</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-primary-500"></span>
-                    <span className="text-gray-600">Confirmed</span>
+                    <span className="text-gray-600 dark:text-gray-300">Confirmed</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <span className="text-gray-600">Completed</span>
+                    <span className="text-gray-600 dark:text-gray-300">Completed</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                    <span className="text-gray-600">Cancelled</span>
+                    <span className="text-gray-600 dark:text-gray-300">Cancelled</span>
                 </div>
             </div>
 
             <style jsx global>{`
+                /* ====== LIGHT MODE ====== */
                 .rbc-calendar-premium {
                     font-family: inherit;
                     background: white;
@@ -349,7 +350,6 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     color: #94a3b8;
                 }
                 .rbc-event {
-                    // min-width: 120px !important;
                     padding: 2px 4px;
                     border: 1px solid rgba(255,255,255,0.2);
                 }
@@ -392,6 +392,166 @@ export default function StaffCalendar({ onSelectEvent, refreshTrigger }: StaffCa
                     border-radius: 4px;
                     font-size: 10px;
                     padding: 2px 4px;
+                }
+                .rbc-time-slot {
+                    border-top: none;
+                }
+                .rbc-day-slot .rbc-time-slot {
+                    border-top: 1px solid #f1f5f9;
+                }
+                .rbc-off-range-bg {
+                    background: #f8fafc;
+                }
+                .rbc-off-range {
+                    color: #cbd5e1;
+                }
+                .rbc-date-cell {
+                    color: #374151;
+                    font-weight: 600;
+                }
+                .rbc-date-cell.rbc-now {
+                    color: #1e3a8a;
+                }
+                .rbc-row-content {
+                    background: white;
+                }
+                .rbc-allday-cell {
+                    background: #f8fafc;
+                }
+
+                /* ====== DARK MODE OVERRIDES ====== */
+                .dark .rbc-calendar-premium {
+                    background: #0f172a;
+                    color: #e2e8f0;
+                }
+                .dark .rbc-header {
+                    color: #cbd5e1;
+                    background-color: #1e293b;
+                    border-bottom: 2px solid #334155;
+                }
+                .dark .rbc-toolbar-label {
+                    color: #f1f5f9;
+                }
+                .dark .rbc-btn-group {
+                    background: #1e293b;
+                }
+                .dark .rbc-toolbar button {
+                    color: #94a3b8;
+                }
+                .dark .rbc-toolbar button:hover {
+                    background-color: var(--color-primary-900) !important;
+                    color: #fff !important;
+                }
+                .dark .rbc-toolbar button.rbc-active {
+                    background-color: var(--color-primary-900) !important;
+                    color: #fff !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                }
+                .dark .rbc-time-view,
+                .dark .rbc-month-view,
+                .dark .rbc-agenda-view {
+                    background: #0f172a;
+                    border-color: #334155;
+                }
+                .dark .rbc-timeslot-group {
+                    border-bottom: 1px solid #1e293b;
+                }
+                .dark .rbc-time-content {
+                    border-top: 2px solid #334155;
+                    background: #0f172a;
+                }
+                .dark .rbc-time-gutter {
+                    background: #0f172a;
+                }
+                .dark .rbc-label {
+                    color: #475569;
+                }
+                .dark .rbc-time-slot {
+                    border-top: none;
+                }
+                .dark .rbc-day-slot .rbc-time-slot {
+                    border-top: 1px solid #1e293b;
+                }
+                .dark .rbc-day-slot .rbc-time-column {
+                    background: #0f172a;
+                }
+                .dark .rbc-today {
+                    background-color: #172554;
+                }
+                .dark .rbc-off-range-bg {
+                    background: #1e293b;
+                }
+                .dark .rbc-off-range {
+                    color: #334155;
+                }
+                .dark .rbc-date-cell {
+                    color: #94a3b8;
+                }
+                .dark .rbc-date-cell.rbc-now {
+                    color: #93c5fd;
+                }
+                .dark .rbc-month-row {
+                    background: #0f172a;
+                    border-color: #1e293b;
+                }
+                .dark .rbc-month-row + .rbc-month-row {
+                    border-top: 1px solid #1e293b;
+                }
+                .dark .rbc-day-bg + .rbc-day-bg {
+                    border-left: 1px solid #1e293b;
+                }
+                .dark .rbc-row-content {
+                    background: #0f172a;
+                }
+                .dark .rbc-allday-cell {
+                    background: #1e293b;
+                }
+                .dark .rbc-show-more {
+                    color: #93c5fd;
+                    background: #1e293b;
+                }
+                .dark .rbc-row-bg .rbc-today {
+                    background-color: #172554;
+                }
+                .dark .rbc-header.rbc-today {
+                    background-color: #1e3a8a;
+                    color: #bfdbfe;
+                }
+                .dark .rbc-agenda-view table {
+                    background: #0f172a;
+                    color: #e2e8f0;
+                    border-color: #334155;
+                }
+                .dark .rbc-agenda-date-cell,
+                .dark .rbc-agenda-time-cell,
+                .dark .rbc-agenda-event-cell {
+                    border-color: #1e293b;
+                    color: #cbd5e1;
+                }
+                .dark .rbc-row-segment .rbc-event-content {
+                    color: white;
+                }
+                .dark .rbc-time-header {
+                    background: #1e293b;
+                    border-color: #334155;
+                }
+                .dark .rbc-time-header-content {
+                    border-left: 1px solid #334155;
+                }
+                .dark .rbc-time-header-gutter {
+                    background: #1e293b;
+                }
+                .dark .rbc-day-slot .rbc-events-container {
+                    margin-right: 10px;
+                }
+                .dark .rbc-event {
+                    border: 1px solid rgba(255,255,255,0.1);
+                }
+                .dark .rbc-current-time-indicator {
+                    background-color: #f87171;
+                }
+                .dark .rbc-current-time-indicator::before {
+                    background: #f87171;
                 }
             `}</style>
         </div>

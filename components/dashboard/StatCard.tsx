@@ -19,7 +19,7 @@ const colorMap = {
 
 export default function StatCard({ title, value, icon: Icon, trend, trendUp, color }: StatCardProps) {
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 transition-all hover:shadow-md">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 transition-all hover:shadow-md">
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>

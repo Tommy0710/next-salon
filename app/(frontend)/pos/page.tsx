@@ -1029,13 +1029,13 @@ export default function POSPage() {
             {/* THÊM VÀO ĐÂY: Modal Xác nhận xóa Bill */}
             {billToDelete && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex flex-col items-center text-center">
                             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4">
                                 <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Xác nhận xóa hóa đơn</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                                 Bạn có chắc chắn muốn xóa hóa đơn này không? Các sản phẩm đã chọn trong bill sẽ bị mất.
                             </p>
                         </div>
@@ -1059,7 +1059,7 @@ export default function POSPage() {
             {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-slate-800 pb-3">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm khách hàng mới</h3>
                             <button
@@ -1070,7 +1070,7 @@ export default function POSPage() {
                             </button>
                         </div>
 
-                        <div className="space-y-4 mb-6">
+                        <div className="space-y-4 mb-4">
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide">
                                     Tên khách hàng <span className="text-red-500 ml-1">*</span>

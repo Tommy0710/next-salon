@@ -90,7 +90,7 @@ export default function Header({ toggleSidebar, toggleCollapse, isSidebarCollaps
                 </button>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
                 {/* Time and Timezone Display */}
                 <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-950/30 rounded-lg border border-primary-100 dark:border-primary-900/50">
                     <Clock className="w-4 h-4 text-primary-900 dark:text-primary-400" />

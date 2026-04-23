@@ -200,7 +200,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* DÒNG 1: CHỈ SỐ CƠ BẢN */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
                     title="Doanh thu hôm nay"
                     value={formatCurrency(todaysSales)}
@@ -227,9 +227,9 @@ export default async function DashboardPage() {
             </div>
 
             {/* DÒNG 2: CHI TIẾT KHÁCH HÀNG & LỊCH HẸN */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Block 1: Biểu đồ khách hàng */}
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6 flex flex-col">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4 flex flex-col">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <Users className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                         Khách hàng hôm nay <span className="ml-auto bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 py-1 px-3 rounded-full text-sm">{uniqueCustomers.size + walkIn} khách</span>
@@ -238,8 +238,8 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Block 2: Trạng thái Lịch hẹn */}
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                         Tình trạng lịch hẹn <span className="ml-auto bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 py-1 px-3 rounded-full text-sm">{apptStats.total} lịch</span>
                     </h3>
@@ -277,13 +277,13 @@ export default async function DashboardPage() {
             </div>
 
             {/* DÒNG 3: BIỂU ĐỒ DOANH THU & DỊCH VỤ */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <SalesChart data={chartData} />
                 <ServiceChart data={serviceChartData} />
             </div>
 
             {/* DÒNG 4: HOẠT ĐỘNG GẦN ĐÂY */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-4">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Giao dịch gần đây</h3>
                 <RecentActivity activities={formattedActivity} />
             </div>

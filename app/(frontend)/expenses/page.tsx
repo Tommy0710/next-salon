@@ -153,10 +153,10 @@ export default function ExpensesPage() {
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Expense Management</h1>
                         <p className="text-sm text-gray-500">Track and manage business expenses</p>

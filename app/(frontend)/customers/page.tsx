@@ -267,7 +267,7 @@ export default function CustomersPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 p-4 md:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -652,7 +652,7 @@ export default function CustomersPage() {
             {/* ─── Import CSV Modal ─── */}
             <Modal isOpen={isImportOpen} onClose={closeImport} title="Import Customers from CSV">
                 {/* Step Indicator */}
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                     {[
                         { num: 1, label: "Upload" },
                         { num: 2, label: "Preview" },
@@ -704,7 +704,7 @@ export default function CustomersPage() {
                                 const file = e.dataTransfer.files[0];
                                 if (file) handleFileSelect(file);
                             }}
-                            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${importDragOver
+                            className={`border-2 border-dashed rounded-xl p-4 md:p-8 text-center cursor-pointer transition-colors ${importDragOver
                                 ? "border-primary-600 bg-primary-50 dark:bg-primary-900/20"
                                 : "border-gray-300 dark:border-slate-600 hover:border-primary-400 hover:bg-gray-50 dark:hover:bg-slate-800"
                                 }`}

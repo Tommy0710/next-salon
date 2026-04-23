@@ -534,14 +534,14 @@ export default function AppointmentsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col h-screen overflow-hidden">
-            <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div className="p-4 bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
                     <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg border border-gray-200 dark:border-slate-700">
                         <button
                             onClick={() => setView('list')}
-                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 ${view === 'list'
+                            className={`w-fit px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2 ${view === 'list'
                                 ? "bg-white dark:bg-slate-900 text-primary-900 dark:text-primary-400 shadow-sm"
                                 : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                                 }`}
@@ -568,7 +568,7 @@ export default function AppointmentsPage() {
                         setFormError("");
                         setIsModalOpen(true);
                     }}
-                    className="px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors flex items-center gap-2 font-medium"
+                    className="w-fit px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors flex items-center gap-2 font-medium"
                 >
                     <Plus className="w-4 h-4" />
                     New Appointment
@@ -576,7 +576,7 @@ export default function AppointmentsPage() {
             </div>
 
             <div className="h-full flex-1 overflow-auto bg-white dark:bg-slate-950 flex flex-col">
-                <div className="h-full p-6 space-y-6">
+                <div className="h-full p-4 space-y-6">
                     {view === 'calendar' ? (
                         <StaffCalendar
                             refreshTrigger={refreshTrigger}
@@ -928,7 +928,7 @@ export default function AppointmentsPage() {
                                             },
                                         })
                                     }
-                                    className="w-auto px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                    className="w-auto px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                 >
                                     <option value="percentage">%</option>
                                     <option value="fixed">₫</option>
@@ -950,7 +950,7 @@ export default function AppointmentsPage() {
                                                 discount: { ...formData.discount, value: val },
                                             });
                                         }}
-                                        className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                        className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                         placeholder={formData.discount.type === 'percentage' ? "0–100" : "Nhập số tiền"}
                                     />
 
@@ -963,11 +963,11 @@ export default function AppointmentsPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
                         {/* Customer */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Customer<span className="text-red-500 ml-1">*</span>
                             </label>
 
@@ -1041,20 +1041,20 @@ export default function AppointmentsPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                <div className="p-4 md:p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                     {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
+                            <div className="p-4 md:p-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950/50 text-sm text-gray-500 dark:text-gray-400 text-center">
                                 <CalendarIcon className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                 Please select date to view availability
                             </div>
                         )}
                     </div>
 
-                    <div className="mt-6 p-4 bg-gradient-to-br from-primary-900 to-indigo-900 rounded-2xl text-white shadow-xl">
+                    <div className="mt-6 p-4 bg-gradient-to-br from-primary-900 to-indigo-900 rounded-xl text-white shadow-xl">
                         <div className="flex items-center justify-between">
                             <div className="space-y-1">
                                 <p className="text-primary-100 text-[10px] font-bold uppercase tracking-wider">Estimated Duration</p>
@@ -1113,7 +1113,7 @@ export default function AppointmentsPage() {
             {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm Khách Hàng Mới</h3>
                             <button
@@ -1185,8 +1185,8 @@ export default function AppointmentsPage() {
             {/* MODAL CHI TIẾT APPOINTMENT */}
             {isDetailModalOpen && selectedAppointment && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
-                        <div className="flex items-center justify-between mb-6">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800">
+                        <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Chi tiết Appointment</h3>
                             <button
                                 onClick={closeDetailModal}

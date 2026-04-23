@@ -56,9 +56,7 @@ export default function DashboardLayout({
                     user={user}
                 />
 
-                <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6">
-                    {children}
-                </main>
+                <main className="p-4 md:p-8 flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
 
                 <Footer />
             </div>

@@ -110,7 +110,7 @@ export default function SetupForm() {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-600 to-indigo-600 rounded-2xl shadow-lg mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-600 to-indigo-600 rounded-xl shadow-lg mb-4">
                         <Shield className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome to SalonNext</h1>
@@ -118,7 +118,7 @@ export default function SetupForm() {
                 </div>
 
                 {/* Setup Form */}
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+                <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 md:p-8">
                     {success ? (
                         <div className="text-center py-8">
                             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />

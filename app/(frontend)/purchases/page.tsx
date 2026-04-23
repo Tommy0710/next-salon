@@ -110,8 +110,8 @@ export default function PurchasesPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="p-4 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Purchase Orders</h1>
                     <p className="text-gray-500 text-sm">Manage supplier purchases and stock intake</p>
@@ -294,8 +294,8 @@ export default function PurchasesPage() {
             {/* Deposit Modal */}
             {showDepositModal && selectedPurchase && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-primary-900 text-white">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-primary-900 text-white">
                             <div>
                                 <h3 className="text-xl font-bold">Add Deposit</h3>
                                 <p className="text-primary-200 text-xs mt-1">Order: {selectedPurchase.purchaseNumber}</p>
@@ -305,7 +305,7 @@ export default function PurchasesPage() {
                             </button>
                         </div>
 
-                        <div className="p-6 space-y-6">
+                        <div className="p-4 space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-3 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 rounded-xl border border-gray-100">
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Amount</p>
@@ -348,7 +348,7 @@ export default function PurchasesPage() {
                             </div>
                         </div>
 
-                        <div className="p-6 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-100 flex gap-3">
+                        <div className="p-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-100 flex gap-3">
                             <button
                                 onClick={() => setShowDepositModal(false)}
                                 className="flex-1 px-4 py-3 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-white transition-all"

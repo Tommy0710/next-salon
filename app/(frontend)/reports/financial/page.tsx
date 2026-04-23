@@ -43,7 +43,7 @@ export default function FinancialReportPage() {
     };
 
     return (
-        <div className="p-6 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
+        <div className="p-4 min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-black">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -86,7 +86,7 @@ export default function FinancialReportPage() {
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-pulse">
                         {[1, 2, 3, 4, 5, 6].map(i => (
                             <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
                         ))}
@@ -94,9 +94,9 @@ export default function FinancialReportPage() {
                 ) : data ? (
                     <div className="space-y-6">
                         {/* Primary Metrics */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {/* Net Profit */}
-                            <div className="bg-gradient-to-br from-primary-900 to-primary-800 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+                            <div className="bg-gradient-to-br from-primary-900 to-primary-800 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10">
                                     <TrendingUp className="w-24 h-24" />
                                 </div>
@@ -110,7 +110,7 @@ export default function FinancialReportPage() {
                             </div>
 
                             {/* Sales Revenue */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-primary-900/30 transition-all">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-primary-900/30 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
                                         <DollarSign className="w-6 h-6 text-emerald-600" />
@@ -125,7 +125,7 @@ export default function FinancialReportPage() {
                             </div>
 
                             {/* Cash Flow */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-primary-900/30 transition-all">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-primary-900/30 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-indigo-50 rounded-xl group-hover:bg-indigo-100 transition-colors">
                                         <CreditCard className="w-6 h-6 text-indigo-600" />
@@ -143,9 +143,9 @@ export default function FinancialReportPage() {
 
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white pt-4">Expense Breakdown</h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Purchases */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-orange-200 transition-all">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-orange-200 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-orange-50 rounded-xl group-hover:bg-orange-100 transition-colors">
                                         <ShoppingBag className="w-6 h-6 text-orange-600" />
@@ -167,7 +167,7 @@ export default function FinancialReportPage() {
                             </div>
 
                             {/* Operational Expenses */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-all">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative overflow-hidden group hover:border-red-200 transition-all">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-red-50 rounded-xl group-hover:bg-red-100 transition-colors">
                                         <TrendingDown className="w-6 h-6 text-red-600" />

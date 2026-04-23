@@ -42,7 +42,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
 
     if (!isSuperAdmin && permissions?.activityLogs?.view === "none") {
         return (
-            <div className="p-8 text-center text-red-500 font-bold bg-red-50 rounded-xl border border-red-200 m-6">
+            <div className="p-4 md:p-8 text-center text-red-500 font-bold bg-red-50 rounded-xl border border-red-200 m-6">
                 Access Denied: You do not have permission to view activity logs.
             </div>
         );
@@ -121,8 +121,8 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="p-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Activity Logs</h1>
                     <p className="text-gray-500 text-sm">Monitor system activity and Zalo messaging events.</p>
@@ -139,7 +139,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
             </div>
 
             {/* Tabs */}
-            <div className="mb-6">
+            <div className="mb-4">
                 <div className="border-b border-gray-200">
                     <nav className="-mb-px flex space-x-8">
                         <Link

@@ -423,10 +423,10 @@ export default function CalendarPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col h-screen overflow-hidden text-black dark:text-white">
-            <div className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <div className="p-4 bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-sm border border-primary-100 dark:border-primary-900/50">
+                    <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/20 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-sm border border-primary-100 dark:border-primary-900/50">
                         <Clock className="w-6 h-6" />
                     </div>
                     <div>
@@ -441,14 +441,14 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setRefreshTrigger(prev => prev + 1)}
-                        className="p-3 text-gray-500 hover:text-primary-900 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-primary-900/20 rounded-2xl transition-all border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm group"
+                        className="p-3 text-gray-500 hover:text-primary-900 hover:bg-primary-50 dark:text-gray-400 dark:hover:text-primary-400 dark:hover:bg-primary-900/20 rounded-xl transition-all border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm group"
                         title="Refresh"
                     >
                         <RefreshCw className={`w-5 h-5 transition-transform duration-500 group-hover:rotate-180 ${loadingSlots ? "animate-spin" : ""}`} />
                     </button>
                     <button
                         onClick={() => { closeModal(); setIsModalOpen(true); }}
-                        className="px-6 py-3 bg-primary-900 text-white rounded-2xl hover:bg-primary-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-primary-900/30 hover:-translate-y-0.5"
+                        className="px-4 py-2 bg-primary-900 text-white rounded-xl hover:bg-primary-800 transition-all flex items-center gap-2 font-bold shadow-lg shadow-primary-900/30 hover:-translate-y-0.5"
                     >
                         <Plus className="w-5 h-5" />
                         Book Appointment
@@ -456,7 +456,7 @@ export default function CalendarPage() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-white dark:bg-slate-900 p-6">
+            <div className="flex-1 overflow-auto bg-white dark:bg-slate-900 p-4">
                 <StaffCalendar
                     refreshTrigger={refreshTrigger}
                     onSelectEvent={onSelectEvent}
@@ -466,7 +466,7 @@ export default function CalendarPage() {
             <Modal isOpen={isModalOpen} onClose={closeModal} title={editingAppointment ? "Appointment Details" : "New Booking"}>
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {formError && (
-                        <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-xs font-bold flex items-center gap-3">
+                        <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold flex items-center gap-3">
                             <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-red-600">!</span>
                             {formError}
                         </div>
@@ -500,7 +500,7 @@ export default function CalendarPage() {
                                             },
                                         })
                                     }
-                                    className="w-auto px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                    className="w-auto px-3 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                 >
                                     <option value="percentage">%</option>
                                     <option value="fixed">₫</option>
@@ -522,7 +522,7 @@ export default function CalendarPage() {
                                                 discount: { ...formData.discount, value: val },
                                             });
                                         }}
-                                        className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
+                                        className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-900"
                                         placeholder={formData.discount.type === 'percentage' ? "0–100" : "Nhập số tiền"}
                                     />
 
@@ -535,10 +535,10 @@ export default function CalendarPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Customer */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Customer<span className="text-red-500 ml-1">*</span>
                             </label>
 
@@ -610,20 +610,20 @@ export default function CalendarPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
+                                <div className="p-4 md:p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
                                     <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                     {loadingSlots ? "Loading available spots..." : "No available slots for this date."}
                                 </div>
                             )
                         ) : (
-                            <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
+                            <div className="p-4 md:p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 dark:bg-slate-900 dark:border-gray-700 text-sm text-gray-500 text-center">
                                 <Clock className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                 Please select date to view availability
                             </div>
                         )}
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-primary-900 to-indigo-900 rounded-2xl text-white shadow-xl">
+                    <div className="p-4 bg-gradient-to-br from-primary-900 to-indigo-900 rounded-xl text-white shadow-xl">
                         <div className="flex items-center justify-between">
                             <div className="space-y-1">
                                 <p className="text-primary-100 text-[10px] font-bold uppercase tracking-wider">Estimated Duration</p>
@@ -675,7 +675,7 @@ export default function CalendarPage() {
                             <button
                                 type="button"
                                 onClick={handleDelete}
-                                className="px-6 py-3 border border-red-200 text-red-600 rounded-2xl text-sm font-bold hover:bg-red-50 transition-all flex items-center gap-2"
+                                className="px-4 py-2 border border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-all flex items-center gap-2"
                                 disabled={isSubmitting}
                             >
                                 <Trash2 className="w-4 h-4" />
@@ -687,14 +687,14 @@ export default function CalendarPage() {
                             {/* <button
                                 type="button"
                                 onClick={closeModal}
-                                className="px-6 py-3 border border-gray-200 rounded-2xl text-sm font-bold text-gray-500 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all"
+                                className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-all"
                             >
                                 Close
                             </button> */}
                             {editingAppointment && (
                                 <Link
                                     href={`/invoices/print/${editingAppointment._id}`}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors rounded-2xl"
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors rounded-xl"
                                 >
                                     <Eye className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                     View Receipt
@@ -703,7 +703,7 @@ export default function CalendarPage() {
                             <FormButton
                                 type="submit"
                                 loading={isSubmitting}
-                                className="rounded-2xl font-black px-10 shadow-lg shadow-primary-900/20"
+                                className="rounded-xl font-black px-10 shadow-lg shadow-primary-900/20"
                             >
                                 {editingAppointment ? "Save Changes" : "Confirm Booking"}
                             </FormButton>
@@ -715,7 +715,7 @@ export default function CalendarPage() {
             {/* THÊM VÀO ĐÂY: Modal Tạo Khách Hàng Nhanh */}
             {isAddCustomerModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl max-w-sm w-full mx-4 animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Thêm Khách Hàng Mới</h3>
                             <button

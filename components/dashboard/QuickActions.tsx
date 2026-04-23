@@ -18,7 +18,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
     return (
         <div className="space-y-6">
             {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <Link href="#" className="flex flex-col items-center justify-center p-4 bg-primary-900 rounded-lg text-white hover:bg-primary-800 transition-colors">
@@ -33,7 +33,7 @@ export default function QuickActions({ lowStockItems = [] }: QuickActionsProps) 
             </div>
 
             {/* Stock Alerts */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">Low Stock Alerts</h3>
                     <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">

@@ -148,15 +148,15 @@ export default function PrintInvoicePage() {
         window.print();
     };
 
-    if (loading) return <div className="p-8 text-center">Đang tải biên lai...</div>;
-    if (!invoice) return <div className="p-8 text-center text-red-500">Không tìm thấy hóa đơn</div>;
+    if (loading) return <div className="p-4 md:p-8 text-center">Đang tải biên lai...</div>;
+    if (!invoice) return <div className="p-4 md:p-8 text-center text-red-500">Không tìm thấy hóa đơn</div>;
 
     const currencySymbol = getCurrencySymbol(settings?.currency || 'USD');
 
     return (
-        <div className="min-h-screen bg-gray-100 py-4 md:p-8 print:p-0 print:bg-white dark:bg-slate-900 text-black">
+        <div className="min-h-screen bg-gray-100 py-4 md:p-4 md:p-8 print:p-0 print:bg-white dark:bg-slate-900 text-black">
             {/* Header / Controls */}
-            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 print:hidden px-2">
+            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 print:hidden px-2">
 
                 {/* LEFT */}
                 <button
@@ -198,7 +198,7 @@ export default function PrintInvoicePage() {
             )}
 
             {/* Thermal Receipt Content */}
-            <div className="max-w-[380px] mx-auto bg-white p-6 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0">
+            <div className="max-w-[380px] mx-auto bg-white p-4 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0">
                 {/* Store Header */}
                 <div className="text-center mb-4">
                     {settings?.logoUrl && (

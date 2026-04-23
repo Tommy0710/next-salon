@@ -130,12 +130,12 @@ export default function EditRolePage() {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading role details...</div>;
+        return <div className="p-4 md:p-8 text-center text-gray-500">Loading role details...</div>;
     }
 
     return (
-        <div className="p-6 max-w-5xl mx-auto">
-            <div className="flex items-center gap-4 mb-6">
+        <div className="p-4 max-w-5xl mx-auto">
+            <div className="flex items-center gap-4 mb-4">
                 <Link href="/roles" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                     <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
@@ -147,7 +147,7 @@ export default function EditRolePage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
-                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white dark:bg-slate-900 dark:border-gray-700 rounded-xl shadow-sm border border-gray-200 p-4">
                     <div className="flex justify-between items-start mb-4">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Shield className="w-5 h-5 text-primary-900" />
@@ -183,13 +183,13 @@ export default function EditRolePage() {
 
                 {/* Permissions Matrix */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-6 border-b border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
+                    <div className="p-4 border-b border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Access Permissions</h2>
                         <p className="text-sm text-gray-500">Configure what users with this role can see and do.</p>
                     </div>
 
                     {/* Special Modules: Dashboard & Settings */}
-                    <div className="p-6 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-primary-50 p-4 rounded-lg border border-primary-100">
                             <h3 className="font-semibold text-primary-900 mb-2">Dashboard</h3>
                             <label className="flex items-center gap-2 cursor-pointer">
@@ -233,9 +233,9 @@ export default function EditRolePage() {
                         <table className="w-full text-left">
                             <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-b border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-3 text-sm font-semibold text-gray-700 w-1/4">Feature</th>
-                                    <th className="px-6 py-3 text-sm font-semibold text-gray-700 w-1/3">View Scope</th>
-                                    <th className="px-6 py-3 text-sm font-semibold text-gray-700">Actions</th>
+                                    <th className="px-4 py-2 text-sm font-semibold text-gray-700 w-1/4">Feature</th>
+                                    <th className="px-4 py-2 text-sm font-semibold text-gray-700 w-1/3">View Scope</th>
+                                    <th className="px-4 py-2 text-sm font-semibold text-gray-700">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -280,7 +280,7 @@ export default function EditRolePage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex gap-6">
+                                            <div className="flex gap-4">
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input
                                                         type="checkbox"

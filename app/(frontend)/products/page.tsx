@@ -151,7 +151,7 @@ export default function ProductsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-slate-950 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
                 <div className="max-w-7xl mx-auto space-y-6">
                     {/* Header Section */}
