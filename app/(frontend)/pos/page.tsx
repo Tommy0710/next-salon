@@ -16,6 +16,7 @@ interface Item {
     type: 'Service' | 'Product';
     duration?: number; // Service only
     stock?: number; // Product only
+    image?: string; // Product only
     commissionType?: 'percentage' | 'fixed';
     commissionValue?: number;
 }
@@ -648,6 +649,8 @@ export default function POSPage() {
                                                 <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
                                                     <ScissorsIcon className="w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400" />
                                                 </div>
+                                            ) : item.image ? (
+                                                <img src={item.image} alt={item.name} className="w-8 h-8 md:w-10 md:h-10 object-cover rounded-lg border border-gray-200 dark:border-slate-700" />
                                             ) : (
                                                 <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
                                                     <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />

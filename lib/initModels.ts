@@ -12,6 +12,8 @@ import Service from '@/models/Service';
 import Staff from '@/models/Staff';
 import Appointment from '@/models/Appointment';
 import Product from '@/models/Product';
+import ProductCategory from '@/models/ProductCategory';
+import ProductBrand from '@/models/ProductBrand';
 import Expense from '@/models/Expense';
 import Invoice from '@/models/Invoice';
 import Purchase from '@/models/Purchase';
@@ -35,6 +37,8 @@ export {
     Staff,
     Appointment,
     Product,
+    ProductCategory,
+    ProductBrand,
     Expense,
     Invoice,
     Payroll,
@@ -61,6 +65,8 @@ export function initModels() {
         Staff,
         Appointment,
         Product,
+        ProductCategory,
+        ProductBrand,
         Expense,
         Invoice,
         Payroll,

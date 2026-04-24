@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Search, Plus, Trash2, Edit, Eye, FileText, Filter, DollarSign, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 import Link from "next/link";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormButton } from "@/components/dashboard/FormInput";
@@ -456,123 +458,84 @@ export default function InvoicesPage() {
                 </div>
 
                 {/* Mobile Card List */}
-                <div className="md:hidden">
-                    {loading ? (
-                        <div className="p-3 space-y-2.5">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                                <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4">
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="space-y-2"><div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-2/3" /><div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/2" /></div>
-                                        <div className="space-y-2"><div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-full" /><div className="h-5 bg-gray-100 dark:bg-slate-800 rounded-full w-20" /></div>
+                <MobileCardList
+                    items={invoices}
+                    loading={loading}
+                    emptyIcon={<FileText className="w-14 h-14" />}
+                    emptyText="No invoices found"
+                    renderItem={(inv) => {
+                        const due = (inv.totalAmount || 0) - (inv.amountPaid || 0);
+                        const statusColors: Record<string, string> = {
+                            paid: 'bg-emerald-400',
+                            partially_paid: 'bg-blue-400',
+                            pending: 'bg-amber-400',
+                            cancelled: 'bg-gray-400',
+                        };
+                        return (
+                            <MobileCard key={inv._id} accentColor={statusColors[inv.status] ?? 'bg-gray-400'}>
+                                <ActionDropdown
+                                    className="absolute right-1 top-1 z-20"
+                                    items={[
+                                        { label: "Record Payment", icon: <DollarSign className="w-4 h-4" />, onClick: () => openPaymentModal(inv), variant: "success", hidden: due <= 0 },
+                                        { label: "View Receipt", icon: <Eye className="w-4 h-4" />, href: `/invoices/print/${inv._id}`, variant: "primary" },
+                                        { label: "Edit Invoice", icon: <Edit className="w-4 h-4" />, href: `/pos?edit=${inv._id}`, variant: "default", hidden: inv.status !== "pending" },
+                                        { label: "Edit Notes", icon: <Edit className="w-4 h-4" />, onClick: () => openEditModal(inv), variant: "warning" },
+                                        { label: "Delete", icon: <Trash2 className="w-4 h-4" />, onClick: () => handleDelete(inv._id), variant: "danger", dividerBefore: true },
+                                    ]}
+                                />
+                                {/* 2-col body */}
+                                <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
+                                    {/* Col 1: Invoice + Customer */}
+                                    <div className="px-3 py-3 pr-4 flex flex-col gap-2 min-w-0">
+                                        <div className="flex items-start gap-2">
+                                            <div className="mt-0.5 p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                <FileText className="w-3.5 h-3.5 text-primary-700 dark:text-primary-400" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white truncate">{inv.invoiceNumber}</div>
+                                                <div className="text-[10px] text-gray-400 font-medium">{formatDate(inv.date, settings.timezone)}</div>
+                                            </div>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="text-[12px] font-semibold text-primary-700 dark:text-primary-400 truncate">{inv.customer?.name || 'Walk-in'}</div>
+                                            {inv.customer?.phone && <div className="text-[10px] text-gray-400 truncate">{inv.customer.phone}</div>}
+                                        </div>
+                                        <span className={`self-start text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${inv.appointment ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                                            {inv.appointment ? 'Appointment' : 'POS'}
+                                        </span>
+                                    </div>
+                                    {/* Col 2: Amounts + Status */}
+                                    <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
+                                        <div>
+                                            <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total</div>
+                                            <div className="text-[14px] font-black text-gray-900 dark:text-white">{formatCurrency(inv.totalAmount)}</div>
+                                        </div>
+                                        {!inv.appointment && inv.staff && (
+                                            <div className="flex flex-col items-start">
+                                                <div className="text-[12px] font-medium text-gray-500 dark:text-gray-400">{inv.staff?.name}</div>
+                                                <div className="text-[10px] text-green-600">{formatCurrency(inv.commission)}</div>
+                                            </div>
+                                        )}
+                                        <div className="grid grid-cols-2 gap-1">
+                                            <div>
+                                                <div className="text-[9px] text-gray-400 uppercase font-semibold">Paid</div>
+                                                <div className="text-[12px] font-bold text-emerald-600">{formatCurrency(inv.amountPaid)}</div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[9px] text-gray-400 uppercase font-semibold">Due</div>
+                                                <div className={`text-[12px] font-bold ${due > 0 ? 'text-red-500' : 'text-gray-400'}`}>{formatCurrency(due)}</div>
+                                            </div>
+                                        </div>
+                                        <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${inv.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : inv.status === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' : inv.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${statusColors[inv.status] ?? 'bg-gray-400'}`} />
+                                            {inv.status?.replace('_', ' ')}
+                                        </span>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    ) : invoices.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400">
-                            <FileText className="w-14 h-14 mb-3 opacity-20" />
-                            <p className="text-sm font-medium">No invoices found</p>
-                        </div>
-                    ) : (
-                        <div className="p-3 space-y-2.5">
-                            {invoices.map((inv) => {
-                                const due = (inv.totalAmount || 0) - (inv.amountPaid || 0);
-                                const isOpen = activeDropdown === inv._id;
-                                const statusColors: Record<string, string> = {
-                                    paid: 'bg-emerald-400',
-                                    partially_paid: 'bg-blue-400',
-                                    pending: 'bg-amber-400',
-                                    cancelled: 'bg-gray-400',
-                                };
-                                return (
-                                    <div key={inv._id} className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-                                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${statusColors[inv.status] ?? 'bg-gray-400'}`} style={{ borderRadius: '4px 0 0 4px' }} />
-                                        {/* Action */}
-                                        <div className="absolute right-1 top-1 z-20 dropdown-trigger">
-                                            <button onClick={(e) => { e.stopPropagation(); setActiveDropdown(isOpen ? null : inv._id); }} className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </button>
-                                            {isOpen && (
-                                                <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
-                                                    {due > 0 && (
-                                                        <button onClick={() => { openPaymentModal(inv); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors">
-                                                            <DollarSign className="w-4 h-4" /> Record Payment
-                                                        </button>
-                                                    )}
-                                                    <Link href={`/invoices/print/${inv._id}`} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setActiveDropdown(null)}>
-                                                        <Eye className="w-4 h-4 text-blue-500" /> View Receipt
-                                                    </Link>
-                                                    {inv.status === 'pending' && (
-                                                        <Link href={`/pos?edit=${inv._id}`} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setActiveDropdown(null)}>
-                                                            <Edit className="w-4 h-4" /> Edit Invoice
-                                                        </Link>
-                                                    )}
-                                                    <button onClick={() => { openEditModal(inv); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-slate-800 transition-colors">
-                                                        <Edit className="w-4 h-4 text-amber-500" /> Edit Notes
-                                                    </button>
-                                                    <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
-                                                    <button onClick={() => { handleDelete(inv._id); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                                        <Trash2 className="w-4 h-4" /> Delete
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {/* 2-col body */}
-                                        <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
-                                            {/* Col 1: Invoice + Customer */}
-                                            <div className="px-3 py-3 pr-4 flex flex-col gap-2 min-w-0">
-                                                <div className="flex items-start gap-2">
-                                                    <div className="mt-0.5 p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
-                                                        <FileText className="w-3.5 h-3.5 text-primary-700 dark:text-primary-400" />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="text-[13px] font-bold text-gray-900 dark:text-white truncate">{inv.invoiceNumber}</div>
-                                                        <div className="text-[10px] text-gray-400 font-medium">{formatDate(inv.date, settings.timezone)}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <div className="text-[12px] font-semibold text-primary-700 dark:text-primary-400 truncate">{inv.customer?.name || 'Walk-in'}</div>
-                                                    {inv.customer?.phone && <div className="text-[10px] text-gray-400 truncate">{inv.customer.phone}</div>}
-                                                </div>
-                                                <span className={`self-start text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${inv.appointment ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
-                                                    {inv.appointment ? 'Appointment' : 'POS'}
-                                                </span>
-
-                                            </div>
-                                            {/* Col 2: Amounts + Status */}
-                                            <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
-                                                <div>
-                                                    <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total</div>
-                                                    <div className="text-[14px] font-black text-gray-900 dark:text-white">{formatCurrency(inv.totalAmount)}</div>
-                                                </div>
-                                                {!inv.appointment && inv.staff && (
-                                                    <div className="flex flex-col items-start">
-                                                        <div className="text-[12px] font-medium text-gray-500 dark:text-gray-400">{inv.staff?.name}</div>
-                                                        <div className="text-[10px] text-green-600">{formatCurrency(inv.commission)}</div>
-                                                    </div>
-                                                )}
-                                                <div className="grid grid-cols-2 gap-1">
-                                                    <div>
-                                                        <div className="text-[9px] text-gray-400 uppercase font-semibold">Paid</div>
-                                                        <div className="text-[12px] font-bold text-emerald-600">{formatCurrency(inv.amountPaid)}</div>
-                                                    </div>
-                                                    <div>
-                                                        <div className="text-[9px] text-gray-400 uppercase font-semibold">Due</div>
-                                                        <div className={`text-[12px] font-bold ${due > 0 ? 'text-red-500' : 'text-gray-400'}`}>{formatCurrency(due)}</div>
-                                                    </div>
-                                                </div>
-                                                <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${inv.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : inv.status === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' : inv.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${statusColors[inv.status] ?? 'bg-gray-400'}`} />
-                                                    {inv.status?.replace('_', ' ')}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                            </MobileCard>
+                        );
+                    }}
+                />
 
                 {/* Pagination */}
                 <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">

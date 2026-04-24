@@ -2,13 +2,17 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
+import { initModels } from "@/lib/initModels";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         await connectToDB();
+        initModels();
         const { id } = await params;
         const body = await request.json();
-        const product = await Product.findByIdAndUpdate(id, body, { new: true });
+        const product = await Product.findByIdAndUpdate(id, body, { new: true })
+            .populate('category', 'name')
+            .populate('brand', 'name');
         return NextResponse.json({ success: true, data: product });
     } catch (error) {
         return NextResponse.json({ success: false, error: "Failed to update product" }, { status: 500 });

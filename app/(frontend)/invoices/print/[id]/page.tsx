@@ -198,11 +198,11 @@ export default function PrintInvoicePage() {
             )}
 
             {/* Thermal Receipt Content */}
-            <div className="max-w-[380px] mx-auto bg-white p-4 shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0">
+            <div id="print-area" className="max-w-[380px] mx-auto bg-white shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0 p-8 pt-0">
                 {/* Store Header */}
-                <div className="text-center mb-4">
+                <div className="text-center mb-2 p-4">
                     {settings?.logoUrl && (
-                        <div className="mb-4">
+                        <div className="mb-2">
                             <img src={settings.logoUrl} alt="Store Logo" className="w-32 h-auto mx-auto object-contain" />
                         </div>
                     )}
@@ -363,13 +363,21 @@ export default function PrintInvoicePage() {
 
             <style jsx global>{`
                 @media print {
-                    body {
-                        background: white !important;
+                    body * {
+                        visibility: hidden;
+                    }
+                    #print-area, #print-area * {
+                        visibility: visible;
+                    }
+                    #print-area {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 80mm;
                         margin: 0;
                         padding: 0;
-                    }
-                    .print\\:hidden {
-                        display: none !important;
+                        border-top: none !important;
+                        box-shadow: none !important;
                     }
                     @page {
                         margin: 0;

@@ -6,6 +6,7 @@ export interface ICustomer extends Document {
     phone?: string;
     address?: string;
     notes?: string;
+    walletBalance?: number;
     totalPurchases: number;
     loyaltyPoints: number;
     createdBy?: string;
@@ -22,6 +23,7 @@ const customerSchema = new Schema<ICustomer>(
         phone: { type: String, trim: true },
         address: { type: String, trim: true },
         notes: { type: String, trim: true },
+        walletBalance: { type: Number, default: 0, min: 0 },
         totalPurchases: { type: Number, default: 0, min: 0 },
         loyaltyPoints: { type: Number, default: 0, min: 0 },
         createdBy: {

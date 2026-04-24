@@ -115,7 +115,7 @@ export function ActionDropdown({
   const visibleItems = items.filter((item) => !item.hidden);
 
   return (
-    <div ref={wrapperRef} className={`relative inline-block ${className}`}>
+    <div ref={wrapperRef} className={`inline-block ${className}`}>
       {/* Trigger */}
       <div
         onClick={(e) => {

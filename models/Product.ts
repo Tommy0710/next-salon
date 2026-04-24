@@ -3,8 +3,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IProduct extends Document {
     name: string;
-    category: string;
-    brand?: string;
+    category: mongoose.Types.ObjectId;
+    brand?: mongoose.Types.ObjectId;
     description?: string;
     price: number; // Retail Price
     costPrice: number;
@@ -21,8 +21,8 @@ export interface IProduct extends Document {
 const productSchema = new Schema<IProduct>(
     {
         name: { type: String, required: true, trim: true },
-        category: { type: String, required: true, trim: true },
-        brand: { type: String, trim: true },
+        category: { type: Schema.Types.ObjectId, ref: 'ProductCategory', required: true },
+        brand: { type: Schema.Types.ObjectId, ref: 'ProductBrand' },
         description: { type: String, trim: true },
         price: { type: Number, required: true, min: 0 },
         costPrice: { type: Number, required: true, min: 0 },
@@ -47,7 +47,8 @@ const productSchema = new Schema<IProduct>(
 );
 
 // ── Production Indexes ─────────────────────────────────────────────────────
-productSchema.index({ category: 1, name: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
 productSchema.index({ status: 1, createdAt: -1 });
 productSchema.index({ createdAt: -1 });
 

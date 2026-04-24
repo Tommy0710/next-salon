@@ -19,14 +19,18 @@ export async function GET(request: NextRequest) {
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "10");
         const search = searchParams.get("search");
+        const category = searchParams.get("category");
+        const brand = searchParams.get("brand");
 
         const query: any = { status: "active" };
-        if (search) {
-            query.name = { $regex: search, $options: "i" };
-        }
+        if (search) query.name = { $regex: search, $options: "i" };
+        if (category) query.category = category;
+        if (brand) query.brand = brand;
 
         const total = await Product.countDocuments(query);
         const products = await Product.find(query)
+            .populate('category', 'name')
+            .populate('brand', 'name')
             .sort({ name: 1 })
             .skip((page - 1) * limit)
             .limit(limit)
@@ -67,7 +71,6 @@ export async function POST(request: NextRequest) {
             maxLength: [
                 { field: 'name', length: 100 },
                 { field: 'description', length: 500 },
-                { field: 'category', length: 50 },
                 { field: 'sku', length: 50 }
             ]
         });
