@@ -873,7 +873,7 @@ export default function AppointmentsPage() {
                             </div>
 
                             {/* List View Pagination */}
-                            <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-4">
+                            <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 flex-wrap gap-4">
                                 <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                                     Showing <span className="text-gray-900 dark:text-white">{appointments.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> appointments
                                 </div>

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, Calendar, User, TrendingUp, Download, Plus, Eye, Check, X, Edit, Trash2, Search, Filter, FileText, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
+import { DollarSign, Calendar, User, TrendingUp, Download, Plus, Eye, Check, X, Edit, Trash2, Search, Filter, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import Modal from "@/components/dashboard/Modal";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import { FormButton } from "@/components/dashboard/FormInput";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
 
@@ -47,23 +49,12 @@ export default function PayrollPage() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [updating, setUpdating] = useState(false);
 
     const currentDate = new Date();
     const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
     const [selectedStaff, setSelectedStaff] = useState("");
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     useEffect(() => {
         fetchData();
@@ -316,70 +307,13 @@ export default function PayrollPage() {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                <div className="relative flex justify-end items-center gap-2 dropdown-trigger">
-                                                    <button
-                                                        onClick={() => handleDelete(payroll._id)}
-                                                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                                                        title="Delete Record"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setActiveDropdown(activeDropdown === payroll._id ? null : payroll._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
-                                                    >
-                                                        <MoreVertical className="w-5 h-5" />
-                                                    </button>
-
-                                                    {activeDropdown === payroll._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                                            <button
-                                                                onClick={() => {
-                                                                    viewDetails(payroll);
-                                                                    setActiveDropdown(null);
-                                                                }}
-                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
-                                                            >
-                                                                <FileText className="w-4 h-4 text-primary-600" />
-                                                                View Details
-                                                            </button>
-                                                            {payroll.status === "draft" && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleStatusUpdate(payroll._id, "approved");
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 transition-colors"
-                                                                >
-                                                                    <Check className="w-4 h-4 text-green-600" />
-                                                                    Approve
-                                                                </button>
-                                                            )}
-                                                            {payroll.status === "approved" && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleStatusUpdate(payroll._id, "paid");
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-green-50 transition-colors"
-                                                                >
-                                                                    <DollarSign className="w-4 h-4 text-green-600" />
-                                                                    Mark as Paid
-                                                                </button>
-                                                            )}
-                                                            <div className="h-px bg-gray-100 my-1" />
-                                                            <button
-                                                                onClick={() => {
-                                                                    handleDelete(payroll._id);
-                                                                    setActiveDropdown(null);
-                                                                }}
-                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                                Delete Record
-                                                            </button>
-                                                        </div>
-                                                    )}
+                                                <div className="relative flex justify-end">
+                                                    <ActionDropdown items={[
+                                                        { label: "View Details", icon: <FileText className="w-4 h-4" />, onClick: () => viewDetails(payroll) },
+                                                        { label: "Approve", icon: <Check className="w-4 h-4" />, variant: "success", hidden: payroll.status !== "draft", onClick: () => handleStatusUpdate(payroll._id, "approved") },
+                                                        { label: "Mark as Paid", icon: <DollarSign className="w-4 h-4" />, variant: "success", hidden: payroll.status !== "approved", onClick: () => handleStatusUpdate(payroll._id, "paid") },
+                                                        { label: "Delete Record", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(payroll._id) },
+                                                    ]} />
                                                 </div>
                                             </td>
                                         </tr>
@@ -388,6 +322,56 @@ export default function PayrollPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    <MobileCardList
+                        items={payrolls}
+                        loading={loading}
+                        emptyIcon={<DollarSign className="w-14 h-14" />}
+                        emptyText="No payroll records found"
+                        renderItem={(payroll) => (
+                            <MobileCard accentColor={payroll.status === 'paid' ? 'bg-emerald-400' : payroll.status === 'approved' ? 'bg-blue-400' : 'bg-gray-300'}>
+                                <div className="absolute right-1 top-1 z-20">
+                                    <ActionDropdown items={[
+                                        { label: "View Details", icon: <FileText className="w-4 h-4" />, onClick: () => viewDetails(payroll) },
+                                        { label: "Approve", icon: <Check className="w-4 h-4" />, variant: "success", hidden: payroll.status !== "draft", onClick: () => handleStatusUpdate(payroll._id, "approved") },
+                                        { label: "Mark as Paid", icon: <DollarSign className="w-4 h-4" />, variant: "success", hidden: payroll.status !== "approved", onClick: () => handleStatusUpdate(payroll._id, "paid") },
+                                        { label: "Delete Record", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(payroll._id) },
+                                    ]} />
+                                </div>
+                                <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs shrink-0">
+                                            {payroll.staff.name.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="text-[13px] font-bold text-gray-900 dark:text-white">{payroll.staff.name}</div>
+                                            <div className="flex items-center gap-1 text-[11px] text-gray-400">
+                                                <Calendar className="w-3 h-3" />
+                                                {MONTHS[payroll.month - 1]} {payroll.year}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2 text-[11px]">
+                                        <div>
+                                            <div className="text-gray-400">Salary</div>
+                                            <div className="font-semibold text-gray-800 dark:text-white">{settings.symbol}{payroll.baseSalary.toLocaleString()}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-gray-400">Commission</div>
+                                            <div className="font-semibold text-green-600">{settings.symbol}{payroll.totalCommission.toLocaleString()}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-gray-400">Total</div>
+                                            <div className="font-bold text-gray-900 dark:text-white">{settings.symbol}{payroll.totalAmount.toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                    <span className={`self-start inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${getStatusColor(payroll.status)}`}>
+                                        {payroll.status}
+                                    </span>
+                                </div>
+                            </MobileCard>
+                        )}
+                    />
 
                     {/* Pagination */}
                     <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">

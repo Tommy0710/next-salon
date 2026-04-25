@@ -125,7 +125,9 @@ export function MobileCardList<T>({
         <MobileCardEmpty icon={emptyIcon} text={emptyText} />
       ) : (
         <div className={`p-3 ${gap}`}>
-          {items.map((item, index) => renderItem(item, index))}
+          {items.map((item, index) => (
+            <React.Fragment key={index}>{renderItem(item, index)}</React.Fragment>
+          ))}
         </div>
       )}
     </div>
@@ -141,6 +143,7 @@ export interface MobileCardProps {
   /** Left accent bar colour e.g. "bg-emerald-400" */
   accentColor?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 /**
@@ -151,10 +154,12 @@ export function MobileCard({
   children,
   accentColor = "bg-gray-300",
   className = "",
+  onClick,
 }: MobileCardProps) {
   return (
     <div
-      className={`relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm ${className}`}
+      className={`relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm ${className}${onClick ? ' cursor-pointer active:bg-gray-50 dark:active:bg-slate-800' : ''}`}
+      onClick={onClick}
     >
       {/* Left accent stripe */}
       <div

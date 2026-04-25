@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, User, Mail, Phone, MoreVertical, ChevronLeft, ChevronRight, Wallet } from "lucide-react";
+import { Plus, Calendar, Edit, Trash2, Search, User, Mail, Phone, ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import CustomerPreviewPanel from "@/components/customers/CustomerPreviewPanel";
 import { formatCurrency } from "@/lib/currency";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 
 interface Customer {
     _id: string;
@@ -34,20 +36,9 @@ export default function CustomersPage() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState("");
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -346,7 +337,7 @@ export default function CustomersPage() {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto text-black dark:text-white">
+                        <div className="hidden md:block overflow-x-auto text-black dark:text-white">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
                                 <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                     <tr>
@@ -437,46 +428,12 @@ export default function CustomersPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                     {new Date(customer.createdAt).toLocaleDateString()}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                    <div className="relative flex justify-end dropdown-trigger">
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); setActiveDropdown(activeDropdown === customer._id ? null : customer._id); }}
-                                                            className="p-2 text-gray-400 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
-                                                        >
-                                                            <MoreVertical className="w-5 h-5" />
-                                                        </button>
-
-                                                        {activeDropdown === customer._id && (
-                                                            <div className="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                                                <PermissionGate resource="customers" action="edit">
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            openModal(customer);
-                                                                            setActiveDropdown(null);
-                                                                        }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                                                                    >
-                                                                        <Edit className="w-4 h-4 text-primary-600 dark:text-primary-500" />
-                                                                        Edit Details
-                                                                    </button>
-                                                                </PermissionGate>
-                                                                <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
-                                                                <PermissionGate resource="customers" action="delete">
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDelete(customer._id);
-                                                                            setActiveDropdown(null);
-                                                                        }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                        Delete Customer
-                                                                    </button>
-                                                                </PermissionGate>
-                                                            </div>
-                                                        )}
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="relative flex justify-end">
+                                                        <ActionDropdown items={[
+                                                            { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(customer) },
+                                                            { label: "Delete Customer", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(customer._id) },
+                                                        ]} />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -486,8 +443,70 @@ export default function CustomersPage() {
                             </table>
                         </div>
 
+                        <MobileCardList
+                            items={customers}
+                            loading={loading}
+                            emptyIcon={<User className="w-14 h-14" />}
+                            emptyText="No customers found"
+                            renderItem={(customer) => (
+                                <MobileCard
+                                    accentColor={customer.status === 1 ? "bg-emerald-400" : "bg-gray-300"}
+                                    onClick={() => setSelectedCustomerId(selectedCustomerId === customer._id ? null : customer._id)}
+                                >
+                                    <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                        <div className="absolute right-2 top-2" onClick={(e) => e.stopPropagation()}>
+                                            <ActionDropdown items={[
+                                                { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(customer) },
+                                                { label: "Delete Customer", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(customer._id) },
+                                            ]} />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                <User className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                                            </div>
+                                            <div>
+                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white">{customer.name}</div>
+                                                {customer.address && (
+                                                    <div className="text-[11px] text-gray-400 truncate max-w-[180px]">{customer.address}</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {customer.email && (
+                                            <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                                <Mail className="w-3 h-3 text-gray-400" />
+                                                {customer.email}
+                                            </div>
+                                        )}
+                                        {customer.phone && (
+                                            <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                                <Phone className="w-3 h-3 text-gray-400" />
+                                                {customer.phone}
+                                            </div>
+                                        )}
+                                        {/* <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                            <User className="w-3 h-3 text-gray-400" />{customer.visitCount}
+                                        </div> */}
+                                        <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                            <Calendar className="w-3 h-3 text-gray-400" />{new Date(customer.createdAt).toLocaleDateString()}
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-wrap mt-1">
+                                            {(customer.walletBalance ?? 0) > 0 && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-700/40">
+                                                    <Wallet className="w-3 h-3" />
+                                                    {formatCurrency(customer.walletBalance ?? 0)}
+                                                </span>
+                                            )}
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${customer.status === 1 ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-slate-700"}`}>
+                                                {customer.status === 1 ? "Active" : "Inactive"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </MobileCard>
+                            )}
+                        />
+
                         {/* Pagination */}
-                        <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                        <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 flex-wrap gap-4">
                             <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                                 Showing <span className="text-gray-900 dark:text-white">{customers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> customers
                             </div>
@@ -622,7 +641,7 @@ export default function CustomersPage() {
                                 <p className="mt-1 text-xs text-gray-400">Số dư hiện tại: {formatCurrency(editingCustomer.walletBalance ?? 0)}</p>
                             </div>
                         )}
-                        {/* <div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1.5">Số lần ghé thăm</label>
                             <input
                                 type="number"
@@ -632,7 +651,7 @@ export default function CustomersPage() {
                                 placeholder="0"
                                 className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm text-gray-900 dark:text-white"
                             />
-                        </div> */}
+                        </div>
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1.5">Notes</label>

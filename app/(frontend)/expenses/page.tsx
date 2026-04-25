@@ -2,13 +2,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, DollarSign, Calendar, Tag, Filter, ChevronLeft, ChevronRight, MoreVertical, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Search, DollarSign, Calendar, Tag, Filter, ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import PermissionGate from "@/components/PermissionGate";
 import { formatDate, getCurrentDateInTimezone } from "@/lib/dateUtils";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 
 interface Expense {
     _id: string;
@@ -41,18 +43,7 @@ export default function ExpensesPage() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -261,43 +252,11 @@ export default function ExpensesPage() {
                                                 {expense.paymentMethod}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                <div className="relative flex justify-end dropdown-trigger">
-                                                    <button
-                                                        onClick={() => setActiveDropdown(activeDropdown === expense._id ? null : expense._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
-                                                    >
-                                                        <MoreVertical className="w-5 h-5" />
-                                                    </button>
-
-                                                    {activeDropdown === expense._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                                            <PermissionGate resource="expenses" action="edit">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        openModal(expense);
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
-                                                                >
-                                                                    <Edit className="w-4 h-4 text-primary-600" />
-                                                                    Edit Details
-                                                                </button>
-                                                            </PermissionGate>
-                                                            <div className="h-px bg-gray-100 my-1" />
-                                                            <PermissionGate resource="expenses" action="delete">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleDelete(expense._id);
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                    Delete Expense
-                                                                </button>
-                                                            </PermissionGate>
-                                                        </div>
-                                                    )}
+                                                <div className="relative flex justify-end">
+                                                    <ActionDropdown items={[
+                                                        { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(expense) },
+                                                        { label: "Delete Expense", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(expense._id) },
+                                                    ]} />
                                                 </div>
                                             </td>
                                         </tr>
@@ -306,6 +265,43 @@ export default function ExpensesPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    <MobileCardList
+                        items={expenses}
+                        loading={loading}
+                        emptyIcon={<DollarSign className="w-14 h-14" />}
+                        emptyText="No expenses found"
+                        renderItem={(expense) => (
+                            <MobileCard accentColor="bg-red-400">
+                                <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                    <div className="absolute right-2 top-2">
+                                        <ActionDropdown items={[
+                                            { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(expense) },
+                                            { label: "Delete Expense", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(expense._id) },
+                                        ]} />
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <div className="text-[13px] font-bold text-gray-900 dark:text-white">{expense.title}</div>
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300">
+                                            <Tag className="w-3 h-3 mr-1" />
+                                            {expense.category}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-wrap text-[11px] text-gray-500 dark:text-gray-400">
+                                        <span className="text-[13px] font-bold text-red-600 dark:text-red-400">{settings.symbol}{expense.amount.toLocaleString()}</span>
+                                        <span className="flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" />
+                                            {formatDate(expense.date, settings.timezone)}
+                                        </span>
+                                        <span>{expense.paymentMethod}</span>
+                                    </div>
+                                    {expense.notes && (
+                                        <div className="text-[11px] text-gray-400 dark:text-gray-500 italic truncate">{expense.notes}</div>
+                                    )}
+                                </div>
+                            </MobileCard>
+                        )}
+                    />
 
                     {/* Pagination */}
                     <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">

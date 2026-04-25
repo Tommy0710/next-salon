@@ -2,9 +2,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, ShoppingBag, Eye, Calendar, ChevronLeft, ChevronRight, MoreVertical, Trash2, Wallet, X } from "lucide-react";
+import { Plus, Search, Filter, ShoppingBag, Eye, Calendar, ChevronLeft, ChevronRight, Trash2, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { FormButton } from "@/components/dashboard/FormInput";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatDate } from "@/lib/dateUtils";
 
@@ -16,8 +18,6 @@ export default function PurchasesPage() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-
     // Deposit States
     const [showDepositModal, setShowDepositModal] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
@@ -28,16 +28,6 @@ export default function PurchasesPage() {
     useEffect(() => {
         fetchPurchases();
     }, [page, search, statusFilter]);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     const fetchPurchases = async () => {
         setLoading(true);
@@ -69,7 +59,6 @@ export default function PurchasesPage() {
             const data = await res.json();
             if (data.success) {
                 fetchPurchases();
-                setActiveDropdown(null);
             } else {
                 alert(data.error || "Failed to delete");
             }
@@ -219,44 +208,12 @@ export default function PurchasesPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                            <div className="relative flex justify-end dropdown-trigger">
-                                                <button
-                                                    onClick={() => setActiveDropdown(activeDropdown === purchase._id ? null : purchase._id)}
-                                                    className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
-                                                >
-                                                    <MoreVertical className="w-5 h-5" />
-                                                </button>
-                                                {activeDropdown === purchase._id && (
-                                                    <div className="absolute right-0 mt-8 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
-                                                        <Link
-                                                            href={`/purchases/${purchase._id}`}
-                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
-                                                        >
-                                                            <Eye className="w-4 h-4 text-primary-600" />
-                                                            View Details
-                                                        </Link>
-                                                        {purchase.paymentStatus !== 'paid' && (
-                                                            <button
-                                                                onClick={() => {
-                                                                    setSelectedPurchase(purchase);
-                                                                    setShowDepositModal(true);
-                                                                    setActiveDropdown(null);
-                                                                }}
-                                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 transition-colors"
-                                                            >
-                                                                <Wallet className="w-4 h-4 text-green-600" />
-                                                                Add Deposit
-                                                            </button>
-                                                        )}
-                                                        <button
-                                                            onClick={() => handleDelete(purchase._id)}
-                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                            Delete Purchase
-                                                        </button>
-                                                    </div>
-                                                )}
+                                            <div className="relative flex justify-end">
+                                                <ActionDropdown items={[
+                                                    { label: "View Details", icon: <Eye className="w-4 h-4" />, href: `/purchases/${purchase._id}` },
+                                                    { label: "Add Deposit", icon: <Wallet className="w-4 h-4" />, variant: "success", hidden: purchase.paymentStatus === 'paid', onClick: () => { setSelectedPurchase(purchase); setShowDepositModal(true); } },
+                                                    { label: "Delete Purchase", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(purchase._id) },
+                                                ]} />
                                             </div>
                                         </td>
                                     </tr>
@@ -266,90 +223,55 @@ export default function PurchasesPage() {
                     </table>
                 </div>
 
-                {/* Mobile Card List */}
-                <div className="md:hidden">
-                    {loading && purchases.length === 0 ? (
-                        <div className="p-3 space-y-2.5">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                                <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4">
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="space-y-2"><div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-3/4" /><div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/2" /></div>
-                                        <div className="space-y-2"><div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-2/3" /><div className="h-5 bg-gray-100 dark:bg-slate-800 rounded-full w-20" /></div>
+                <MobileCardList
+                    items={purchases}
+                    loading={loading}
+                    emptyIcon={<ShoppingBag className="w-14 h-14" />}
+                    emptyText="No purchases found"
+                    renderItem={(purchase) => {
+                        const statusDot: Record<string, string> = { received: 'bg-emerald-400', pending: 'bg-amber-400', cancelled: 'bg-gray-400' };
+                        const paymentDot: Record<string, string> = { paid: 'bg-emerald-400', partially_paid: 'bg-blue-400', unpaid: 'bg-orange-400' };
+                        return (
+                            <MobileCard accentColor={statusDot[purchase.status] ?? 'bg-gray-400'}>
+                                <div className="absolute right-1 top-1 z-20">
+                                    <ActionDropdown items={[
+                                        { label: "View Details", icon: <Eye className="w-4 h-4" />, href: `/purchases/${purchase._id}` },
+                                        { label: "Add Deposit", icon: <Wallet className="w-4 h-4" />, variant: "success", hidden: purchase.paymentStatus === 'paid', onClick: () => { setSelectedPurchase(purchase); setShowDepositModal(true); } },
+                                        { label: "Delete", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(purchase._id) },
+                                    ]} />
+                                </div>
+                                <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
+                                    <div className="px-3 py-3 pr-6 flex flex-col gap-2 min-w-0">
+                                        <div className="flex items-start gap-2">
+                                            <div className="mt-0.5 p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                <ShoppingBag className="w-3.5 h-3.5 text-primary-700 dark:text-primary-400" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white truncate">{purchase.purchaseNumber}</div>
+                                                <div className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 truncate">{purchase.supplier?.name || 'Unknown'}</div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-[11px] text-gray-400">
+                                            <Calendar className="w-3 h-3" />
+                                            {formatDate(purchase.date, settings.timezone)}
+                                        </div>
+                                    </div>
+                                    <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
+                                        <div className="text-[14px] font-black text-gray-900 dark:text-white">{settings.symbol}{purchase.totalAmount.toFixed(2)}</div>
+                                        <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${purchase.status === 'received' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : purchase.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${statusDot[purchase.status] ?? 'bg-gray-400'}`} />
+                                            {purchase.status}
+                                        </span>
+                                        <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${purchase.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : purchase.paymentStatus === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${paymentDot[purchase.paymentStatus] ?? 'bg-orange-400'}`} />
+                                            {purchase.paymentStatus?.replace('_', ' ') || 'Unpaid'}
+                                        </span>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    ) : purchases.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400">
-                            <ShoppingBag className="w-14 h-14 mb-3 opacity-20" />
-                            <p className="text-sm font-medium">No purchases found</p>
-                        </div>
-                    ) : (
-                        <div className="p-3 space-y-2.5">
-                            {purchases.map((purchase) => {
-                                const isOpen = activeDropdown === purchase._id;
-                                const statusDot: Record<string, string> = { received: 'bg-emerald-400', pending: 'bg-amber-400', cancelled: 'bg-gray-400' };
-                                const paymentDot: Record<string, string> = { paid: 'bg-emerald-400', partially_paid: 'bg-blue-400', unpaid: 'bg-orange-400' };
-                                return (
-                                    <div key={purchase._id} className="relative bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm">
-                                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${statusDot[purchase.status] ?? 'bg-gray-400'}`} style={{ borderRadius: '4px 0 0 4px' }} />
-                                        <div className="absolute right-1 top-1 z-20 dropdown-trigger">
-                                            <button onClick={(e) => { e.stopPropagation(); setActiveDropdown(isOpen ? null : purchase._id); }} className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </button>
-                                            {isOpen && (
-                                                <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
-                                                    <Link href={`/purchases/${purchase._id}`} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors" onClick={() => setActiveDropdown(null)}>
-                                                        <Eye className="w-4 h-4 text-blue-500" /> View Details
-                                                    </Link>
-                                                    {purchase.paymentStatus !== 'paid' && (
-                                                        <button onClick={() => { setSelectedPurchase(purchase); setShowDepositModal(true); setActiveDropdown(null); }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors">
-                                                            <Wallet className="w-4 h-4" /> Add Deposit
-                                                        </button>
-                                                    )}
-                                                    <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
-                                                    <button onClick={() => handleDelete(purchase._id)} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                                                        <Trash2 className="w-4 h-4" /> Delete
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
-                                            {/* Col 1: Purchase# + Supplier + Date */}
-                                            <div className="px-3 py-3 pr-6 flex flex-col gap-2 min-w-0">
-                                                <div className="flex items-start gap-2">
-                                                    <div className="mt-0.5 p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
-                                                        <ShoppingBag className="w-3.5 h-3.5 text-primary-700 dark:text-primary-400" />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="text-[13px] font-bold text-gray-900 dark:text-white truncate">{purchase.purchaseNumber}</div>
-                                                        <div className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 truncate">{purchase.supplier?.name || 'Unknown'}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                                                    <Calendar className="w-3 h-3" />
-                                                    {formatDate(purchase.date, settings.timezone)}
-                                                </div>
-                                            </div>
-                                            {/* Col 2: Total + Status + Payment */}
-                                            <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
-                                                <div className="text-[14px] font-black text-gray-900 dark:text-white">{settings.symbol}{purchase.totalAmount.toFixed(2)}</div>
-                                                <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${purchase.status === 'received' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : purchase.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${statusDot[purchase.status] ?? 'bg-gray-400'}`} />
-                                                    {purchase.status}
-                                                </span>
-                                                <span className={`self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${purchase.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : purchase.paymentStatus === 'partially_paid' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${paymentDot[purchase.paymentStatus] ?? 'bg-orange-400'}`} />
-                                                    {purchase.paymentStatus?.replace('_', ' ') || 'Unpaid'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                            </MobileCard>
+                        );
+                    }}
+                />
 
                 {/* Pagination - Reuse logic from other pages */}
                 <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">

@@ -2,11 +2,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, User, Phone, Mail, Scissors, ChevronLeft, ChevronRight, MoreVertical, Filter, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Search, User, Phone, Mail, Scissors, ChevronLeft, ChevronRight, Filter, FileText } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormButton } from "@/components/dashboard/FormInput";
 import PermissionGate from "@/components/PermissionGate";
 import { useSettings } from "@/components/providers/SettingsProvider";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 
 interface Staff {
     _id: string;
@@ -29,18 +31,7 @@ export default function StaffPage() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -259,43 +250,11 @@ export default function StaffPage() {
                                                 <span className="text-sm font-bold text-gray-900 dark:text-white">{staff.commissionRate}%</span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                <div className="relative flex justify-end dropdown-trigger">
-                                                    <button
-                                                        onClick={() => setActiveDropdown(activeDropdown === staff._id ? null : staff._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
-                                                    >
-                                                        <MoreVertical className="w-5 h-5" />
-                                                    </button>
-
-                                                    {activeDropdown === staff._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                                            <PermissionGate resource="staff" action="edit">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        openModal(staff);
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
-                                                                >
-                                                                    <Edit className="w-4 h-4 text-primary-600" />
-                                                                    Edit Details
-                                                                </button>
-                                                            </PermissionGate>
-                                                            <div className="h-px bg-gray-100 my-1" />
-                                                            <PermissionGate resource="staff" action="delete">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleDelete(staff._id);
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                    Delete Staff
-                                                                </button>
-                                                            </PermissionGate>
-                                                        </div>
-                                                    )}
+                                                <div className="relative flex justify-end">
+                                                    <ActionDropdown items={[
+                                                        { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(staff) },
+                                                        { label: "Delete Staff", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(staff._id) },
+                                                    ]} />
                                                 </div>
                                             </td>
                                         </tr>
@@ -304,6 +263,66 @@ export default function StaffPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    <MobileCardList
+                        items={staffMembers}
+                        loading={loading}
+                        emptyIcon={<User className="w-14 h-14" />}
+                        emptyText="No staff members found"
+                        renderItem={(staff) => {
+                            const isActive = staff.isActive;
+                            return (
+                                <MobileCard accentColor={isActive ? "bg-blue-400" : "bg-gray-300"}>
+                                    <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                        <div className="absolute right-2 top-2">
+                                            <ActionDropdown items={[
+                                                { label: "Edit Details", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(staff) },
+                                                { label: "Delete Staff", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(staff._id) },
+                                            ]} />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                <User className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                                            </div>
+                                            <div>
+                                                <div className="text-[13px] font-bold text-gray-900 dark:text-white">{staff.name}</div>
+                                                {staff.designation && (
+                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300">
+                                                        {staff.designation}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {staff.email && (
+                                            <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                                <Mail className="w-3 h-3 text-gray-400" />
+                                                {staff.email}
+                                            </div>
+                                        )}
+                                        {staff.phone && (
+                                            <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                                <Phone className="w-3 h-3 text-gray-400" />
+                                                {staff.phone}
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-3 text-[11px] text-gray-600 dark:text-gray-300 mt-1">
+                                            <span><span className="font-semibold">Salary:</span> {settings.symbol}{staff.salary?.toLocaleString() || 0}</span>
+                                            <span><span className="font-semibold">Commission:</span> {staff.commissionRate}%</span>
+                                        </div>
+                                        {staff.skills?.length > 0 && (
+                                            <div className="flex flex-wrap gap-1">
+                                                {staff.skills.slice(0, 2).map((skill, i) => (
+                                                    <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-primary-700 border border-primary-100">
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </MobileCard>
+                            );
+                        }}
+                    />
 
                     {/* Pagination */}
                     <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">

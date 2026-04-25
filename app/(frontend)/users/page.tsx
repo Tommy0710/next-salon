@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Users, Edit, Trash2, Shield, Mail, Filter, ChevronLeft, ChevronRight, MoreVertical, FileText } from "lucide-react";
+import { Plus, Search, Users, Edit, Trash2, Shield, Mail, Filter, ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import PermissionGate from "@/components/PermissionGate";
+import ActionDropdown from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -11,18 +13,6 @@ export default function UsersPage() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
-
     useEffect(() => {
         fetchUsers();
     }, [search, page]);
@@ -182,40 +172,11 @@ export default function UsersPage() {
                                                 })}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                <div className="relative flex justify-end dropdown-trigger">
-                                                    <button
-                                                        onClick={() => setActiveDropdown(activeDropdown === user._id ? null : user._id)}
-                                                        className="p-2 text-gray-400 hover:text-primary-900 hover:bg-primary-50 rounded-lg transition-all"
-                                                    >
-                                                        <MoreVertical className="w-5 h-5" />
-                                                    </button>
-
-                                                    {activeDropdown === user._id && (
-                                                        <div className="absolute right-0 mt-10 w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 text-left">
-                                                            <PermissionGate resource="users" action="edit">
-                                                                <Link
-                                                                    href={`/users/${user._id}`}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
-                                                                >
-                                                                    <Edit className="w-4 h-4 text-primary-600" />
-                                                                    Edit User
-                                                                </Link>
-                                                            </PermissionGate>
-                                                            <div className="h-px bg-gray-100 my-1" />
-                                                            <PermissionGate resource="users" action="delete">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleDelete(user._id);
-                                                                        setActiveDropdown(null);
-                                                                    }}
-                                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                    Delete User
-                                                                </button>
-                                                            </PermissionGate>
-                                                        </div>
-                                                    )}
+                                                <div className="relative flex justify-end">
+                                                    <ActionDropdown items={[
+                                                        { label: "Edit User", icon: <Edit className="w-4 h-4" />, href: `/users/${user._id}` },
+                                                        { label: "Delete User", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(user._id) },
+                                                    ]} />
                                                 </div>
                                             </td>
                                         </tr>
@@ -224,6 +185,53 @@ export default function UsersPage() {
                             </tbody>
                         </table>
                     </div>
+
+                    <MobileCardList
+                        items={users}
+                        loading={loading}
+                        emptyIcon={<Users className="w-14 h-14" />}
+                        emptyText="No users found"
+                        renderItem={(user) => (
+                            <MobileCard accentColor="bg-primary-400">
+                                <div className="pl-4 pr-10 py-3 flex flex-col gap-2">
+                                    <div className="absolute right-2 top-2">
+                                        <ActionDropdown items={[
+                                            { label: "Edit User", icon: <Edit className="w-4 h-4" />, href: `/users/${user._id}` },
+                                            { label: "Delete User", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(user._id) },
+                                        ]} />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
+                                            {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="text-[13px] font-bold text-gray-900 dark:text-white">{user.name || "Unnamed User"}</div>
+                                            <div className="text-[10px] text-gray-400">ID: {user._id.slice(-6)}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                        <Mail className="w-3 h-3 text-gray-400" />
+                                        {user.email}
+                                    </div>
+                                    <div>
+                                        {user.role ? (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border bg-primary-50 text-primary-700 border-primary-200">
+                                                <Shield className="w-3 h-3" />
+                                                {user.role.name}
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-gray-100 text-gray-600 border border-gray-200">
+                                                No Role Assigned
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-[11px] text-gray-400">
+                                        Joined {new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                    </div>
+                                </div>
+                            </MobileCard>
+                        )}
+                    />
 
                     {/* Pagination */}
                     <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
