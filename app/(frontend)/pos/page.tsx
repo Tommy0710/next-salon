@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit, X } from "lucide-react";
+import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit, X, Wallet } from "lucide-react";
 import { FormButton } from "@/components/dashboard/FormInput";
 import { formatCurrency } from "@/lib/currency";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -14,6 +14,7 @@ interface Item {
     name: string;
     price: number;
     type: 'Service' | 'Product';
+    productType?: 'PRODUCT' | 'PRE_AMOUNT';
     duration?: number; // Service only
     stock?: number; // Product only
     image?: string; // Product only
@@ -35,6 +36,7 @@ interface Customer {
     _id: string;
     name: string;
     phone?: string;
+    walletBalance?: number;
 }
 
 interface StaffAssignment {
@@ -53,6 +55,7 @@ interface Bill {
     paymentMethod: string;
     selectedQrIndex: number;
     amountPaid: number | string;
+    walletAmountUsed: number;
     editInvoiceId?: string;
 }
 
@@ -69,6 +72,7 @@ const createEmptyBill = (): Bill => {
         paymentMethod: "Tiền mặt",
         selectedQrIndex: 0,
         amountPaid: "",
+        walletAmountUsed: 0,
         editInvoiceId: undefined
     };
 };
@@ -134,6 +138,7 @@ export default function POSPage() {
                             paymentMethod: inv.paymentMethod || "Tiền mặt",
                             selectedQrIndex: 0,
                             amountPaid: inv.amountPaid === 0 ? "" : inv.amountPaid,
+                            walletAmountUsed: 0,
                         };
                         setBills(prev => {
                             const newBills = [...prev.filter(b => b.id !== editBill.id), editBill];
@@ -406,7 +411,7 @@ export default function POSPage() {
     };
 
     const calculateTotal = () => {
-        if (!activeBill) return { subtotal: 0, tax: 0, total: 0, discountAmount: 0, commission: 0, assignments: [] };
+        if (!activeBill) return { subtotal: 0, tax: 0, total: 0, discountAmount: 0, commission: 0, assignments: [], walletUsed: 0, afterWalletTotal: 0 };
         const subtotal = activeBill.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const tax = subtotal * (settings.taxRate / 100);
         const discountVal = activeBill.discount || 0;
@@ -414,6 +419,12 @@ export default function POSPage() {
             ? Math.min(discountVal, subtotal)
             : subtotal * (discountVal / 100);
         const total = subtotal + tax - discountAmount;
+
+        const selectedCustomerObj = customers.find(c => c._id === activeBill.selectedCustomer);
+        const walletUsed = activeBill.selectedCustomer && activeBill.selectedCustomer !== 'walking-customer'
+            ? Math.min(activeBill.walletAmountUsed || 0, selectedCustomerObj?.walletBalance || 0, Math.max(0, total))
+            : 0;
+        const afterWalletTotal = Math.max(0, total - walletUsed);
 
         // Commission calculation aggregated per staff from per-service assignments
         // Use subtotalAfterDiscount (exclude tax) to apportion discount fairly per item
@@ -455,8 +466,7 @@ export default function POSPage() {
             percentage: serviceNetBase > 0 ? (assignment.commission / serviceNetBase) * 100 : 0,
             commission: assignment.commission
         }));
-        //return vào database
-        return { subtotal, tax, total, discountAmount, commission: totalCommission, assignments: updatedAssignments };
+        return { subtotal, tax, total, discountAmount, commission: totalCommission, assignments: updatedAssignments, walletUsed, afterWalletTotal };
     };
 
     const handleCheckout = async () => {
@@ -492,7 +502,7 @@ export default function POSPage() {
 
         setSubmitting(true);
         try {
-            const { subtotal, tax, total, discountAmount, commission, assignments } = calculateTotal();
+            const { subtotal, tax, total, discountAmount, commission, assignments, walletUsed } = calculateTotal();
 
             const paid = activeBill.amountPaid === "" ? 0 : parseFloat(activeBill.amountPaid.toString());
             const status = "pending"; // POS tạo đơn luôn pending, hoàn tất ở trang invoice
@@ -511,12 +521,14 @@ export default function POSPage() {
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,
-                    total: item.price * item.quantity
+                    total: item.price * item.quantity,
+                    productType: item.productType || 'PRODUCT',
                 })),
                 subtotal,
                 tax,
                 discount: discountAmount,
                 totalAmount: total,
+                walletUsed,
                 commission,
                 staffAssignments: assignments.map(a => ({
                     staff: a.staffId,
@@ -583,7 +595,7 @@ export default function POSPage() {
         }
     };
 
-    const { subtotal, tax, total, commission, assignments } = calculateTotal();
+    const { subtotal, tax, total, commission, assignments, walletUsed: billWalletUsed, afterWalletTotal } = calculateTotal();
     const [mobileTab, setMobileTab] = useState<'catalog' | 'cart'>('catalog');
 
     const filteredBills = bills.filter(b => b.name.toLowerCase().includes(billSearchQuery.toLowerCase()));
@@ -653,11 +665,20 @@ export default function POSPage() {
                                                 <img src={item.image} alt={item.name} className="w-8 h-8 md:w-10 md:h-10 object-cover rounded-lg border border-gray-200 dark:border-slate-700" />
                                             ) : (
                                                 <div className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                                                    <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
+                                                    {item.productType === 'PRE_AMOUNT' ? (
+                                                        <Wallet className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
+                                                    ) : (
+                                                        <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600 dark:text-green-400" />
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
                                         <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-[10px] md:text-xs leading-tight line-clamp-2 mb-1 flex items-center justify-center">{item.name}</h3>
+                                        {item.productType === 'PRE_AMOUNT' && (
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[8px] font-black rounded-full uppercase mb-0.5">
+                                                Nạp ví
+                                            </span>
+                                        )}
                                         <p className="text-primary-900 dark:text-primary-400 font-bold text-xs md:text-sm">{formatCurrency(item.price)}</p>
                                     </div>
                                 ))}
@@ -751,6 +772,35 @@ export default function POSPage() {
                                         <Plus className="w-4 h-4 md:w-5 md:h-5" />
                                     </button>
                                 </div>
+                                {/* Wallet balance row */}
+                                {(() => {
+                                    const cust = customers.find(c => c._id === activeBill.selectedCustomer);
+                                    if (!cust || (cust.walletBalance ?? 0) <= 0) return null;
+                                    return (
+                                        <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/40 rounded-lg px-3 py-2">
+                                            <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                            <span className="text-xs text-emerald-700 dark:text-emerald-300 flex-1 font-medium">
+                                                Số dư ví: <span className="font-black">{formatCurrency(cust.walletBalance ?? 0)}</span>
+                                            </span>
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Dùng:</span>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max={Math.min(cust.walletBalance ?? 0, afterWalletTotal + (activeBill.walletAmountUsed || 0))}
+                                                    value={activeBill.walletAmountUsed || ""}
+                                                    onChange={(e) => {
+                                                        const max = Math.min(cust.walletBalance ?? 0, total);
+                                                        const val = Math.min(Math.max(0, parseFloat(e.target.value) || 0), max);
+                                                        updateActiveBill({ walletAmountUsed: val });
+                                                    }}
+                                                    placeholder='0'
+                                                    className="w-20 text-right text-[11px] font-black border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-950 text-emerald-700 dark:text-emerald-300 rounded px-1 py-0.5 focus:ring-1 focus:ring-emerald-500 outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
 
@@ -772,14 +822,27 @@ export default function POSPage() {
                                                             <ScissorsIcon className="w-3 h-3 text-primary-600 dark:text-primary-400" />
                                                         </div>
                                                     ) : (
-                                                        <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                                                            <Package className="w-3 h-3 text-green-600 dark:text-green-400" />
-                                                        </div>
+                                                        item.productType === 'PRE_AMOUNT' ? (
+                                                            <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                                                                <Wallet className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                                                                <Package className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                                            </div>
+                                                        )
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-[10px] md:text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{item.name}</p>
-                                                    <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">{settings.symbol}{item.price}</p>
+                                                    <div className="flex items-center gap-1">
+                                                        <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400">{settings.symbol}{item.price}</p>
+                                                        {item.productType === 'PRE_AMOUNT' && (
+                                                            <span className="inline-flex items-center gap-0.5 px-1 py-0 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[8px] font-black rounded uppercase">
+                                                                Nạp ví
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1 flex-shrink-0">
@@ -907,20 +970,26 @@ export default function POSPage() {
                                             placeholder="0"
                                         />
                                     </div>
-                                </div>                                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 pt-1.5 mt-1">
+                                </div>                                {billWalletUsed > 0 && (
+                                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400 border-t border-gray-100 dark:border-slate-800 pt-1 mt-1">
+                                        <span className="flex items-center gap-1"><Wallet className="w-3 h-3" />Ví sử dụng</span>
+                                        <span className="font-bold">-{formatCurrency(billWalletUsed)}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 pt-1.5 mt-1">
                                     <span className="text-[10px] font-bold">Đã thanh toán</span>
                                     <input
                                         type="number"
-                                        placeholder={total.toFixed(2)}
+                                        placeholder={formatCurrency(afterWalletTotal)}
                                         value={activeBill.amountPaid}
                                         onChange={(e) => updateActiveBill({ amountPaid: e.target.value })}
                                         className="w-20 text-right text-[10px] md:text-xs border-2 border-primary-900/20 dark:border-primary-900/50 rounded px-1 py-0.5 focus:border-primary-900 bg-white dark:bg-slate-950 text-gray-900 dark:text-white outline-none font-bold"
                                     />
                                 </div>
                                 <div className="flex justify-between text-sm md:text-base font-black text-gray-900 dark:text-white dark:text-gray-100 pt-1 border-t border-gray-200 dark:border-slate-800">
-                                    <span> {(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'Còn nợ' : 'Tổng cộng'}</span>
-                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? 'text-red-600 dark:text-red-400' : 'text-primary-900 dark:text-primary-400'}>
-                                        {formatCurrency(((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < total) ? (total - parseFloat(activeBill.amountPaid.toString())) : total))}
+                                    <span>{(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < afterWalletTotal) ? 'Còn nợ' : 'Tổng cộng'}</span>
+                                    <span className={(activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < afterWalletTotal) ? 'text-red-600 dark:text-red-400' : 'text-primary-900 dark:text-primary-400'}>
+                                        {formatCurrency((activeBill.amountPaid !== "" && parseFloat(activeBill.amountPaid.toString()) < afterWalletTotal) ? (afterWalletTotal - parseFloat(activeBill.amountPaid.toString())) : afterWalletTotal)}
                                     </span>
                                 </div>
                             </div>
@@ -992,7 +1061,7 @@ export default function POSPage() {
                                 onClick={handleCheckout}
                                 loading={submitting}
                                 variant="success"
-                                className="w-full py-4 md:py-4 text-xs md:text-sm uppercase tracking-widest font-black shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all mb-4"
+                                className="w-full py-4 md:py-4 text-xs md:text-sm uppercase tracking-widest font-black shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all"
                                 icon={<CreditCard className="w-4 h-4" />}
                             >
                                 {activeBill?.editInvoiceId ? "Lưu chỉnh sửa" : "Hoàn thành đơn hàng"}

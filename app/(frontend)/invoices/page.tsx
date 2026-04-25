@@ -626,7 +626,7 @@ export default function InvoicesPage() {
 
                     {/* Phần Giao Diện Chọn Phương Thức Thanh Toán Mới */}
                     <div className="mb-3">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">Payment Method</label>
                         <div className="mb-3 space-y-2">
                             <div className="grid grid-cols-2 gap-2">
                                 {['Tiền mặt', 'Mã QR'].map(method => (
@@ -693,7 +693,7 @@ export default function InvoicesPage() {
             >
                 <form onSubmit={handleEditSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Status</label>
                         <select
                             value={editFormData.status}
                             onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
@@ -706,7 +706,7 @@ export default function InvoicesPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Notes</label>
                         <textarea
                             value={editFormData.notes}
                             onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}

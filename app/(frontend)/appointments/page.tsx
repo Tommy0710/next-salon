@@ -955,8 +955,8 @@ export default function AppointmentsPage() {
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                         />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <div className="pb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">
                                 Giảm giá
                             </label>
 
@@ -1013,7 +1013,7 @@ export default function AppointmentsPage() {
 
                         {/* Customer */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">
                                 Customer<span className="text-red-500 ml-1">*</span>
                             </label>
 

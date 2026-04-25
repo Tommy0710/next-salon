@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
     X, User, Mail, Phone, MapPin, Calendar, TrendingUp,
     ShoppingBag, Clock, Award, ChevronRight, Scissors, Package,
-    CreditCard, BarChart2, AlertCircle
+    CreditCard, BarChart2, AlertCircle, Wallet
 } from "lucide-react";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatCurrency } from "@/lib/currency";
@@ -31,6 +31,7 @@ interface CustomerProfile {
         visitCount?: number;
         totalPurchases: number;
         loyaltyPoints: number;
+        walletBalance?: number;
         createdAt: string;
     };
     invoices: {
@@ -211,6 +212,19 @@ function PanelContent({
                                 <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                                 <span>Tham gia: {new Date(c.createdAt).toLocaleDateString("vi-VN")}</span>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* ── Wallet Balance ── */}
+                    <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800">
+                        <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${(c.walletBalance ?? 0) > 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/40' : 'bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700'}`}>
+                            <div className="flex items-center gap-2.5">
+                                <Wallet className={`w-4 h-4 shrink-0 ${(c.walletBalance ?? 0) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`} />
+                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Số dư ví</span>
+                            </div>
+                            <span className={`text-sm font-black ${(c.walletBalance ?? 0) > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-400 dark:text-slate-500'}`}>
+                                {formatCurrency(c.walletBalance ?? 0)}
+                            </span>
                         </div>
                     </div>
 

@@ -13,6 +13,7 @@ export interface IProduct extends Document {
     sku?: string;
     barcode?: string;
     type: 'retail' | 'internal';
+    productType: 'PRODUCT' | 'PRE_AMOUNT';
     image?: string;
     supplier?: mongoose.Types.ObjectId;
     status: 'active' | 'inactive';
@@ -34,6 +35,11 @@ const productSchema = new Schema<IProduct>(
             type: String,
             enum: ['retail', 'internal'],
             default: 'retail',
+        },
+        productType: {
+            type: String,
+            enum: ['PRODUCT', 'PRE_AMOUNT'],
+            default: 'PRODUCT',
         },
         image: { type: String },
         supplier: { type: Schema.Types.ObjectId, ref: 'Supplier' },

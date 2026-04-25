@@ -38,54 +38,74 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         const body = await request.json();
 
-        // Find existing invoice to check status change
-        // Find existing invoice to check status change
         const oldInvoice = await Invoice.findById(id);
         if (!oldInvoice) {
             return NextResponse.json({ success: false, error: "Invoice not found" }, { status: 404 });
         }
 
         // Cập nhật Hóa đơn trước
-        const invoice = await Invoice.findByIdAndUpdate(id, body, { new: true });
+        let invoice = await Invoice.findByIdAndUpdate(id, body, { new: true });
 
         // ========================================================
-        // LUỒNG TỰ ĐỘNG KHI HÓA ĐƠN CHUYỂN SANG TRẠNG THÁI "PAID"
+        // 🌟 LUỒNG XỬ LÝ SONG SONG KHI HÓA ĐƠN ĐƯỢC THANH TOÁN
         // ========================================================
         if (body.status === 'paid' && oldInvoice.status !== 'paid') {
+            const backgroundTasks: Promise<any>[] = [];
 
-            // 1. ĐỒNG BỘ TRẠNG THÁI SANG APPOINTMENT (Nếu có gắn Lịch hẹn)
+            // 1. ĐỒNG BỘ TRẠNG THÁI LỊCH HẸN
             if (oldInvoice.appointment) {
-                await Appointment.findByIdAndUpdate(
-                    oldInvoice.appointment,
-                    { status: 'completed' }
+                backgroundTasks.push(
+                    Appointment.findByIdAndUpdate(oldInvoice.appointment, { status: 'completed' })
                 );
-                console.log(`✅ Đã tự động chuyển Lịch hẹn ${oldInvoice.appointment} sang Completed`);
             }
 
-            // 2. CỘNG ĐIỂM THƯỞNG CHO KHÁCH HÀNG (Nếu có gắn Khách hàng)
-            // if (invoice.customer) {
-            //     const pointsToGain = Math.floor(invoice.totalAmount / 10);
-            //     if (pointsToGain > 0) {
-            //         await Customer.findByIdAndUpdate(invoice.customer, {
-            //             $inc: {
-            //                 loyaltyPoints: pointsToGain,
-            //                 totalPurchases: invoice.totalAmount
-            //             }
-            //         });
-            //     }
-            // }
-        }
-        // Loyalty Point Logic: If status changed to 'paid'
-        if (body.status === 'paid' && oldInvoice.status !== 'paid' && invoice.customer) {
-            const pointsToGain = Math.floor(invoice.totalAmount / 10);
-            if (pointsToGain > 0) {
-                await Customer.findByIdAndUpdate(invoice.customer, {
-                    $inc: {
-                        loyaltyPoints: pointsToGain,
-                        totalPurchases: invoice.totalAmount
+            // 2. XỬ LÝ KHÁCH HÀNG (Điểm thưởng & Ví) TRONG 1 TRUY VẤN
+            if (invoice.customer) {
+                backgroundTasks.push((async () => {
+                    const customer = await Customer.findById(invoice.customer);
+                    if (customer) {
+                        const customerUpdates: any = { $inc: {} };
+
+                        // A. Tính toán Điểm thưởng & Tổng chi tiêu
+                        const pointsToGain = Math.floor(invoice.totalAmount / 10);
+                        if (pointsToGain > 0) {
+                            customerUpdates.$inc.loyaltyPoints = pointsToGain;
+                            customerUpdates.$inc.totalPurchases = invoice.totalAmount;
+                        }
+
+                        // B. Tính toán Biến động Ví (Top-up & Deduct)
+                        const walletDeduct = invoice.walletUsed || 0;
+                        const preAmountAdded = (invoice.items || [])
+                            .filter((it: any) => it.productType === 'PRE_AMOUNT')
+                            .reduce((sum: number, it: any) => sum + (it.total || 0), 0);
+
+                        const delta = preAmountAdded - walletDeduct;
+                        let newBalance = customer.walletBalance || 0;
+
+                        if (delta !== 0) {
+                            newBalance = Math.max(0, newBalance + delta);
+                            customerUpdates.walletBalance = newBalance;
+
+                            // Lưu trữ số dư sau thanh toán vào Invoice
+                            await Invoice.findByIdAndUpdate(id, { walletBalanceAfter: newBalance });
+                            invoice.walletBalanceAfter = newBalance;
+                        }
+
+                        // Dọn dẹp object $inc nếu rỗng để tránh lỗi MongoDB
+                        if (Object.keys(customerUpdates.$inc).length === 0) {
+                            delete customerUpdates.$inc;
+                        }
+
+                        // C. Thực thi cập nhật Khách hàng 1 lần duy nhất
+                        if (Object.keys(customerUpdates).length > 0) {
+                            await Customer.findByIdAndUpdate(invoice.customer, customerUpdates);
+                        }
                     }
-                });
+                })());
             }
+
+            // Chạy đồng thời các tiến trình để giảm thiểu thời gian chờ (Latency)
+            await Promise.all(backgroundTasks);
         }
 
         // Log Activity

@@ -292,10 +292,6 @@ export default function PrintInvoicePage() {
 
                 {/* Summary Section */}
                 <div className="border-t border-gray-100 pt-4 space-y-2 text-[13px]">
-                    {/* <div className="flex justify-between">
-                        <span className="text-gray-500">Tổng phụ</span>
-                        <span>{formatCurrency(invoice.subtotal)}</span>
-                    </div> */}
                     <div className="flex justify-between text-gray-700">
                         <span>Thuế ({((invoice.tax / invoice.subtotal) * 100).toFixed(0)}%)</span>
                         <span>{formatCurrency(invoice.tax)}</span>
@@ -310,6 +306,24 @@ export default function PrintInvoicePage() {
                         <span>Tổng cộng</span>
                         <span>{formatCurrency(invoice.totalAmount)}</span>
                     </div>
+                    {invoice.walletUsed > 0 && (
+                        <>
+                            <div className="flex justify-between text-emerald-700">
+                                <span>Ví sử dụng</span>
+                                <span>-{formatCurrency(invoice.walletUsed)}</span>
+                            </div>
+                            <div className="flex justify-between font-bold">
+                                <span>Còn thanh toán</span>
+                                <span>{formatCurrency(Math.max(0, invoice.totalAmount - invoice.walletUsed))}</span>
+                            </div>
+                            {/* {invoice.walletBalanceAfter != null && (
+                                <div className="flex justify-between text-[11px] text-gray-500">
+                                    <span>Số dư ví còn lại</span>
+                                    <span>{formatCurrency(invoice.walletBalanceAfter)}</span>
+                                </div>
+                            )} */}
+                        </>
+                    )}
                     {/* <div className="flex justify-between font-bold">
                         <span>Đã thanh toán</span>
                         <span>{formatCurrency(invoice.amountPaid)}</span>

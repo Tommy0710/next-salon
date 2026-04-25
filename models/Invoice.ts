@@ -14,6 +14,7 @@ export interface IInvoice extends Document {
         quantity: number;
         discount: number; // Amount
         total: number;
+        productType?: 'PRODUCT' | 'PRE_AMOUNT';
     }[];
     subtotal: number;
     tax: number;
@@ -25,6 +26,8 @@ export interface IInvoice extends Document {
     qrCodeImage?: string;
     bankDetails?: string;
     status: 'paid' | 'pending' | 'partially_paid' | 'cancelled';
+    walletUsed: number;
+    walletBalanceAfter?: number;
     staff?: mongoose.Types.ObjectId;
     staffAssignments: {
         staff: mongoose.Types.ObjectId;
@@ -51,6 +54,7 @@ const invoiceSchema = new Schema<IInvoice>(
                 quantity: { type: Number, default: 1 },
                 discount: { type: Number, default: 0 },
                 total: Number,
+                productType: { type: String, enum: ['PRODUCT', 'PRE_AMOUNT'], default: 'PRODUCT' },
             },
         ],
         subtotal: { type: Number, required: true },
@@ -67,6 +71,8 @@ const invoiceSchema = new Schema<IInvoice>(
             enum: ['paid', 'pending', 'partially_paid', 'cancelled'],
             default: 'paid',
         },
+        walletUsed: { type: Number, default: 0, min: 0 },
+        walletBalanceAfter: { type: Number },
         staff: { type: Schema.Types.ObjectId, ref: 'Staff' },
         staffAssignments: [
             {

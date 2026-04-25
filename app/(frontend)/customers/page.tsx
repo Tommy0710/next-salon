@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, User, Mail, Phone, MoreVertical, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit, Trash2, Search, User, Mail, Phone, MoreVertical, ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import PermissionGate from "@/components/PermissionGate";
@@ -17,6 +17,7 @@ interface Customer {
     address?: string;
     notes?: string;
     totalPurchases: number;
+    walletBalance?: number;
     status: number;
     gender?: string;
     dateOfBirth?: string;
@@ -57,6 +58,7 @@ export default function CustomersPage() {
         gender: "other",
         dateOfBirth: "",
         status: 1,
+        walletBalance: 0,
     });
 
     useEffect(() => {
@@ -107,10 +109,11 @@ export default function CustomersPage() {
                 gender: (customer as any).gender || "other",
                 dateOfBirth: customer.dateOfBirth ? customer.dateOfBirth.split('T')[0] : "",
                 status: customer.status,
+                walletBalance: customer.walletBalance ?? 0,
             });
         } else {
             setEditingCustomer(null);
-            setFormData({ name: "", email: "", phone: "", address: "", notes: "", gender: "other", dateOfBirth: "", status: 1 });
+            setFormData({ name: "", email: "", phone: "", address: "", notes: "", gender: "other", dateOfBirth: "", status: 1, walletBalance: 0 });
         }
         setIsModalOpen(true);
     };
@@ -350,6 +353,7 @@ export default function CustomersPage() {
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contact</th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Purchases</th>
+                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Wallet</th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Join Date</th>
                                         <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
@@ -359,12 +363,12 @@ export default function CustomersPage() {
                                     {loading && customers.length === 0 ? (
                                         Array.from({ length: 5 }).map((_, i) => (
                                             <tr key={i} className="animate-pulse">
-                                                <td colSpan={6} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                                <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                             </tr>
                                         ))
                                     ) : customers.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
+                                            <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                                 <User className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                                 <p>No customers found</p>
                                             </td>
@@ -411,6 +415,16 @@ export default function CustomersPage() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(customer.totalPurchases)}</span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {(customer.walletBalance ?? 0) > 0 ? (
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-700/40">
+                                                            <Wallet className="w-3 h-3" />
+                                                            {formatCurrency(customer.walletBalance ?? 0)}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-300 dark:text-slate-600 text-sm">—</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${customer.status === 1
@@ -582,7 +596,7 @@ export default function CustomersPage() {
                     />
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Ngày sinh</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1.5">Ngày sinh</label>
                             <input
                                 type="date"
                                 value={(formData as any).dateOfBirth || ""}
@@ -590,8 +604,26 @@ export default function CustomersPage() {
                                 className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm text-gray-900 dark:text-white"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Số lần ghé thăm</label>
+                        {editingCustomer && (
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Số dư ví (VND)
+                                </label>
+                                <div className="relative">
+                                    <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={formData.walletBalance}
+                                        onChange={(e) => setFormData({ ...formData, walletBalance: Math.max(0, Number(e.target.value)) })}
+                                        className="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <p className="mt-1 text-xs text-gray-400">Số dư hiện tại: {formatCurrency(editingCustomer.walletBalance ?? 0)}</p>
+                            </div>
+                        )}
+                        {/* <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1.5">Số lần ghé thăm</label>
                             <input
                                 type="number"
                                 min={0}
@@ -600,10 +632,10 @@ export default function CustomersPage() {
                                 placeholder="0"
                                 className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent text-sm text-gray-900 dark:text-white"
                             />
-                        </div>
+                        </div> */}
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1.5">Notes</label>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

@@ -59,7 +59,7 @@ export default function ProductsPage() {
 
     const [formData, setFormData] = useState({
         name: "", category: "", brand: "", image: "",
-        price: 0, costPrice: 0, stock: 0, type: "retail", alertQuantity: 5, status: "active"
+        price: 0, costPrice: 0, stock: 0, type: "retail", productType: "PRODUCT", alertQuantity: 5, status: "active"
     });
 
     useEffect(() => { fetchCategories(); fetchBrands(); }, []);
@@ -141,10 +141,10 @@ export default function ProductsPage() {
     const openModal = (product?: Product) => {
         if (product) {
             setEditingProduct(product);
-            setFormData({ name: product.name, category: product.category?._id || "", brand: product.brand?._id || "", image: product.image || "", price: product.price, costPrice: product.costPrice, stock: product.stock, type: product.type, alertQuantity: product.alertQuantity ?? 5, status: product.status });
+            setFormData({ name: product.name, category: product.category?._id || "", brand: product.brand?._id || "", image: product.image || "", price: product.price, costPrice: product.costPrice, stock: product.stock, type: product.type, productType: (product as any).productType || "PRODUCT", alertQuantity: product.alertQuantity ?? 5, status: product.status });
         } else {
             setEditingProduct(null);
-            setFormData({ name: "", category: categories[0]?._id || "", brand: "", image: "", price: 0, costPrice: 0, stock: 0, type: "retail", alertQuantity: 5, status: "active" });
+            setFormData({ name: "", category: categories[0]?._id || "", brand: "", image: "", price: 0, costPrice: 0, stock: 0, type: "retail", productType: "PRODUCT", alertQuantity: 5, status: "active" });
         }
         setIsModalOpen(true);
     };
@@ -209,14 +209,15 @@ export default function ProductsPage() {
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">POS</th>
                                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
                                 {loading && products.length === 0 ? Array.from({ length: 5 }).map((_, i) => (
-                                    <tr key={i} className="animate-pulse"><td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded" /></td></tr>
+                                    <tr key={i} className="animate-pulse"><td colSpan={8} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded" /></td></tr>
                                 )) : products.length === 0 ? (
-                                    <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500"><Package className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>No products found</p></td></tr>
+                                    <tr><td colSpan={8} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500"><Package className="w-12 h-12 mx-auto mb-3 opacity-20" /><p>No products found</p></td></tr>
                                 ) : products.map((product) => (
                                     <tr key={product._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -244,6 +245,17 @@ export default function ProductsPage() {
                                         <td className="px-6 py-4 whitespace-nowrap"><span className="text-sm font-bold text-gray-900 dark:text-white">{formatCurrency(product.price, settings.currency)}</span></td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`text-[10px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border ${product.type === 'retail' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-primary-50 text-primary-700 border-primary-200'}`}>{product.type}</span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {(product as any).productType === 'PRE_AMOUNT' ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-700/40">
+                                                    Nạp ví
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-700/40">
+                                                    Sản phẩm
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <div className="relative flex justify-end">
@@ -297,6 +309,11 @@ export default function ProductsPage() {
                                                 <span className={`w-1.5 h-1.5 rounded-full ${product.type === 'retail' ? 'bg-emerald-400' : 'bg-primary-400'}`} />
                                                 {product.type}
                                             </span>
+                                            {(product as any).productType === 'PRE_AMOUNT' && (
+                                                <span className="self-start inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700/40">
+                                                    Nạp ví
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </MobileCard>
@@ -325,18 +342,18 @@ export default function ProductsPage() {
             <Modal isOpen={isModalOpen} onClose={closeModal} title={editingProduct ? "Edit Product" : "Add Product"}>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image URL</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Image URL</label>
                         <input type="text" className="w-full p-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-gray-900 dark:text-white rounded-lg outline-none focus:border-primary-500 text-sm" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="https://example.com/image.jpg" />
                         {formData.image && <img src={formData.image} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm" />}
                     </div> */}
                     <FormInput label="Product Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Category <span className="text-red-500">*</span></label>
                             <SearchableSelect value={formData.category} onChange={(val) => setFormData({ ...formData, category: val })} options={categories.map(c => ({ value: c._id, label: c.name }))} placeholder="Select category" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Brand</label>
                             <SearchableSelect value={formData.brand} onChange={(val) => setFormData({ ...formData, brand: val })} options={[{ value: "", label: "No Brand" }, ...brands.map(b => ({ value: b._id, label: b.name }))]} placeholder="Select brand" />
                         </div>
                     </div>
@@ -347,6 +364,7 @@ export default function ProductsPage() {
                     <div className="grid grid-cols-2 gap-4">
                         <FormInput label="Stock" type="number" required value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })} />
                         <FormSelect label="Type" value={formData.type} onChange={(e: any) => setFormData({ ...formData, type: e.target.value })} options={[{ value: "retail", label: "Retail Sale" }, { value: "internal", label: "Internal Use" }]} />
+                        <FormSelect label="POS Behavior" value={formData.productType} onChange={(e: any) => setFormData({ ...formData, productType: e.target.value })} options={[{ value: "PRODUCT", label: "Normal Product" }, { value: "PRE_AMOUNT", label: "Wallet Top-up (Nạp ví)" }]} />
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <button type="button" onClick={closeModal} className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 text-sm">Cancel</button>

@@ -162,7 +162,7 @@ export default function UsageLogsPage() {
                                 ))
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         <History className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                         <p>No usage logs found</p>
                                     </td>

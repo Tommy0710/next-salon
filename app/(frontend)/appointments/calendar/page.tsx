@@ -482,7 +482,7 @@ export default function CalendarPage() {
                         />
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">
                                 Giảm giá
                             </label>
 
@@ -538,7 +538,7 @@ export default function CalendarPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Customer */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">
                                 Customer<span className="text-red-500 ml-1">*</span>
                             </label>
 

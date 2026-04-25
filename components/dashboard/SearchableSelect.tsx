@@ -52,7 +52,7 @@ export default function SearchableSelect({
     return (
         <div className={`${className}`} ref={wrapperRef}>
             {label && (
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
                 </label>
