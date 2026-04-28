@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import { Appointment } from "@/lib/initModels";
-import { addDays, startOfDay, endOfDay, format } from "date-fns";
+import { addDays, startOfDay, endOfDay } from "date-fns";
 import {
     sendSMS,
     sendEmail,
@@ -11,9 +11,66 @@ import {
     isSMSConfigured,
 } from "@/lib/notifications";
 import { ZALO_EVENTS, buildTemplateData } from "@/lib/zalo-payloads";
+import { sendZaloZNS } from "@/lib/zalo";
 import { formatAppointmentDateTime } from '@/lib/zaloDate';
+import { logActivity } from "@/lib/logger";
 import Settings from "@/models/Settings";
 import ZaloLog from "@/models/ZaloLog";
+
+const ZALO_MAX_RETRIES = 3;
+
+async function sendZaloReminderWithRetry(params: {
+    phone: string;
+    templateId: string;
+    templateName: string;
+    templateData: any;
+    trackingId: string;
+    eventType: string;
+}): Promise<boolean> {
+    const { phone, templateId, templateName, templateData, trackingId, eventType } = params;
+    const formattedPhone = phone.replace(/^(\+?84|0)/, '84');
+    let lastError: string | undefined;
+
+    for (let attempt = 1; attempt <= ZALO_MAX_RETRIES; attempt++) {
+        const result = await sendZaloZNS(phone, templateId, templateData);
+
+        if (result.success) {
+            await ZaloLog.create({
+                phone: formattedPhone,
+                templateId,
+                templateName,
+                eventType,
+                trackingId,
+                sentAt: new Date(),
+                status: 'success',
+                responseData: result.data,
+            });
+            console.log(`✅ Zalo Reminder OK (attempt ${attempt}) → ${phone}`);
+            return true;
+        }
+
+        lastError = result.error;
+        console.warn(`⚠️ Zalo Retry ${attempt}/${ZALO_MAX_RETRIES} → ${phone}: ${lastError}`);
+
+        if (attempt < ZALO_MAX_RETRIES) {
+            await new Promise(r => setTimeout(r, 1000 * attempt));
+        }
+    }
+
+    await ZaloLog.create({
+        phone: formattedPhone,
+        templateId,
+        templateName,
+        eventType,
+        trackingId,
+        sentAt: new Date(),
+        status: 'failed',
+        errorMessage: lastError,
+    });
+
+    console.error(`❌ Zalo Reminder failed after ${ZALO_MAX_RETRIES} attempts → ${phone}: ${lastError}`);
+    return false;
+}
 
 // POST /api/appointments/send-reminders - Send reminders for upcoming appointments
 export async function POST(request: Request) {
@@ -21,13 +78,16 @@ export async function POST(request: Request) {
         await connectToDB();
 
         const body = await request.json();
-        const { daysBefore = 1, methods = ['sms', 'email'] } = body; // methods: array of ['sms', 'email', 'zalo']
+        const { daysBefore = 1, methods = ['sms', 'email'] } = body;
 
-        // Check configuration
         const emailEnabled = await isEmailConfigured();
         const smsEnabled = await isSMSConfigured();
         const settings = await Settings.findOne();
-        const zaloEnabled = settings?.zaloEnabled && settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER)?.templateId;
+
+        const zaloTemplateConfig = settings?.zaloEnabled
+            ? settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER)
+            : null;
+        const zaloEnabled = !!(zaloTemplateConfig?.templateId);
 
         if (!emailEnabled && !smsEnabled && !zaloEnabled) {
             return NextResponse.json({
@@ -36,12 +96,10 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
-        // Get appointments for the target date
         const targetDate = addDays(new Date(), daysBefore);
         const startDate = startOfDay(targetDate);
         const endDate = endOfDay(targetDate);
 
-        // Find appointments that haven't had reminders sent
         const appointments = await Appointment.find({
             date: { $gte: startDate, $lte: endDate },
             status: 'confirmed',
@@ -59,8 +117,8 @@ export async function POST(request: Request) {
             });
         }
 
-        const remindersSent = [];
-        const errors = [];
+        const remindersSent: any[] = [];
+        const errors: any[] = [];
 
         for (const appointment of appointments) {
             const customer: any = appointment.customer;
@@ -83,12 +141,11 @@ export async function POST(request: Request) {
             if (methods.includes('sms') && smsEnabled && customer.phone) {
                 const smsMessage = getAppointmentReminderSMS(
                     customer.name,
-                    staff.name,
+                    staff?.name,
                     dateStr,
                     timeStr,
                     process.env.SALON_NAME || 'Our Salon'
                 );
-
                 smsSent = await sendSMS(customer.phone, smsMessage);
             }
 
@@ -96,7 +153,7 @@ export async function POST(request: Request) {
             if (methods.includes('email') && emailEnabled && customer.email) {
                 const emailContent = getAppointmentReminderEmail(
                     customer.name,
-                    staff.name,
+                    staff?.name,
                     dateStr,
                     timeStr,
                     services,
@@ -104,7 +161,6 @@ export async function POST(request: Request) {
                     process.env.SALON_PHONE,
                     process.env.SALON_ADDRESS
                 );
-
                 emailSent = await sendEmail(
                     customer.email,
                     emailContent.subject,
@@ -113,47 +169,28 @@ export async function POST(request: Request) {
                 );
             }
 
-            // Send Zalo ZNS
+            // Send Zalo ZNS — direct call with retry
             if (methods.includes('zalo') && zaloEnabled && customer.phone) {
-                try {
-                    // Dùng Absolute URL chuẩn xác của Next.js (lấy từ Header host)
-                    const host = request.headers.get("host") || "localhost:3000";
-                    const protocol = host.includes("localhost") ? "http" : "https";
-                    const baseUrl = `${protocol}://${host}`;
+                const payloadData = {
+                    customerName: customer.name || "Quý khách",
+                    appointmentDate: dateStr,
+                    bookingCode: appointment.bookingCode || appointment._id.toString().substring(0, 8).toUpperCase(),
+                    serviceName: services.length > 0 ? services.join(', ') : "Dịch vụ Spa",
+                    status: "Sắp tới giờ hẹn",
+                };
 
-                    const zaloResponse = await fetch(`${baseUrl}/api/zalo/zns`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            phone: customer.phone,
-                            eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
-                            payloadData: {
-                                customerName: customer.name || "Quý khách",
-                                appointmentDate: formatAppointmentDateTime(appointment.date, appointment.startTime),
-                                bookingCode: appointment.bookingCode || appointment._id.toString().substring(0, 8).toUpperCase(),
-                                serviceName: services.length > 0 ? services.join(', ') : "Dịch vụ Spa",
-                                status: "Sắp tới giờ hẹn",
-                                invoiceId: appointment._id // Để bên trong tự tracking
-                            }
-                        })
-                    });
+                const templateData = buildTemplateData(ZALO_EVENTS.APPOINTMENT_REMINDER, payloadData);
 
-                    const zaloResult = await zaloResponse.json();
-                    zaloSent = zaloResult.success;
-
-                    if (!zaloSent) {
-                        console.error(`❌ Zalo Reminder Failed cho KH ${customer.name}:`, zaloResult.error);
-                    } else {
-                        console.log(`✅ Zalo Reminder Thành công cho KH ${customer.name}`);
-                    }
-
-                } catch (error) {
-                    console.error(`🚨 Lỗi hệ thống khi gửi Zalo Reminder cho KH ${customer.name}:`, error);
-                    zaloSent = false;
-                }
+                zaloSent = await sendZaloReminderWithRetry({
+                    phone: customer.phone,
+                    templateId: zaloTemplateConfig.templateId,
+                    templateName: zaloTemplateConfig.name || ZALO_EVENTS.APPOINTMENT_REMINDER,
+                    templateData,
+                    trackingId: appointment._id.toString(),
+                    eventType: ZALO_EVENTS.APPOINTMENT_REMINDER,
+                });
             }
 
-            // Mark as sent if at least one method succeeded
             if (smsSent || emailSent || zaloSent) {
                 appointment.reminderSent = true;
                 appointment.reminderSentAt = new Date();
@@ -179,24 +216,25 @@ export async function POST(request: Request) {
             }
         }
 
+        await logActivity({
+            req: request,
+            action: 'create',
+            resource: 'reminder',
+            details: `Sent ${remindersSent.length} appointment reminders (${errors.length} failed) for ${targetDate.toDateString()}`,
+        });
+
         return NextResponse.json({
             success: true,
             message: `Sent ${remindersSent.length} reminders`,
             count: remindersSent.length,
             reminders: remindersSent,
             errors: errors.length > 0 ? errors : undefined,
-            config: {
-                emailEnabled,
-                smsEnabled,
-                zaloEnabled,
-            }
+            config: { emailEnabled, smsEnabled, zaloEnabled }
         });
+
     } catch (error: any) {
         console.error('Error sending reminders:', error);
-        return NextResponse.json({
-            success: false,
-            error: error.message
-        }, { status: 500 });
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
 
@@ -241,9 +279,6 @@ export async function GET(request: Request) {
             }
         });
     } catch (error: any) {
-        return NextResponse.json({
-            success: false,
-            error: error.message
-        }, { status: 500 });
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }

@@ -132,7 +132,7 @@ export default function InvoicesPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this invoice?")) return;
+        if (!confirm("Bạn có chắc chắn muốn xóa hóa đơn này?")) return;
         try {
             const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
             const data = await res.json();
@@ -227,8 +227,8 @@ export default function InvoicesPage() {
         <div className="p-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices & Payments</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Manage billing, track partial payments and dues</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Hóa đơn & Thanh toán</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Quản lý thanh toán, theo dõi thanh toán từng phần và các khoản phải thu</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Link
@@ -236,7 +236,7 @@ export default function InvoicesPage() {
                         className="flex items-center gap-2 px-4 py-2 bg-primary-900 text-white rounded-lg hover:bg-primary-800 transition-colors shadow-sm font-medium"
                     >
                         <Plus className="w-4 h-4" />
-                        Create Invoice (POS)
+                        Tạo hóa đơn (POS)
                     </Link>
                 </div>
             </div>
@@ -291,14 +291,14 @@ export default function InvoicesPage() {
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
                         <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Invoice / Customer</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Paid</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff (Comm)</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hóa đơn / Khách hàng</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nguồn</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tổng tiền</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Đã thanh toán</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Còn lại</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Trạng thái</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nhân viên (Hoa hồng)</th>
+                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hành động</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
@@ -312,7 +312,7 @@ export default function InvoicesPage() {
                                 <tr>
                                     <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                         <FileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                        <p>No invoices found</p>
+                                        <p>Không tìm thấy hóa đơn nào</p>
                                     </td>
                                 </tr>
                             ) : (
@@ -404,7 +404,7 @@ export default function InvoicesPage() {
                                                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                                                             >
                                                                 <DollarSign className="w-4 h-4" />
-                                                                Record Payment
+                                                                Thanh toán
                                                             </button>
                                                         )}
                                                         <Link
@@ -413,7 +413,7 @@ export default function InvoicesPage() {
                                                             onClick={() => setActiveDropdown(null)}
                                                         >
                                                             <Eye className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                                                            View Receipt
+                                                            Xem hóa đơn
                                                         </Link>
                                                         {inv.status === 'pending' && (
                                                             <Link
@@ -422,7 +422,7 @@ export default function InvoicesPage() {
                                                                 onClick={() => setActiveDropdown(null)}
                                                             >
                                                                 <Edit className="w-4 h-4" />
-                                                                Edit Invoice (POS)
+                                                                Sửa hóa đơn (POS)
                                                             </Link>
                                                         )}
                                                         <button
@@ -433,7 +433,7 @@ export default function InvoicesPage() {
                                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
                                                         >
                                                             <Edit className="w-4 h-4 text-amber-600 dark:text-amber-500" />
-                                                            Edit Notes
+                                                            Sửa ghi chú
                                                         </button>
                                                         <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
                                                         <button
@@ -444,7 +444,7 @@ export default function InvoicesPage() {
                                                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
-                                                            Delete Invoice
+                                                            Xóa hóa đơn
                                                         </button>
                                                     </div>
                                                 )}
@@ -693,20 +693,20 @@ export default function InvoicesPage() {
             >
                 <form onSubmit={handleEditSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Status</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Trạng thái</label>
                         <select
                             value={editFormData.status}
                             onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
                             className="w-full px-4 py-2 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary-900/20 focus:border-primary-900 outline-none transition-all text-gray-900 dark:text-white"
                         >
-                            <option value="paid" className="bg-white dark:bg-slate-900">Paid</option>
-                            <option value="partially_paid" className="bg-white dark:bg-slate-900">Partially Paid</option>
-                            <option value="pending" className="bg-white dark:bg-slate-900">Pending</option>
-                            <option value="cancelled" className="bg-white dark:bg-slate-900">Cancelled</option>
+                            <option value="paid" className="bg-white dark:bg-slate-900">Đã thanh toán</option>
+                            <option value="partially_paid" className="bg-white dark:bg-slate-900">Thanh toán từng phần</option>
+                            <option value="pending" className="bg-white dark:bg-slate-900">Chờ thanh toán</option>
+                            <option value="cancelled" className="bg-white dark:bg-slate-900">Đã hủy</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Notes</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-1">Ghi chú</label>
                         <textarea
                             value={editFormData.notes}
                             onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
@@ -721,13 +721,13 @@ export default function InvoicesPage() {
                             onClick={() => setIsEditModalOpen(false)}
                             className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-all font-medium"
                         >
-                            Cancel
+                            Hủy
                         </button>
                         <FormButton
                             type="submit"
                             loading={isEditing}
                         >
-                            Save Changes
+                            Lưu thay đổi
                         </FormButton>
                     </div>
                 </form>

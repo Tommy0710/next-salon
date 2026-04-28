@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format, addDays, subDays, isSameDay, parse, addMinutes, startOfDay, endOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, Filter, DollarSign, Eye, ArrowUpDown, Hash, Globe, Tag, Scissors } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, Filter, DollarSign, Eye, ArrowUpDown, Hash, Globe, Tag, Scissors, Bell } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -151,6 +151,32 @@ export default function AppointmentsPage() {
             console.error("❌ Lỗi hệ thống khi gọi API Zalo:", error);
         }
     };
+    const sendReminderZNS = async (apt: Appointment) => {
+        if (!apt.customer?.phone) return;
+        try {
+            const res = await fetch("/api/zalo/zns", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone: apt.customer.phone,
+                    eventType: "appointment_reminder",
+                    payloadData: {
+                        customerName: apt.customer?.name || "Quý khách",
+                        appointmentDate: formatAppointmentDateTime(apt.date, apt.startTime),
+                        bookingCode: apt.bookingCode || apt._id.substring(0, 8).toUpperCase(),
+                        serviceName: apt.services?.map((s: any) => s.name).join(", ") || "Dịch vụ Spa",
+                        status: apt.status === "confirmed" ? "Đã xác nhận" : "Đang chờ xác nhận",
+                    },
+                }),
+            });
+            const result = await res.json();
+            if (!result.success) console.error("❌ Lỗi gửi nhắc lịch Zalo:", result.error);
+            else console.log("✅ Đã gửi nhắc lịch hẹn Zalo thành công");
+        } catch (error) {
+            console.error("❌ Lỗi hệ thống khi gửi nhắc lịch:", error);
+        }
+    };
+
     useEffect(() => {
         fetchResources();
     }, []);
@@ -758,8 +784,14 @@ export default function AppointmentsPage() {
                                                                         label: "Cancel",
                                                                         icon: <X className="w-4 h-4" />,
                                                                         onClick: () => handleStatusUpdate(apt._id, 'cancelled', true),
-                                                                        variant: "warning",
                                                                         hidden: apt.status === 'cancelled' || apt.status === 'completed',
+                                                                    },
+                                                                    {
+                                                                        label: "Nhắc lịch hẹn",
+                                                                        icon: <Bell className="w-4 h-4" />,
+                                                                        onClick: () => sendReminderZNS(apt),
+                                                                        variant: "warning",
+                                                                        hidden: apt.status === "cancelled" || apt.status === "completed",
                                                                     },
                                                                     {
                                                                         label: "Edit Details",
@@ -840,6 +872,12 @@ export default function AppointmentsPage() {
                                                             icon: <X className="w-4 h-4" />,
                                                             onClick: () => handleStatusUpdate(apt._id, "cancelled", true),
                                                             variant: "warning",
+                                                            hidden: apt.status === "cancelled" || apt.status === "completed",
+                                                        },
+                                                        {
+                                                            label: "Nhắc lịch hẹn",
+                                                            icon: <Bell className="w-4 h-4" />,
+                                                            onClick: () => sendReminderZNS(apt),
                                                             hidden: apt.status === "cancelled" || apt.status === "completed",
                                                         },
                                                         {

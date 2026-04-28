@@ -205,7 +205,7 @@ export async function POST(request: Request) {
         const bookingCode = `BOOK-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
         const servicesNotes = serviceEntries.map(s => `${s.name}`).join(' + ');
         // Gom Note khách tự viết với Note dịch vụ
-        const finalNotes = note ? `Khách ghi: ${note}\n(Dịch vụ: ${servicesNotes})` : servicesNotes;
+        const finalNotes = note ? `${note}` : '';
 
         const appointmentPayload = {
             customer: customer._id.toString(),
