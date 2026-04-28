@@ -474,7 +474,7 @@ export default function InvoicesPage() {
                         return (
                             <MobileCard key={inv._id} accentColor={statusColors[inv.status] ?? 'bg-gray-400'}>
                                 <ActionDropdown
-                                    className="absolute right-1 top-1 z-20"
+                                    className="absolute right-1 top-1 z-1"
                                     items={[
                                         { label: "Record Payment", icon: <DollarSign className="w-4 h-4" />, onClick: () => openPaymentModal(inv), variant: "success", hidden: due <= 0 },
                                         { label: "View Receipt", icon: <Eye className="w-4 h-4" />, href: `/invoices/print/${inv._id}`, variant: "primary" },

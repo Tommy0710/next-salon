@@ -280,7 +280,7 @@ export default function ProductsPage() {
                             const isLowStock = product.stock <= (product.alertQuantity ?? 5);
                             return (
                                 <MobileCard key={product._id} accentColor={isLowStock ? 'bg-red-400' : 'bg-orange-400'}>
-                                    <ActionDropdown className="absolute right-1 top-1 z-20" items={[
+                                    <ActionDropdown className="absolute right-1 top-1 z-1" items={[
                                         { label: "Edit Product", icon: <Edit className="w-4 h-4" />, onClick: () => openModal(product), variant: "default" },
                                         { label: "Delete", icon: <Trash2 className="w-4 h-4" />, onClick: () => handleDelete(product._id), variant: "danger", dividerBefore: true },
                                     ]} />

@@ -233,7 +233,7 @@ export default function PurchasesPage() {
                         const paymentDot: Record<string, string> = { paid: 'bg-emerald-400', partially_paid: 'bg-blue-400', unpaid: 'bg-orange-400' };
                         return (
                             <MobileCard accentColor={statusDot[purchase.status] ?? 'bg-gray-400'}>
-                                <div className="absolute right-1 top-1 z-20">
+                                <div className="absolute right-1 top-1 z-1">
                                     <ActionDropdown items={[
                                         { label: "View Details", icon: <Eye className="w-4 h-4" />, href: `/purchases/${purchase._id}` },
                                         { label: "Add Deposit", icon: <Wallet className="w-4 h-4" />, variant: "success", hidden: purchase.paymentStatus === 'paid', onClick: () => { setSelectedPurchase(purchase); setShowDepositModal(true); } },
@@ -274,7 +274,7 @@ export default function PurchasesPage() {
                 />
 
                 {/* Pagination - Reuse logic from other pages */}
-                <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div className="flex-col md:flex-row gap-4 px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
                         Showing <span className="text-gray-900 dark:text-white">{purchases.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> purchases
                     </div>

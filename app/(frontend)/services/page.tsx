@@ -349,7 +349,7 @@ export default function ServicesPage() {
                             const isActive = service.status === 1;
                             return (
                                 <MobileCard accentColor={isActive ? 'bg-emerald-400' : 'bg-gray-300'}>
-                                    <div className="absolute right-1 top-1 z-20">
+                                    <div className="absolute right-1 top-1 z-1">
                                         <ActionDropdown items={[
                                             { label: "Edit Service", icon: <Edit className="w-4 h-4" />, onClick: () => openServiceModal(service) },
                                             { label: "Delete", icon: <Trash2 className="w-4 h-4" />, variant: "danger", dividerBefore: true, onClick: () => handleDelete(service._id) },

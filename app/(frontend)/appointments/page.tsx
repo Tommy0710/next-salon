@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { format, addDays, subDays, isSameDay, parse, addMinutes, startOfDay, endOfDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, MoreVertical, Filter, FileText, DollarSign, Eye, ArrowUpDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, Filter, DollarSign, Eye, ArrowUpDown, Hash, Globe, Tag, Scissors } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
 import MultiSearchableSelect from "@/components/dashboard/MultiSearchableSelect";
 import StaffCalendar from "@/components/appointments/StaffCalendar";
-import AppointmentCard from "@/components/appointments/AppointmentCard";
+import { ActionDropdown } from "@/components/dashboard/ActionDropdown";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 import { formatAppointmentDateTime } from '@/lib/zaloDate';
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatCurrency } from "@/lib/currency";
@@ -85,7 +86,6 @@ export default function AppointmentsPage() {
     const [statusFilter, setStatusFilter] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, page: 1, limit: 10, pages: 0 });
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [formError, setFormError] = useState("");
     const [itemsPerPage, setItemsPerPage] = useState(10);
     // Default sort: by appointment date, descending (newest first)
@@ -202,16 +202,6 @@ export default function AppointmentsPage() {
         }, 500);
         return () => clearTimeout(timer);
     }, [searchTerm]);
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (activeDropdown && !(event.target as Element).closest('.dropdown-trigger')) {
-                setActiveDropdown(null);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [activeDropdown]);
 
     const fetchResources = async () => {
         const [staffRes, serviceRes, customerRes] = await Promise.all([
@@ -740,85 +730,51 @@ export default function AppointmentsPage() {
                                                         {format(new Date(apt.createdAt || apt.date), "dd MMM yyyy HH:mm")}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                                        <div className="relative flex justify-end dropdown-trigger">
-                                                            <button
-                                                                onClick={() => setActiveDropdown(activeDropdown === apt._id ? null : apt._id)}
-                                                                className="p-2 text-gray-400 hover:text-primary-900 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all"
-                                                            >
-                                                                <MoreVertical className="w-5 h-5" />
-                                                            </button>
-
-                                                            {activeDropdown === apt._id && (
-                                                                <div className="absolute right-0 mt-10 w-48 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            openDetailModal(apt);
-                                                                            setActiveDropdown(null);
-                                                                        }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                                                                    >
-                                                                        <Eye className="w-4 h-4" />
-                                                                        Xem thông tin
-                                                                    </button>
-                                                                    {apt.status !== 'completed' && (
-                                                                        <button
-                                                                            onClick={() => {
-                                                                                handleStatusUpdate(apt._id, 'completed');
-                                                                                setActiveDropdown(null);
-                                                                            }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-slate-800 transition-colors"
-                                                                        >
-                                                                            <CheckCircle className="w-4 h-4" />
-                                                                            Complete
-                                                                        </button>
-                                                                    )}
-                                                                    {apt.status === 'pending' && (
-                                                                        <button
-                                                                            onClick={() => {
-                                                                                handleStatusUpdate(apt._id, 'confirmed', true);
-                                                                                setActiveDropdown(null);
-                                                                            }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                                                                        >
-                                                                            <CheckCircle className="w-4 h-4" />
-                                                                            Confirm
-                                                                        </button>
-                                                                    )}
-                                                                    {apt.status !== 'cancelled' && apt.status !== 'completed' && (
-                                                                        <button
-                                                                            onClick={() => {
-                                                                                handleStatusUpdate(apt._id, 'cancelled', true);
-                                                                                setActiveDropdown(null);
-                                                                            }}
-                                                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-slate-800 transition-colors"
-                                                                        >
-                                                                            <X className="w-4 h-4" />
-                                                                            Cancel
-                                                                        </button>
-                                                                    )}
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            openEditModal(apt);
-                                                                            setActiveDropdown(null);
-                                                                        }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-slate-800 transition-colors"
-                                                                    >
-                                                                        <Edit className="w-4 h-4 text-primary-600 dark:text-primary-500" />
-                                                                        Edit Details
-                                                                    </button>
-                                                                    <div className="h-px bg-gray-100 dark:bg-slate-800 my-1" />
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            handleDelete(apt._id);
-                                                                            setActiveDropdown(null);
-                                                                        }}
-                                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                        Delete
-                                                                    </button>
-                                                                </div>
-                                                            )}
+                                                        <div className="relative flex justify-end">
+                                                            <ActionDropdown
+                                                                panelWidth="w-52"
+                                                                items={[
+                                                                    {
+                                                                        label: "Xem thông tin",
+                                                                        icon: <Eye className="w-4 h-4" />,
+                                                                        onClick: () => openDetailModal(apt),
+                                                                        variant: "primary",
+                                                                    },
+                                                                    {
+                                                                        label: "Complete",
+                                                                        icon: <CheckCircle className="w-4 h-4" />,
+                                                                        onClick: () => handleStatusUpdate(apt._id, 'completed'),
+                                                                        variant: "success",
+                                                                        hidden: apt.status === 'completed',
+                                                                    },
+                                                                    {
+                                                                        label: "Confirm",
+                                                                        icon: <CheckCircle className="w-4 h-4" />,
+                                                                        onClick: () => handleStatusUpdate(apt._id, 'confirmed', true),
+                                                                        variant: "primary",
+                                                                        hidden: apt.status !== 'pending',
+                                                                    },
+                                                                    {
+                                                                        label: "Cancel",
+                                                                        icon: <X className="w-4 h-4" />,
+                                                                        onClick: () => handleStatusUpdate(apt._id, 'cancelled', true),
+                                                                        variant: "warning",
+                                                                        hidden: apt.status === 'cancelled' || apt.status === 'completed',
+                                                                    },
+                                                                    {
+                                                                        label: "Edit Details",
+                                                                        icon: <Edit className="w-4 h-4" />,
+                                                                        onClick: () => openEditModal(apt),
+                                                                    },
+                                                                    {
+                                                                        label: "Delete",
+                                                                        icon: <Trash2 className="w-4 h-4" />,
+                                                                        onClick: () => handleDelete(apt._id),
+                                                                        variant: "danger",
+                                                                        dividerBefore: true,
+                                                                    },
+                                                                ]}
+                                                            />
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -829,48 +785,172 @@ export default function AppointmentsPage() {
                             </div>
 
                             {/* ── MOBILE CARD LIST (hidden on md+) ── */}
-                            <div className="md:hidden flex-1 overflow-y-auto">
-                                {loading && appointments.length === 0 ? (
-                                    <div className="p-4 space-y-3">
-                                        {Array.from({ length: 4 }).map((_, i) => (
-                                            <div key={i} className="animate-pulse bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 p-4">
-                                                <div className="flex gap-3">
-                                                    <div className="flex-1 space-y-2">
-                                                        <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-2/3" />
-                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-1/2" />
-                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-3/4" />
+                            <MobileCardList
+                                items={appointments}
+                                loading={loading}
+                                emptyIcon={<CalendarIcon className="w-14 h-14" />}
+                                emptyText="No appointments found"
+                                skeletonColumns={2}
+                                renderItem={(apt) => {
+                                    const accentMap: Record<string, string> = {
+                                        confirmed: "bg-emerald-500",
+                                        completed: "bg-blue-500",
+                                        pending: "bg-amber-400",
+                                        cancelled: "bg-gray-400",
+                                    };
+                                    const badgeMap: Record<string, string> = {
+                                        confirmed: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200",
+                                        completed: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200",
+                                        pending: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200",
+                                        cancelled: "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-700",
+                                    };
+                                    const accentColor = accentMap[apt.status] ?? "bg-gray-400";
+                                    const badgeClass = badgeMap[apt.status] ?? badgeMap.cancelled;
+                                    const totalDuration = apt.services.reduce((s, sv) => s + sv.duration, 0);
+
+                                    return (
+                                        <MobileCard accentColor={accentColor}>
+                                            {/* Actions */}
+                                            <div className="absolute right-1 top-1 z-1">
+                                                <ActionDropdown
+                                                    panelWidth="w-52"
+                                                    items={[
+                                                        {
+                                                            label: "Xem thông tin",
+                                                            icon: <Eye className="w-4 h-4" />,
+                                                            onClick: () => openDetailModal(apt),
+                                                            variant: "primary",
+                                                        },
+                                                        {
+                                                            label: "Complete",
+                                                            icon: <CheckCircle className="w-4 h-4" />,
+                                                            onClick: () => handleStatusUpdate(apt._id, "completed"),
+                                                            variant: "success",
+                                                            hidden: apt.status === "completed",
+                                                        },
+                                                        {
+                                                            label: "Confirm",
+                                                            icon: <CheckCircle className="w-4 h-4" />,
+                                                            onClick: () => handleStatusUpdate(apt._id, "confirmed", true),
+                                                            variant: "primary",
+                                                            hidden: apt.status !== "pending",
+                                                        },
+                                                        {
+                                                            label: "Cancel",
+                                                            icon: <X className="w-4 h-4" />,
+                                                            onClick: () => handleStatusUpdate(apt._id, "cancelled", true),
+                                                            variant: "warning",
+                                                            hidden: apt.status === "cancelled" || apt.status === "completed",
+                                                        },
+                                                        {
+                                                            label: "Edit Details",
+                                                            icon: <Edit className="w-4 h-4" />,
+                                                            onClick: () => openEditModal(apt),
+                                                        },
+                                                        {
+                                                            label: "Delete",
+                                                            icon: <Trash2 className="w-4 h-4" />,
+                                                            onClick: () => handleDelete(apt._id),
+                                                            variant: "danger",
+                                                            dividerBefore: true,
+                                                        },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Body: 2 columns */}
+                                            <div className="grid grid-cols-2 divide-x divide-gray-100 dark:divide-slate-800 pl-3">
+                                                {/* Col 1: Booking info */}
+                                                <div className="px-3 py-3 pr-4 flex flex-col gap-2 min-w-0">
+                                                    <div className="flex items-start gap-2">
+                                                        <div className="mt-0.5 p-1.5 bg-primary-50 dark:bg-primary-900/20 rounded-lg shrink-0">
+                                                            <Clock className="w-3.5 h-3.5 text-primary-700 dark:text-primary-400" />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <div className="text-[13px] font-bold text-gray-900 dark:text-white leading-tight">
+                                                                {format(new Date(apt.date), "dd MMM yyyy")}
+                                                            </div>
+                                                            <div className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                                                                {apt.startTime} – {apt.endTime}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex-1 space-y-2">
-                                                        <div className="h-3.5 bg-gray-100 dark:bg-slate-800 rounded w-full" />
-                                                        <div className="h-3 bg-gray-100 dark:bg-slate-800 rounded w-2/3" />
-                                                        <div className="h-5 bg-gray-100 dark:bg-slate-800 rounded-full w-20 mt-2" />
+
+                                                    {apt.bookingCode && (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Hash className="w-3 h-3 text-gray-400 shrink-0" />
+                                                            <span className="text-[11px] font-mono font-bold text-primary-700 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-1.5 py-0.5 rounded truncate">
+                                                                {apt.bookingCode}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {apt.source && (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Globe className="w-3 h-3 text-gray-400 shrink-0" />
+                                                            <span className="text-[11px] text-gray-500 dark:text-gray-400 capitalize">{apt.source}</span>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex items-start gap-1.5 min-w-0">
+                                                        <User className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
+                                                        <div className="min-w-0">
+                                                            <div className="text-[12px] font-semibold text-gray-900 dark:text-white truncate">{apt.customer?.name}</div>
+                                                            {apt.customer?.phone && (
+                                                                <div className="text-[10px] text-gray-400 truncate">{apt.customer.phone}</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <Scissors className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                                        <span className="text-[12px] text-gray-600 dark:text-gray-300 truncate">
+                                                            {apt.staff?.name ?? <span className="italic text-gray-400">No staff</span>}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Col 2: Services & price */}
+                                                <div className="px-3 py-3 flex flex-col gap-2 min-w-0">
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-1 mb-0.5">
+                                                            <Tag className="w-3 h-3 text-gray-400 shrink-0" />
+                                                            <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Services</span>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {apt.services.slice(0, 2).map((s, idx) => (
+                                                                <span key={idx} title={s.name}
+                                                                    className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300 border border-primary-100 dark:border-primary-800/30 max-w-full truncate">
+                                                                    {s.name}
+                                                                </span>
+                                                            ))}
+                                                            {apt.services.length > 2 && (
+                                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                                                    +{apt.services.length - 2}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-[10px] text-gray-400 mt-0.5">
+                                                            {apt.services.length} svc · {totalDuration} min
+                                                        </div>
+                                                    </div>
+
+                                                    <span className="text-[14px] font-black text-gray-900 dark:text-white">
+                                                        {formatCurrency(apt.totalAmount)}
+                                                    </span>
+
+                                                    <div className="mt-auto pt-1">
+                                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeClass}`}>
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${accentColor}`} />
+                                                            {apt.status}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : appointments.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center py-16 px-4 text-gray-400 dark:text-slate-500">
-                                        <CalendarIcon className="w-14 h-14 mb-3 opacity-20" />
-                                        <p className="text-sm font-medium">No appointments found</p>
-                                    </div>
-                                ) : (
-                                    <div className="p-3 space-y-2.5 flex flex-col gap-4">
-                                        {appointments.map((apt) => (
-                                            <AppointmentCard
-                                                key={apt._id}
-                                                apt={apt}
-                                                activeDropdown={activeDropdown}
-                                                onToggleDropdown={setActiveDropdown}
-                                                onOpenDetail={openDetailModal}
-                                                onStatusUpdate={handleStatusUpdate}
-                                                onEdit={openEditModal}
-                                                onDelete={handleDelete}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                        </MobileCard>
+                                    );
+                                }}
+                            />
 
                             {/* List View Pagination */}
                             <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-t border-gray-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 flex-wrap gap-4">

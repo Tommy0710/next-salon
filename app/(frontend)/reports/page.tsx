@@ -28,6 +28,7 @@ import StatCard from "@/components/dashboard/StatCard";
 import { useSettings } from "@/components/providers/SettingsProvider";
 import { formatCurrency } from "@/lib/currency";
 import { getCurrentDateInTimezone, getMonthDateRangeInTimezone } from "@/lib/dateUtils";
+import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
 
 type ReportType = 'summary' | 'sales' | 'services' | 'staff' | 'customers' | 'inventory' | 'expenses' | 'profit' | 'daily' | 'activity-log';
 
@@ -235,21 +236,22 @@ export default function ReportsPage() {
     );
 
     const renderTable = (headers: string[], rows: any[]) => (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm overflow-hidden">
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700 border-b border-gray-100">
+                        <tr className="bg-gray-50 dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
                             {headers.map((h, i) => (
-                                <th key={i} className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-tight">{h}</th>
+                                <th key={i} className="px-6 py-4 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-tight">{h}</th>
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
                         {rows.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:hover:bg-gray-700/50 transition-colors">
+                            <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                                 {Object.values(row).map((val: any, j) => (
-                                    <td key={j} className="px-6 py-4 text-sm font-medium text-gray-700">
+                                    <td key={j} className="px-6 py-4 text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {val}
                                     </td>
                                 ))}
@@ -257,12 +259,40 @@ export default function ReportsPage() {
                         ))}
                     </tbody>
                 </table>
+                {rows.length === 0 && !loading && (
+                    <div className="py-20 text-center text-gray-400">
+                        <p className="text-sm font-bold">No data record available for this range</p>
+                    </div>
+                )}
             </div>
-            {rows.length === 0 && !loading && (
-                <div className="py-20 text-center text-gray-400">
-                    <p className="text-sm font-bold">No data record available for this range</p>
-                </div>
-            )}
+
+            {/* Mobile card list */}
+            <MobileCardList
+                items={rows}
+                loading={false}
+                emptyText="No data record available for this range"
+                skeletonColumns={1}
+                className="md:hidden"
+                renderItem={(row) => {
+                    const values = Object.values(row) as any[];
+                    return (
+                        <MobileCard>
+                            <div className="px-4 py-3 pl-6 space-y-2">
+                                {headers.map((header, j) => (
+                                    <div key={j} className="flex items-start justify-between gap-3 min-w-0">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 pt-0.5">
+                                            {header}
+                                        </span>
+                                        <div className="text-xs font-semibold text-gray-800 dark:text-white text-right">
+                                            {values[j]}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </MobileCard>
+                    );
+                }}
+            />
         </div>
     );
 
@@ -494,7 +524,7 @@ export default function ReportsPage() {
                             <p className="text-sm text-gray-500 font-medium">Business health analytics and performance tracking</p>
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-start gap-4 flex-col md:flex-row flex-start">
                             <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 p-1.5 rounded-xl border border-gray-200">
                                 <button onClick={() => setPresetRange('thisMonth')} className="px-4 py-2 text-xs font-bold rounded-lg hover:bg-white hover:shadow-sm transition-all">Month</button>
                                 <button onClick={() => setPresetRange('last3Months')} className="px-4 py-2 text-xs font-bold rounded-lg hover:bg-white hover:shadow-sm transition-all">Quarter</button>
@@ -527,7 +557,7 @@ export default function ReportsPage() {
 
                 {/* Tab Strip */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex overflow-x-auto no-scrollbar gap-4 md:p-8">
+                    <div className="flex overflow-x-auto no-scrollbar gap-4 md:p-8 flex-wrap">
                         {reportTabs.map((tab) => (
                             <button
                                 key={tab.id}

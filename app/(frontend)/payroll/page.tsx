@@ -244,7 +244,7 @@ export default function PayrollPage() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
@@ -330,7 +330,7 @@ export default function PayrollPage() {
                         emptyText="No payroll records found"
                         renderItem={(payroll) => (
                             <MobileCard accentColor={payroll.status === 'paid' ? 'bg-emerald-400' : payroll.status === 'approved' ? 'bg-blue-400' : 'bg-gray-300'}>
-                                <div className="absolute right-1 top-1 z-20">
+                                <div className="absolute right-1 top-1 z-1">
                                     <ActionDropdown items={[
                                         { label: "View Details", icon: <FileText className="w-4 h-4" />, onClick: () => viewDetails(payroll) },
                                         { label: "Approve", icon: <Check className="w-4 h-4" />, variant: "success", hidden: payroll.status !== "draft", onClick: () => handleStatusUpdate(payroll._id, "approved") },
@@ -374,7 +374,7 @@ export default function PayrollPage() {
                     />
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div className="flex-col md:flex-row gap-4 px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-500 font-medium">
                             Showing <span className="text-gray-900 dark:text-white">{payrolls.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> records
                         </div>

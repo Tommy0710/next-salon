@@ -7,14 +7,10 @@ import {
     Shield,
     Clock,
     User as UserIcon,
-    Globe,
     Info,
-    Search,
     RefreshCcw,
-    Filter,
     ChevronLeft,
     ChevronRight,
-    MoreVertical,
     Activity,
     MessageSquare,
     CheckCircle,
@@ -22,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ActivityLogFilters from "./ActivityLogFilters";
+import { ActivityLogMobileCards } from "./ActivityLogMobileCards";
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -170,8 +167,8 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                 {/* Search & Filters */}
                 <ActivityLogFilters initialSearch={search} initialLimit={limit} initialTab={tab} />
 
-                {/* Table */}
-                <div className="overflow-x-auto text-black">
+                {/* Table — desktop only */}
+                <div className="hidden md:block overflow-x-auto text-black">
                     <table className="min-w-full divide-y divide-gray-200">
                         {tab === "action" ? (
                             <>
@@ -318,7 +315,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps) {
                         )}
                     </table>
                 </div>
-                <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                {/* Mobile card list */}
+                <ActivityLogMobileCards logs={JSON.parse(JSON.stringify(logs))} tab={tab} />
+
+                <div className="flex-col md:flex-row gap-4 px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="text-sm text-gray-500 font-medium">
                         Showing <span className="text-gray-900 dark:text-white">{logs.length}</span> of <span className="text-gray-900 dark:text-white">{total}</span> records
                     </div>

@@ -198,12 +198,12 @@ export default function PrintInvoicePage() {
             )}
 
             {/* Thermal Receipt Content */}
-            <div id="print-area" className="max-w-[380px] mx-auto bg-white shadow-xl print:shadow-none print:w-full  text-sm border-t-8 border-primary-900 print:border-t-0 p-8 pt-0">
+            <div id="print-area" className="w-[80mm] mx-auto bg-white print:shadow-none text-sm p-[4mm] box-border">
                 {/* Store Header */}
                 <div className="text-center mb-2 p-4">
                     {settings?.logoUrl && (
-                        <div className="mb-2">
-                            <img src={settings.logoUrl} alt="Store Logo" className="w-32 h-auto mx-auto object-contain" />
+                        <div className="w-full h-16 overflow-hidden">
+                            <img src={settings.logoUrl} alt="Store Logo" className="w-28 h-full object-cover mx-auto" />
                         </div>
                     )}
                     {/* <h1 className="text-2xl font-bold uppercase tracking-tighter mb-1">{settings?.storeName || "SALON POS"}</h1> */}
@@ -358,15 +358,15 @@ export default function PrintInvoicePage() {
                         </div>
                     )}
 
-                    {/* <div className="pt-2 relative">
-                        <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div>
-                        <Scissors className="w-4 h-4 text-gray-300 absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-1" />
+                    <div className="pt-2 relative">
+                        {/* <div className="absolute top-0 left-0 w-full border-t border-dashed border-gray-300"></div> */}
+                        {/* <Scissors className="w-4 h-4 text-gray-300 absolute -top-2 left-1/2 -translate-x-1/2 bg-white px-1" /> */}
                         <p className="text-[11px] font-bold text-gray-900 dark:text-white mt-4 leading-relaxed">
                             CẢM ƠN BẠN ĐÃ CHỌN {settings?.storeName || "CHÚNG TÔI"}!<br />
                             HẸN GẶP LẠI.
                         </p>
-                        <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p>
-                    </div> */}
+                        {/* <p className="text-[9px] text-gray-400 mt-2 italic">Giá đã bao gồm thuế nếu áp dụng</p> */}
+                    </div>
 
                     {/* <div className="pt-4 flex justify-center opacity-20">
                         <div className="flex gap-px h-8 bg-gray-900 w-full max-w-[200px]"></div>
@@ -375,30 +375,46 @@ export default function PrintInvoicePage() {
                 </div>
             </div>
 
+            {/* KHỐI STYLE DÀNH RIÊNG CHO MÁY IN NHIỆT */}
             <style jsx global>{`
-                @media print {
-                    body * {
-                        visibility: hidden;
-                    }
-                    #print-area, #print-area * {
-                        visibility: visible;
-                    }
-                    #print-area {
-                        position: fixed;
-                        left: 0;
-                        top: 0;
-                        width: 80mm;
-                        margin: 0;
-                        padding: 0;
-                        border-top: none !important;
-                        box-shadow: none !important;
-                    }
-                    @page {
-                        margin: 0;
-                        size: 80mm auto;
-                    }
-                }
-            `}</style>
+    @media print {
+        @page {
+            size: 80mm auto; /* Cấu hình cuộn giấy in nhiệt 80mm */
+            margin: 0;
+        }
+        html, body {
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        /* Ẩn các thành phần bao ngoài của Next.js layout (nếu có) */
+        header, nav, footer, .print\\:hidden {
+            display: none !important;
+        }
+        /* Cấu hình vùng in chuẩn xác 1:1 với webapp */
+        #print-area {
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 4mm !important;
+            box-shadow: none !important;
+            page-break-after: auto;
+        }
+        /* Đảm bảo độ sắc nét của văn bản và đường viền */
+        #print-area * {
+            color: #000 !important;
+            background: transparent !important;
+        }
+        #print-area .border-gray-100,
+        #print-area .border-gray-200,
+        #print-area .border-gray-300, 
+        #print-area .border-gray-400 {
+            border-color: #000 !important;
+        }
+    }
+`}</style>
         </div>
     );
 }

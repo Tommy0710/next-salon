@@ -175,7 +175,7 @@ export default function StaffPage() {
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
                                 <tr>
@@ -325,7 +325,7 @@ export default function StaffPage() {
                     />
 
                     {/* Pagination */}
-                    <div className="px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div className="flex-col md:flex-row gap-4 px-6 py-4 bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:bg-slate-800/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-500 font-medium">
                             Showing <span className="text-gray-900 dark:text-white">{staffMembers.length}</span> of <span className="text-gray-900 dark:text-white">{pagination.total}</span> staff members
                         </div>
