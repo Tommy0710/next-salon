@@ -3,6 +3,7 @@ import { connectToDB } from "@/lib/mongodb";
 import { initModels } from "@/lib/initModels";
 import Appointment from "@/models/Appointment";
 import Customer from "@/models/Customer";
+import Invoice from "@/models/Invoice";
 import Service from "@/models/Service";
 import ServiceCategory from "@/models/ServiceCategory";
 import { ZALO_EVENTS } from "@/lib/zalo-payloads";
@@ -230,6 +231,49 @@ export async function POST(request: Request) {
         console.log("✅ Đã tạo Lịch hẹn tự động:", newAppointment._id);
 
         // ==========================================
+        // BƯỚC 4: TẠO HÓA ĐƠN CHỜ THANH TOÁN
+        // ==========================================
+        const lastInvoice = await Invoice.findOne().sort({ createdAt: -1 });
+        let nextInvoiceNum = 1;
+        if (lastInvoice?.invoiceNumber) {
+            const lastNum = parseInt(lastInvoice.invoiceNumber.split('-').pop() || '0');
+            if (!isNaN(lastNum)) nextInvoiceNum = lastNum + 1;
+        }
+        const invoiceNumber = `INV-${new Date().getFullYear()}-${nextInvoiceNum.toString().padStart(5, '0')}`;
+
+        const invoiceItems = serviceEntries.map(s => ({
+            item: s.service,
+            itemModel: 'Service' as const,
+            name: s.name,
+            price: s.price,
+            quantity: 1,
+            discount: 0,
+            total: s.price,
+        }));
+
+        const newInvoice = await Invoice.create({
+            invoiceNumber,
+            customer: customer._id,
+            appointment: newAppointment._id,
+            bookingCode,
+            items: invoiceItems,
+            subtotal: finalAmount,
+            tax: 0,
+            discount: 0,
+            totalAmount: finalAmount,
+            amountPaid: 0,
+            paymentMethod: 'Cash',
+            status: 'pending',
+            walletUsed: 0,
+            staffAssignments: [],
+            commission: 0,
+            notes: finalNotes,
+            date: appointmentDate,
+        });
+
+        console.log("🧾 Đã tạo Hóa đơn chờ thanh toán:", newInvoice._id, invoiceNumber);
+
+        // ==========================================
         // GỬI ZALO (NON-BLOCKING)
         // ==========================================
         if (customer.phone && newAppointment.status === 'confirmed') {
@@ -252,7 +296,7 @@ export async function POST(request: Request) {
             }).catch(err => console.error("Lỗi Zalo ZNS:", err));
         }
 
-        return NextResponse.json({ success: true, appointmentId: newAppointment._id }, { status: 201 });
+        return NextResponse.json({ success: true, appointmentId: newAppointment._id, invoiceId: newInvoice._id, invoiceNumber }, { status: 201 });
 
     } catch (error: any) {
         console.error("❌ [WEBHOOK] Lỗi xử lý:", error);
