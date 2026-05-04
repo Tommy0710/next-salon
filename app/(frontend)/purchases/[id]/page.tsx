@@ -1,5 +1,6 @@
 
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -65,11 +66,11 @@ export default function PurchaseDetailsPage() {
             if (data.success) {
                 router.push('/purchases');
             } else {
-                alert(data.error || "Failed to delete purchase");
+                toast.error(data.error || "Failed to delete purchase");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred while deleting");
+            toast.error("An error occurred while deleting");
         } finally {
             setDeleting(false);
         }

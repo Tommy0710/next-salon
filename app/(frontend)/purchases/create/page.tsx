@@ -1,6 +1,7 @@
 
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Plus, Trash2, Save, Calculator } from "lucide-react";
 import Link from "next/link";
@@ -101,8 +102,8 @@ export default function CreatePurchasePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.supplier) return alert("Please select a supplier");
-        if (formData.items.length === 0) return alert("Please add at least one item");
+        if (!formData.supplier) return toast.error("Please select a supplier");
+        if (formData.items.length === 0) return toast.error("Please add at least one item");
 
         setLoading(true);
         try {
@@ -129,11 +130,11 @@ export default function CreatePurchasePage() {
             if (data.success) {
                 router.push('/purchases');
             } else {
-                alert(data.error || "Failed to create purchase");
+                toast.error(data.error || "Failed to create purchase");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setLoading(false);
         }

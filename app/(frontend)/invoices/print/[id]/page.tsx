@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Printer, ArrowLeft, Scissors } from "lucide-react";
+import toast from "react-hot-toast";
 import { FormButton } from "@/components/dashboard/FormInput";
 import { getCurrencySymbol } from "@/lib/currency";
 import { formatCurrency } from "@/lib/currency";
@@ -16,7 +17,6 @@ export default function PrintInvoicePage() {
     const [deposits, setDeposits] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [statusMessage, setStatusMessage] = useState<string>("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -58,7 +58,6 @@ export default function PrintInvoicePage() {
         if (!confirm("Xác nhận thanh toán thành công và gửi Zalo cảm ơn?")) return;
 
         setActionLoading(true);
-        setStatusMessage("");
 
         try {
             const paymentMethod = invoice.paymentMethod || (showQr ? 'Mã QR' : 'Tiền mặt');
@@ -124,21 +123,20 @@ export default function PrintInvoicePage() {
                     });
                     const zaloResult = await zaloResponse.json();
                     if (zaloResult.success) {
-                        setStatusMessage("Cập nhật thành công: Đã thanh toán và gửi Zalo cảm ơn.");
+                        toast.success("Cập nhật thành công: Đã thanh toán và gửi Zalo cảm ơn.");
                     } else {
-                        setStatusMessage("Cập nhật thành công: Đã thanh toán. Zalo gửi thất bại: " + (zaloResult.error || "Lỗi không xác định"));
+                        toast.error("Đã thanh toán. Zalo gửi thất bại: " + (zaloResult.error || "Lỗi không xác định"));
                     }
                 } catch (zaloError) {
                     console.error("Zalo API error:", zaloError);
-                    setStatusMessage("Cập nhật thành công: Đã thanh toán. Zalo gửi thất bại:");
+                    toast.error("Đã thanh toán. Zalo gửi thất bại.");
                 }
             } else {
-                setStatusMessage("Cập nhật thành công: Đã thanh toán. Không có số điện thoại để gửi Zalo.");
+                toast.success("Đã thanh toán. Không có số điện thoại để gửi Zalo.");
             }
         } catch (error: any) {
             console.error("Error mark as paid:", error);
-            alert(error?.message || "Không thể cập nhật trạng thái thanh toán");
-            setStatusMessage("Lỗi: " + (error?.message || "Không thể cập nhật"));
+            toast.error(error?.message || "Không thể cập nhật trạng thái thanh toán");
         } finally {
             setActionLoading(false);
         }
@@ -193,10 +191,6 @@ export default function PrintInvoicePage() {
                     </FormButton>
                 </div>
             </div>
-            {statusMessage && (
-                <div className="max-w-[400px] mx-auto text-sm text-primary-700 mb-4 print:hidden">{statusMessage}</div>
-            )}
-
             {/* Thermal Receipt Content */}
             <div id="print-area" className="w-[80mm] mx-auto bg-white print:shadow-none text-sm p-[4mm] box-border">
                 {/* Store Header */}

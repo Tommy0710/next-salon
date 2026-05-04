@@ -1,6 +1,7 @@
 
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Search, DollarSign, Calendar, Tag, Filter, ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
@@ -95,11 +96,11 @@ export default function ExpensesPage() {
                 fetchExpenses();
                 closeModal();
             } else {
-                alert(data.error || "Something went wrong");
+                toast.error(data.error || "Something went wrong");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setSubmitting(false);
         }

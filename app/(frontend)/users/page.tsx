@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Users, Edit, Trash2, Shield, Mail, Filter, ChevronLeft, ChevronRight, FileText } from "lucide-react";
@@ -50,11 +51,11 @@ export default function UsersPage() {
             if (data.success) {
                 fetchUsers();
             } else {
-                alert(data.error || "Failed to delete user");
+                toast.error(data.error || "Failed to delete user");
             }
         } catch (error) {
             console.error("Error deleting user:", error);
-            alert("Error deleting user");
+            toast.error("Error deleting user");
         }
     };
 

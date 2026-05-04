@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { DollarSign, Calendar, User, TrendingUp, Download, Plus, Eye, Check, X, Edit, Trash2, Search, Filter, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
@@ -85,7 +86,7 @@ export default function PayrollPage() {
 
     const handleGeneratePayroll = async () => {
         if (!selectedStaff) {
-            alert("Please select a staff member");
+            toast.error("Please select a staff member");
             return;
         }
 
@@ -107,11 +108,11 @@ export default function PayrollPage() {
                 setIsGenerateModalOpen(false);
                 setSelectedStaff("");
             } else {
-                alert(data.error || "Failed to generate payroll");
+                toast.error(data.error || "Failed to generate payroll");
             }
         } catch (error) {
             console.error(error);
-            alert("Error generating payroll");
+            toast.error("Error generating payroll");
         } finally {
             setGenerating(false);
         }
@@ -143,7 +144,7 @@ export default function PayrollPage() {
                 setIsDetailModalOpen(false);
                 setSelectedPayroll(null);
             } else {
-                alert(data.error || "Failed to delete payroll");
+                toast.error(data.error || "Failed to delete payroll");
             }
         } catch (error) {
             console.error(error);

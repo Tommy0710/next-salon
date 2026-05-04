@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Shield, Edit, Trash2, Key, Filter, ChevronLeft, ChevronRight, MoreVertical, FileText, Clock } from "lucide-react";
@@ -60,11 +61,11 @@ export default function RolesPage() {
             if (data.success) {
                 fetchRoles();
             } else {
-                alert(data.error || "Failed to delete role");
+                toast.error(data.error || "Failed to delete role");
             }
         } catch (error) {
             console.error("Error deleting role:", error);
-            alert("Error deleting role");
+            toast.error("Error deleting role");
         }
     };
 

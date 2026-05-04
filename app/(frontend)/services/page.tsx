@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Plus, Edit, Trash2, Search, Scissors, Tag, Clock, DollarSign, ChevronLeft, ChevronRight, Filter, FileText } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
@@ -120,12 +121,13 @@ export default function ServicesPage() {
             if (data.success) {
                 fetchServices();
                 closeServiceModal();
+                toast.success(editingService ? "Service updated!" : "Service created!");
             } else {
-                alert(data.error || "Something went wrong");
+                toast.error(data.error || "Something went wrong");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setSubmitting(false);
         }
@@ -145,12 +147,13 @@ export default function ServicesPage() {
                 fetchCategories();
                 setCategoryName("");
                 setIsCategoryModalOpen(false);
+                toast.success("Category created!");
             } else {
-                alert(data.error || "Failed to create category");
+                toast.error(data.error || "Failed to create category");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setCategorySubmitting(false);
         }

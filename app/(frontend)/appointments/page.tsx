@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { format, addDays, subDays, isSameDay, parse, addMinutes, startOfDay, endOfDay } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, User, Plus, X, List, Edit, Trash2, Search, CheckCircle, Filter, DollarSign, Eye, ArrowUpDown, Hash, Globe, Tag, Scissors, Bell } from "lucide-react";
@@ -303,11 +304,11 @@ export default function AppointmentsPage() {
                 }
                 fetchAppointments();
             } else {
-                alert(data.error || "Failed to update status");
+                toast.error(data.error || "Failed to update status");
             }
         } catch (error) {
             console.error("Error updating status:", error);
-            alert("An unexpected error occurred");
+            toast.error("An unexpected error occurred");
         }
     };
 
@@ -499,7 +500,11 @@ export default function AppointmentsPage() {
     // HÀM TẠO CUSTOMER NHANH
     const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) {
-            alert("Vui lòng nhập tên khách hàng");
+            toast.error("Vui lòng nhập tên khách hàng");
+            return;
+        }
+        if (!newCustomerPhone.trim()) {
+            toast.error("Vui lòng nhập số điện thoại khách hàng");
             return;
         }
 
@@ -529,11 +534,11 @@ export default function AppointmentsPage() {
                 setNewCustomerPhone("");
                 setNewCustomerGender("other");
             } else {
-                alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
+                toast.error(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
         } catch (error) {
             console.error(error);
-            alert("Đã xảy ra lỗi khi tạo khách hàng");
+            toast.error("Đã xảy ra lỗi khi tạo khách hàng");
         } finally {
             setIsSubmittingCustomer(false);
         }
@@ -1300,7 +1305,7 @@ export default function AppointmentsPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-2">Số Điện Thoại <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white dark:text-gray-300 mb-2">Số Điện Thoại</label>
                                 <input
                                     type="tel"
                                     value={newCustomerPhone}

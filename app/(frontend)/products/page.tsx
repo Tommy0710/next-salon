@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Plus, Edit, Trash2, Search, Package, AlertCircle, ChevronLeft, ChevronRight, Filter, Tag } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
@@ -102,9 +103,9 @@ export default function ProductsPage() {
             const url = editingProduct ? `/api/products/${editingProduct._id}` : "/api/products";
             const res = await fetch(url, { method: editingProduct ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
             const data = await res.json();
-            if (data.success) { fetchProducts(); closeModal(); }
-            else alert(data.error || "Something went wrong");
-        } catch { alert("An error occurred"); }
+            if (data.success) { fetchProducts(); closeModal(); toast.success(editingProduct ? "Product updated!" : "Product added!"); }
+            else toast.error(data.error || "Something went wrong");
+        } catch { toast.error("An error occurred"); }
         finally { setSubmitting(false); }
     };
 
@@ -114,9 +115,9 @@ export default function ProductsPage() {
         try {
             const res = await fetch("/api/product-categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: categoryName }) });
             const data = await res.json();
-            if (data.success) { fetchCategories(); setCategoryName(""); setIsCategoryModalOpen(false); }
-            else alert(data.error || "Failed to create category");
-        } catch { alert("An error occurred"); }
+            if (data.success) { fetchCategories(); setCategoryName(""); setIsCategoryModalOpen(false); toast.success("Category created!"); }
+            else toast.error(data.error || "Failed to create category");
+        } catch { toast.error("An error occurred"); }
         finally { setCategorySubmitting(false); }
     };
 
@@ -126,9 +127,9 @@ export default function ProductsPage() {
         try {
             const res = await fetch("/api/product-brands", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: brandName }) });
             const data = await res.json();
-            if (data.success) { fetchBrands(); setBrandName(""); setIsBrandModalOpen(false); }
-            else alert(data.error || "Failed to create brand");
-        } catch { alert("An error occurred"); }
+            if (data.success) { fetchBrands(); setBrandName(""); setIsBrandModalOpen(false); toast.success("Brand created!"); }
+            else toast.error(data.error || "Failed to create brand");
+        } catch { toast.error("An error occurred"); }
         finally { setBrandSubmitting(false); }
     };
 

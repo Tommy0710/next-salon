@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Plus, Edit, Trash2, Search, User, Phone, Mail, Scissors, ChevronLeft, ChevronRight, Filter, FileText } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormButton } from "@/components/dashboard/FormInput";
@@ -88,12 +89,13 @@ export default function StaffPage() {
             if (data.success) {
                 fetchStaff();
                 closeModal();
+                toast.success(editingStaff ? "Staff updated!" : "Staff added!");
             } else {
-                alert(data.error || "Something went wrong");
+                toast.error(data.error || "Something went wrong");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setSubmitting(false);
         }

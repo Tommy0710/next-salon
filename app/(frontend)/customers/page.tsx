@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Plus, Calendar, Edit, Trash2, Search, User, Mail, Phone, ChevronLeft, ChevronRight, Wallet } from "lucide-react";
 import Modal from "@/components/dashboard/Modal";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
@@ -123,6 +124,7 @@ export default function CustomersPage() {
             if (data.success) {
                 fetchCustomers();
                 closeModal();
+                toast.success(editingCustomer ? "Customer updated!" : "Customer created!");
             } else {
                 const errorMessage = data.details ? `Validation failed: ${data.details.join(', ')}` : (data.error || "Something went wrong");
                 setFormError(errorMessage);
@@ -163,7 +165,7 @@ export default function CustomersPage() {
             setTimeout(() => window.URL.revokeObjectURL(url), 1000);
         } catch (err) {
             console.error(err);
-            alert("Export failed. Please try again.");
+            toast.error("Export failed. Please try again.");
         } finally {
             // Đảm bảo loading luôn tắt dù download dialog có làm gián đoạn hay không
             setTimeout(() => setExporting(false), 500);
@@ -217,7 +219,7 @@ export default function CustomersPage() {
 
     const handleFileSelect = (file: File) => {
         if (!file.name.toLowerCase().endsWith(".csv")) {
-            alert("Only CSV files are supported.");
+            toast.error("Only CSV files are supported.");
             return;
         }
         setImportFile(file);
@@ -245,12 +247,13 @@ export default function CustomersPage() {
                 setImportResult(data.data);
                 setImportStep(3);
                 fetchCustomers();
+                toast.success("Import successful!");
             } else {
-                alert(data.error || "Import failed");
+                toast.error(data.error || "Import failed");
             }
         } catch (err) {
             console.error(err);
-            alert("Import failed. Please try again.");
+            toast.error("Import failed. Please try again.");
         } finally {
             setImporting(false);
         }

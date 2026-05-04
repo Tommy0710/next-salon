@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Search, Plus, Trash2, Edit, Eye, FileText, Filter, DollarSign, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
 import ActionDropdown from "@/components/dashboard/ActionDropdown";
 import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
@@ -166,12 +167,13 @@ export default function InvoicesPage() {
             if (data.success) {
                 fetchInvoices(pagination.page);
                 setIsEditModalOpen(false);
+                toast.success("Hóa đơn đã được cập nhật!");
             } else {
-                alert(data.error || "Failed to update invoice");
+                toast.error(data.error || "Failed to update invoice");
             }
         } catch (error) {
             console.error("Error editing invoice:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setIsEditing(false);
         }
@@ -193,7 +195,9 @@ export default function InvoicesPage() {
             // Quy đổi sang định dạng mà hệ thống đang lưu
             const paymentMethodString = paymentData.method === 'Mã QR'
                 ? `QR Code - ${settings?.qrCodes?.[paymentData.selectedQrIndex]?.bankName || ''}`
-                : 'Cash';
+                : paymentData.method === 'Cà thẻ'
+                    ? 'Card'
+                    : 'Cash';
             const selectedQr = settings?.qrCodes?.[paymentData.selectedQrIndex];
             const paymentQrIdString = paymentData.method === 'Mã QR' ? selectedQr?.qrId : null;
             const res = await fetch("/api/deposits", {
@@ -213,11 +217,11 @@ export default function InvoicesPage() {
                 setIsPaymentModalOpen(false);
                 router.push(`/invoices/print/${payingInvoice._id}`);
             } else {
-                alert(data.error || "Failed to record payment");
+                toast.error(data.error || "Failed to record payment");
             }
         } catch (error) {
             console.error("Error recording payment:", error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         } finally {
             setSubmitting(false);
         }
@@ -612,7 +616,7 @@ export default function InvoicesPage() {
                 <form onSubmit={handlePaymentSubmit} className="space-y-4">
                     <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg mb-4 flex justify-between items-center text-primary-900 dark:text-primary-400">
                         <span className="text-sm font-medium">Total Balance Due</span>
-                        <span className="text-xl font-bold">{settings.symbol}{(payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0).toFixed(2)}</span>
+                        <span className="text-xl font-bold">{formatCurrency((payingInvoice ? ((payingInvoice.totalAmount || 0) - (payingInvoice.amountPaid || 0)) : 0))}</span>
                     </div>
 
                     <FormInput
@@ -628,8 +632,8 @@ export default function InvoicesPage() {
                     <div className="mb-3">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mb-2">Payment Method</label>
                         <div className="mb-3 space-y-2">
-                            <div className="grid grid-cols-2 gap-2">
-                                {['Tiền mặt', 'Mã QR'].map(method => (
+                            <div className="grid grid-cols-3 gap-2">
+                                {['Tiền mặt', 'Cà thẻ', 'Mã QR'].map(method => (
                                     <button
                                         key={method}
                                         type="button"
@@ -679,7 +683,7 @@ export default function InvoicesPage() {
                             loading={submitting}
                             variant="success"
                         >
-                            Record {settings.symbol}{parseFloat(paymentData.amount || "0").toFixed(2)}
+                            Record {formatCurrency(parseFloat(paymentData.amount || "0"))}
                         </FormButton>
                     </div>
                 </form>

@@ -6,6 +6,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import Footer from "@/components/dashboard/Footer";
 import NavigationLoader from "@/components/NavigationLoader";
+import { Toaster } from "react-hot-toast";
 import "@/app/globals.css";
 
 export default function DashboardLayout({
@@ -26,6 +27,15 @@ export default function DashboardLayout({
     if (isPosPage) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700">
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        duration: 3500,
+                        style: { borderRadius: '10px', fontWeight: 600, fontSize: '14px' },
+                        success: { style: { background: '#052e16', color: '#bbf7d0', border: '1px solid #166534' } },
+                        error: { style: { background: '#450a0a', color: '#fecaca', border: '1px solid #991b1b' } },
+                    }}
+                />
                 <NavigationLoader />
                 <main>{children}</main>
             </div>
@@ -34,6 +44,15 @@ export default function DashboardLayout({
 
     return (
         <div className="flex h-screen bg-gray-50 dark:bg-slate-900 dark:border-gray-700 dark:bg-[#0b1120] dark:text-slate-200">
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    duration: 3500,
+                    style: { borderRadius: '10px', fontWeight: 600, fontSize: '14px' },
+                    success: { style: { background: '#052e16', color: '#bbf7d0', border: '1px solid #166534' } },
+                    error: { style: { background: '#450a0a', color: '#fecaca', border: '1px solid #991b1b' } },
+                }}
+            />
             {/* Navigation Loading Overlay */}
             <NavigationLoader />
 

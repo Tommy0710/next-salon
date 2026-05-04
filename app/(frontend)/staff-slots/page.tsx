@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { Calendar, Clock, User, Plus, Save, X, Trash2 } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
@@ -103,7 +104,7 @@ export default function StaffSlotsPage() {
 
     const openModal = () => {
         if (!selectedStaff || (creationType === 'date' ? !selectedDate : !selectedDay)) {
-            setMessage({ type: 'error', text: 'Please select staff and date/day first' });
+            toast.error('Please select staff and date/day first');
             return;
         }
         setSlotForm({
@@ -132,13 +133,13 @@ export default function StaffSlotsPage() {
         const end = parse(slotForm.endTime, "HH:mm", new Date());
 
         if (start >= end) {
-            setMessage({ type: 'error', text: 'End time must be after start time' });
+            toast.error('End time must be after start time');
             return;
         }
 
         const slotDuration = slotForm.slotDuration || 30;
         if (slotDuration <= 0) {
-            setMessage({ type: 'error', text: 'Slot duration must be greater than 0' });
+            toast.error('Slot duration must be greater than 0');
             return;
         }
 
@@ -172,7 +173,7 @@ export default function StaffSlotsPage() {
         }
 
         if (newSlots.length === 0) {
-            setMessage({ type: 'error', text: 'No slots created (overlap or duration issue)' });
+            toast.error('No slots created (overlap or duration issue)');
             return;
         }
 
@@ -184,8 +185,7 @@ export default function StaffSlotsPage() {
 
         setSlots(updatedSlots);
         closeModal();
-        setMessage({ type: 'success', text: `${newSlots.length} slot(s) added successfully` });
-        setTimeout(() => setMessage(null), 3000);
+        toast.success(`${newSlots.length} slot(s) added successfully`);
     };
 
     const toggleSlotAvailability = (index: number) => {
@@ -203,13 +203,13 @@ export default function StaffSlotsPage() {
                     const res = await fetch(`/api/staff-slots/${slot._id}`, { method: "DELETE" });
                     const data = await res.json();
                     if (!data.success) {
-                        setMessage({ type: 'error', text: 'Failed to delete slot from database' });
+                        toast.error('Failed to delete slot from database');
                         setDeleting(false);
                         return;
                     }
                 } catch (error) {
                     console.error("Error deleting slot:", error);
-                    setMessage({ type: 'error', text: 'Error deleting slot' });
+                    toast.error('Error deleting slot');
                     setDeleting(false);
                     return;
                 }
@@ -217,8 +217,7 @@ export default function StaffSlotsPage() {
             const updatedSlots = slots.filter((_, i) => i !== index);
             setSlots(updatedSlots);
             setDeleting(false);
-            setMessage({ type: 'success', text: 'Slot deleted successfully' });
-            setTimeout(() => setMessage(null), 3000);
+            toast.success('Slot deleted successfully');
         }
     };
 
@@ -243,15 +242,14 @@ export default function StaffSlotsPage() {
 
             const data = await res.json();
             if (data.success) {
-                setMessage({ type: 'success', text: 'Slots saved successfully!' });
+                toast.success('Slots saved successfully!');
                 await fetchSlots();
-                setTimeout(() => setMessage(null), 3000);
             } else {
-                setMessage({ type: 'error', text: data.error || 'Failed to save slots' });
+                toast.error(data.error || 'Failed to save slots');
             }
         } catch (error) {
             console.error("Error saving slots:", error);
-            setMessage({ type: 'error', text: 'Error saving slots' });
+            toast.error('Error saving slots');
         } finally {
             setSaving(false);
         }

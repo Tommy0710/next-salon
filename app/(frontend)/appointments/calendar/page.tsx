@@ -1,5 +1,6 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { format, parse, addMinutes } from "date-fns";
 import Link from "next/link";
@@ -369,7 +370,7 @@ export default function CalendarPage() {
     // HÀM TẠO CUSTOMER NHANH
     const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) {
-            alert("Vui lòng nhập tên khách hàng");
+            toast.error("Vui lòng nhập tên khách hàng");
             return;
         }
 
@@ -399,11 +400,11 @@ export default function CalendarPage() {
                 setNewCustomerPhone("");
                 setNewCustomerGender("other");
             } else {
-                alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
+                toast.error(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
         } catch (error) {
             console.error(error);
-            alert("Đã xảy ra lỗi khi tạo khách hàng");
+            toast.error("Đã xảy ra lỗi khi tạo khách hàng");
         } finally {
             setIsSubmittingCustomer(false);
         }

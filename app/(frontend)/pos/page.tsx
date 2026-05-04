@@ -1,6 +1,7 @@
 
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingCart, Plus, Minus, Trash2, CreditCard, User, Scissors as ScissorsIcon, Package, LayoutDashboard, Edit, X, Wallet } from "lucide-react";
@@ -115,7 +116,7 @@ export default function POSPage() {
                         const inv = data.data;
 
                         if (inv.status !== 'pending') {
-                            alert("Chỉ hóa đơn ở trạng thái Pending mới có thể chỉnh sửa.");
+                            toast.error("Chỉ hóa đơn ở trạng thái Pending mới có thể chỉnh sửa.");
                             window.history.replaceState({}, '', '/pos');
                             return;
                         }
@@ -231,7 +232,11 @@ export default function POSPage() {
     // --- HÀM TẠO KHÁCH HÀNG NHANH ---
     const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) {
-            alert("Vui lòng nhập tên khách hàng");
+            toast.error("Vui lòng nhập tên khách hàng");
+            return;
+        }
+        if (!newCustomerPhone.trim()) {
+            toast.error("Vui lòng nhập số điện thoại khách hàng");
             return;
         }
 
@@ -261,11 +266,11 @@ export default function POSPage() {
                 setNewCustomerPhone("");
                 setNewCustomerGender("other");
             } else {
-                alert(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
+                toast.error(data.error || "Không thể tạo khách hàng. Vui lòng thử lại.");
             }
         } catch (error) {
             console.error(error);
-            alert("Đã xảy ra lỗi khi tạo khách hàng");
+            toast.error("Đã xảy ra lỗi khi tạo khách hàng");
         } finally {
             setIsSubmittingCustomer(false);
         }
@@ -472,11 +477,11 @@ export default function POSPage() {
     const handleCheckout = async () => {
         if (!activeBill) return;
         if (!activeBill.selectedCustomer) {
-            alert("Please select a customer");
+            toast.error("Please select a customer");
             return;
         }
         if (activeBill.cart.length === 0) {
-            alert("Cart is empty");
+            toast.error("Cart is empty");
             return;
         }
         const serviceItems = activeBill.cart.filter(item => item.type === 'Service');
@@ -485,7 +490,7 @@ export default function POSPage() {
             const itemAssignments = activeBill.serviceStaffAssignments[key] || [];
             const percentTotal = itemAssignments.reduce((sum, a) => sum + (Number(a.percentage) || 0), 0);
             if (percentTotal > 100) {
-                alert(`Staff percentage for service "${item.name}" cannot exceed 100%`);
+                toast.error(`Staff percentage for service "${item.name}" cannot exceed 100%`);
                 return;
             }
         }
@@ -585,11 +590,11 @@ export default function POSPage() {
                 // Khi nhấn nút "Thanh toán thành công" trên trang invoice id mới gửi Zalo.
                 router.push(`/invoices/print/${data.data._id}`);
             } else {
-                alert(data.error || "Failed to create invoice");
+                toast.error(data.error || "Failed to create invoice");
             }
         } catch (error) {
             console.error(error);
-            alert("Error processing checkout");
+            toast.error("Error processing checkout");
         } finally {
             setSubmitting(false);
         }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Save, Store, Mail, Phone, MapPin, DollarSign, Percent, Image as ImageIcon, Globe, FileText, Calendar, Clock, CreditCard, User, MessageSquare, Send, Bell, Sparkles, QrCode, Trash2, ChevronDown } from "lucide-react";
 import FormInput, { FormSelect, FormButton } from "@/components/dashboard/FormInput";
 import SearchableSelect from "@/components/dashboard/SearchableSelect";
@@ -124,7 +125,6 @@ export default function SettingsPage() {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
     const [newQr, setNewQr] = useState({ name: "", bankName: "", accountNumber: "", image: "" });
     const [openTabs, setOpenTabs] = useState({
         general: true,
@@ -151,9 +151,12 @@ export default function SettingsPage() {
         fetchSettings();
     }, []);
 
-    const fetchSettings = async () => {
+    const fetchSettings = async (bypassCache = false) => {
         try {
-            const res = await fetch("/api/settings", { credentials: 'include' });
+            const res = await fetch("/api/settings", {
+                credentials: 'include',
+                cache: bypassCache ? 'no-store' : 'default'
+            });
             const data = await res.json();
             if (data.success) {
                 // Merge fetched data with defaults to ensure all fields exist
@@ -228,7 +231,7 @@ export default function SettingsPage() {
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
-            setMessage({ type: "error", text: "Failed to load settings" });
+            toast.error("Failed to load settings");
         } finally {
             setLoading(false);
         }
@@ -239,7 +242,6 @@ export default function SettingsPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setMessage({ type: "", text: "" });
 
         try {
             const res = await fetch("/api/settings", {
@@ -251,16 +253,18 @@ export default function SettingsPage() {
             const data = await res.json();
 
             if (!res.ok || !data.success) {
-                setMessage({ type: "error", text: data.error || "Failed to save settings" });
+                toast.error(data.error || "Failed to save settings");
                 return;
             }
 
-            setSettings(data.data);
-            // await refreshSettings(); // Không cần refresh vì đã setSettings với data từ save
-            setMessage({ type: "success", text: "Settings saved successfully!" });
+            // Re-fetch and normalize settings (same as initial load) to avoid
+            // Mongoose document type mismatches (e.g. reminderMethods, zaloTemplates)
+            await fetchSettings(true);
+            await refreshSettings(); // Cập nhật SettingsProvider toàn app
+            toast.success("Settings saved successfully!");
         } catch (error) {
             console.error("Error saving settings:", error);
-            setMessage({ type: "error", text: "Failed to save settings" });
+            toast.error("Failed to save settings");
         } finally {
             setSaving(false);
         }
@@ -289,12 +293,6 @@ export default function SettingsPage() {
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cài đặt cửa hàng</h1>
                 <p className="text-gray-500 dark:text-gray-400">Quản lý chi tiết và cấu hình cửa hàng của bạn</p>
             </div>
-
-            {message.text && (
-                <div className={`p-4 rounded-lg mb-4 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-                    {message.text}
-                </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* General Information */}
@@ -942,7 +940,7 @@ export default function SettingsPage() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            if (!newQr.name || !newQr.image) return alert("Vui lòng nhập tên và chọn ảnh QR");
+                                            if (!newQr.name || !newQr.image) { toast.error("Vui lòng nhập tên và chọn ảnh QR"); return; }
                                             const qrWithId = { ...newQr, qrId: `qr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` };
                                             setSettings({ ...settings, qrCodes: [...(settings.qrCodes || []), qrWithId] });
                                             setNewQr({ name: "", bankName: "", accountNumber: "", image: "" }); // Reset form
@@ -1330,7 +1328,7 @@ export default function SettingsPage() {
                 </div>
                 {/* --- KẾT THÚC KHỐI ZALO --- */}
                 {/* AI Settings */}
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
+                {/* <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                     <button
                         type="button"
                         onClick={() => toggleTab('ai')}
@@ -1389,7 +1387,7 @@ export default function SettingsPage() {
                             </div>
                         </div>
                     )}
-                </div>
+                </div> */}
 
                 {/* System Management */}
                 <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 p-4">
@@ -1410,7 +1408,7 @@ export default function SettingsPage() {
                                         window.location.href = '/api/settings/backup';
                                     } catch (error) {
                                         console.error("Backup failed:", error);
-                                        alert("Backup failed. Please try again.");
+                                        toast.error("Backup failed. Please try again.");
                                     }
                                 }}
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary-900 text-white rounded-lg text-sm font-bold hover:bg-primary-800 transition-colors shadow-sm"

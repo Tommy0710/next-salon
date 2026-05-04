@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Save, User, Mail, Lock, Shield } from "lucide-react";
 import FormInput, { FormButton } from "@/components/dashboard/FormInput";
 
@@ -20,7 +21,6 @@ export default function ProfilePage() {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
 
     useEffect(() => {
         fetchProfile();
@@ -39,7 +39,7 @@ export default function ProfilePage() {
             }
         } catch (error) {
             console.error("Error fetching profile:", error);
-            setMessage({ type: "error", text: "Failed to load profile" });
+            toast.error("Failed to load profile");
         } finally {
             setLoading(false);
         }
@@ -48,17 +48,15 @@ export default function ProfilePage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        setMessage({ type: "", text: "" });
 
         if (profile.password && profile.password !== profile.confirmPassword) {
-            setMessage({ type: "error", text: "Passwords do not match" });
+            toast.error("Passwords do not match");
             setSaving(false);
             return;
         }
 
-        // Additional password strength validation
         if (profile.password && profile.password.length < 8) {
-            setMessage({ type: "error", text: "Password must be at least 8 characters" });
+            toast.error("Password must be at least 8 characters");
             setSaving(false);
             return;
         }
@@ -66,7 +64,7 @@ export default function ProfilePage() {
         if (profile.password) {
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
             if (!passwordRegex.test(profile.password)) {
-                setMessage({ type: "error", text: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character" });
+                toast.error("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
                 setSaving(false);
                 return;
             }
@@ -87,13 +85,13 @@ export default function ProfilePage() {
                     password: "",
                     confirmPassword: ""
                 }));
-                setMessage({ type: "success", text: "Profile updated successfully!" });
+                toast.success("Profile updated successfully!");
             } else {
-                setMessage({ type: "error", text: data.error || "Failed to update profile" });
+                toast.error(data.error || "Failed to update profile");
             }
         } catch (error) {
             console.error("Error updating profile:", error);
-            setMessage({ type: "error", text: "Failed to update profile" });
+            toast.error("Failed to update profile");
         } finally {
             setSaving(false);
         }
@@ -113,12 +111,6 @@ export default function ProfilePage() {
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Profile</h1>
                 <p className="text-gray-500">Manage your account settings and preferences</p>
             </div>
-
-            {message.text && (
-                <div className={`p-4 rounded-lg mb-4 ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-                    {message.text}
-                </div>
-            )}
 
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4 flex items-start gap-3">
                 <Shield className="w-5 h-5 mt-0.5 flex-shrink-0" />

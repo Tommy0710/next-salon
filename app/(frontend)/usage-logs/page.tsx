@@ -1,6 +1,7 @@
 
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { Plus, Search, Archive, User, Calendar, History, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { MobileCardList, MobileCard } from "@/components/dashboard/MobileCardList";
@@ -78,11 +79,11 @@ export default function UsageLogsPage() {
             if (data.success) {
                 fetchLogs();
             } else {
-                alert(data.error || "Failed to delete");
+                toast.error(data.error || "Failed to delete");
             }
         } catch (error) {
             console.error(error);
-            alert("Error deleting usage log");
+            toast.error("Error deleting usage log");
         }
     };
 
@@ -101,11 +102,11 @@ export default function UsageLogsPage() {
                 setIsModalOpen(false);
                 setFormData({ product: "", quantity: 1, reason: "Service", staff: "", notes: "" });
             } else {
-                alert(data.error || "Failed to add log");
+                toast.error(data.error || "Failed to add log");
             }
         } catch (error) {
             console.error(error);
-            alert("Error adding usage log");
+            toast.error("Error adding usage log");
         } finally {
             setSubmitting(false);
         }

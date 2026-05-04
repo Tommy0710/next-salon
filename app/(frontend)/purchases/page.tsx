@@ -1,6 +1,7 @@
 
 "use client";
 
+import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { Plus, Search, Filter, ShoppingBag, Eye, Calendar, ChevronLeft, ChevronRight, Trash2, Wallet, X } from "lucide-react";
 import Link from "next/link";
@@ -60,11 +61,11 @@ export default function PurchasesPage() {
             if (data.success) {
                 fetchPurchases();
             } else {
-                alert(data.error || "Failed to delete");
+                toast.error(data.error || "Failed to delete");
             }
         } catch (error) {
             console.error(error);
-            alert("Error deleting purchase");
+            toast.error("Error deleting purchase");
         }
     };
 
@@ -88,11 +89,11 @@ export default function PurchasesPage() {
                 setDepositAmount("");
                 fetchPurchases();
             } else {
-                alert(data.error || "Failed to add deposit");
+                toast.error(data.error || "Failed to add deposit");
             }
         } catch (error) {
             console.error(error);
-            alert("Error adding deposit");
+            toast.error("Error adding deposit");
         } finally {
             setDepositLoading(false);
         }
