@@ -191,15 +191,7 @@ export default function SettingsPage() {
                     smtpFrom: data.data.smtpFrom || "",
                     // Reminder Settings
                     reminderHoursBefore: data.data.reminderHoursBefore || 24,
-                    reminderMethods: (() => {
-                        // Backward compatibility: convert old reminderMethod to array
-                        if (data.data.reminderMethod) {
-                            if (data.data.reminderMethod === 'both') return ['sms', 'email'];
-                            if (data.data.reminderMethod === 'sms') return ['sms'];
-                            if (data.data.reminderMethod === 'email') return ['email'];
-                        }
-                        return data.data.reminderMethods || ['sms', 'email'];
-                    })(),
+                    reminderMethods: data.data.reminderMethods || ['zalo'],
                     // AI Settings
                     aiEnabled: data.data.aiEnabled || false,
                     openaiApiKey: data.data.openaiApiKey || "",

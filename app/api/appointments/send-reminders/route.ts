@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import { Appointment } from "@/lib/initModels";
-import { addDays, startOfDay, endOfDay } from "date-fns";
+import { addDays, addHours, addMinutes, startOfDay, endOfDay } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import {
     sendSMS,
     sendEmail,
@@ -72,17 +73,23 @@ async function sendZaloReminderWithRetry(params: {
     return false;
 }
 
-// POST /api/appointments/send-reminders - Send reminders for upcoming appointments
+// POST /api/appointments/send-reminders - Manually trigger reminders (body can override settings)
 export async function POST(request: Request) {
     try {
         await connectToDB();
 
-        const body = await request.json();
-        const { daysBefore = 1, methods = ['sms', 'email'] } = body;
+        const body = await request.json().catch(() => ({}));
+        const settings = await Settings.findOne();
+
+        // Body overrides settings — useful for manual testing
+        const reminderHours: number =
+            body.hoursBefore ?? settings?.reminderHoursBefore ?? 24;
+        const methods: string[] =
+            body.methods ?? settings?.reminderMethods ?? ["email"];
+        const timezone: string = settings?.timezone || "Asia/Ho_Chi_Minh";
 
         const emailEnabled = await isEmailConfigured();
         const smsEnabled = await isSMSConfigured();
-        const settings = await Settings.findOne();
 
         const zaloTemplateConfig = settings?.zaloEnabled
             ? settings?.zaloTemplates?.find((t: any) => t.eventType === ZALO_EVENTS.APPOINTMENT_REMINDER)
@@ -96,12 +103,18 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
-        const targetDate = addDays(new Date(), daysBefore);
-        const startDate = startOfDay(targetDate);
-        const endDate = endOfDay(targetDate);
+        const now = new Date();
+        const targetTime = addHours(now, reminderHours);
+        const windowStart = addMinutes(targetTime, -30);
+        const windowEnd = addMinutes(targetTime, 30);
 
-        const appointments = await Appointment.find({
-            date: { $gte: startDate, $lte: endDate },
+        const dateFrom = new Date(windowStart);
+        dateFrom.setUTCHours(0, 0, 0, 0);
+        const dateTo = new Date(windowEnd);
+        dateTo.setUTCHours(23, 59, 59, 999);
+
+        const candidates = await Appointment.find({
+            date: { $gte: dateFrom, $lte: dateTo },
             status: 'confirmed',
             reminderSent: { $ne: true }
         })
@@ -109,11 +122,29 @@ export async function POST(request: Request) {
             .populate('staff', 'name')
             .populate('services.service', 'name');
 
+        const appointments = candidates.filter((apt: any) => {
+            if (!apt.startTime) return false;
+            try {
+                const d = new Date(apt.date);
+                const year = d.getUTCFullYear();
+                const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+                const day = String(d.getUTCDate()).padStart(2, "0");
+                const aptUTC = fromZonedTime(
+                    `${year}-${month}-${day}T${apt.startTime}:00`,
+                    timezone
+                );
+                return aptUTC >= windowStart && aptUTC <= windowEnd;
+            } catch {
+                return false;
+            }
+        });
+
         if (appointments.length === 0) {
             return NextResponse.json({
                 success: true,
-                message: "No appointments found for reminders",
-                count: 0
+                message: "No appointments in reminder window",
+                count: 0,
+                window: { from: windowStart, to: windowEnd, reminderHours, methods },
             });
         }
 
@@ -144,7 +175,7 @@ export async function POST(request: Request) {
                     staff?.name,
                     dateStr,
                     timeStr,
-                    process.env.SALON_NAME || 'Our Salon'
+                    settings?.storeName || process.env.SALON_NAME || 'Our Salon'
                 );
                 smsSent = await sendSMS(customer.phone, smsMessage);
             }
@@ -157,9 +188,9 @@ export async function POST(request: Request) {
                     dateStr,
                     timeStr,
                     services,
-                    process.env.SALON_NAME || 'Our Salon',
-                    process.env.SALON_PHONE,
-                    process.env.SALON_ADDRESS
+                    settings?.storeName || process.env.SALON_NAME || 'Our Salon',
+                    settings?.phone || process.env.SALON_PHONE,
+                    settings?.address || process.env.SALON_ADDRESS
                 );
                 emailSent = await sendEmail(
                     customer.email,
@@ -220,7 +251,7 @@ export async function POST(request: Request) {
             req: request,
             action: 'create',
             resource: 'reminder',
-            details: `Sent ${remindersSent.length} appointment reminders (${errors.length} failed) for ${targetDate.toDateString()}`,
+            details: `[Manual] Sent ${remindersSent.length} reminders (${errors.length} failed). Window: ${reminderHours}h ±30min`,
         });
 
         return NextResponse.json({
@@ -229,7 +260,8 @@ export async function POST(request: Request) {
             count: remindersSent.length,
             reminders: remindersSent,
             errors: errors.length > 0 ? errors : undefined,
-            config: { emailEnabled, smsEnabled, zaloEnabled }
+            config: { reminderHours, methods, emailEnabled, smsEnabled, zaloEnabled },
+            window: { from: windowStart, to: windowEnd },
         });
 
     } catch (error: any) {

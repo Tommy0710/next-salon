@@ -39,6 +39,18 @@ export async function GET(request: NextRequest) {
                 website: settings.website,
                 businessHours: settings.businessHours,
                 currency: settings.currency,
+                //thêm
+                reminderHours: settings.reminderHours,
+                reminderMethods: settings.reminderMethods,
+                qrCodes: settings.qrCodes,
+                timeFormat: settings.timeFormat,
+                dateFormat: settings.dateFormat,
+                zaloEnabled: settings.zaloEnabled,
+                zaloTemplates: settings.zaloTemplates,
+                zaloQR: settings.zaloQR,
+                zaloAppId: settings.zaloAppId,
+                zaloAppSecret: settings.zaloAppSecret,
+                //hết
                 timezone: settings.timezone,
             };
             serverCache.set(SETTINGS_PUBLIC_CACHE_KEY, publicData, CACHE_TTL.SETTINGS);
