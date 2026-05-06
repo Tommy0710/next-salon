@@ -30,6 +30,7 @@ export interface IAppointment extends Document {
     reminderSent?: boolean;
     reminderSentAt?: Date;
     reminderCount?: number;
+    lastReminderAttemptAt?: Date;
 }
 
 const appointmentSchema = new Schema<IAppointment>(
@@ -68,6 +69,7 @@ const appointmentSchema = new Schema<IAppointment>(
         reminderSent: { type: Boolean, default: false },
         reminderSentAt: { type: Date },
         reminderCount: { type: Number, default: 0 },
+        lastReminderAttemptAt: { type: Date },
     },
     { timestamps: true }
 );
@@ -76,6 +78,8 @@ const appointmentSchema = new Schema<IAppointment>(
 // Calendar queries: date range filter + status
 appointmentSchema.index({ date: 1, status: 1 });
 appointmentSchema.index({ date: 1 });
+// Cron reminder query: covers all filter fields in order
+appointmentSchema.index({ date: 1, status: 1, reminderSent: 1 });
 // Sort mặc định
 appointmentSchema.index({ createdAt: -1 });
 // Customer appointment history
