@@ -146,22 +146,20 @@ export const SummaryPanel = memo(function SummaryPanel({
                         <div className="flex rounded overflow-hidden border border-gray-300 dark:border-slate-700 text-[10px] font-bold">
                             <button
                                 onClick={handleDiscountTypePercentage}
-                                className={`px-1.5 py-0.5 transition-colors ${
-                                    (activeBill.discountType ?? "percentage") ===
+                                className={`px-1.5 py-0.5 transition-colors ${(activeBill.discountType ?? "percentage") ===
                                     "percentage"
-                                        ? "bg-primary-900 text-white"
-                                        : "bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
-                                }`}
+                                    ? "bg-primary-900 text-white"
+                                    : "bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
+                                    }`}
                             >
                                 %
                             </button>
                             <button
                                 onClick={handleDiscountTypeFixed}
-                                className={`px-1.5 py-0.5 transition-colors ${
-                                    activeBill.discountType === "fixed"
-                                        ? "bg-primary-900 text-white"
-                                        : "bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
-                                }`}
+                                className={`px-1.5 py-0.5 transition-colors ${activeBill.discountType === "fixed"
+                                    ? "bg-primary-900 text-white"
+                                    : "bg-white dark:bg-slate-950 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
+                                    }`}
                             >
                                 ₫
                             </button>
@@ -194,7 +192,7 @@ export const SummaryPanel = memo(function SummaryPanel({
                 )}
 
                 {/* Amount paid */}
-                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 pt-1.5 mt-1">
+                <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-slate-800 pt-1.5 mt-1">
                     <span className="text-[10px] font-bold">Đã thanh toán</span>
                     <input
                         type="number"
@@ -304,11 +302,10 @@ const PaymentMethodButton = memo(function PaymentMethodButton({
     return (
         <button
             onClick={handleClick}
-            className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${
-                isActive
-                    ? "bg-primary-900 text-white border-primary-900 shadow-sm"
-                    : "bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700"
-            }`}
+            className={`py-2 text-[11px] md:text-xs uppercase tracking-wider font-bold rounded-lg border transition-all ${isActive
+                ? "bg-primary-900 text-white border-primary-900 shadow-sm"
+                : "bg-white dark:bg-slate-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-700"
+                }`}
         >
             {method}
         </button>

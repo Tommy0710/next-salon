@@ -159,7 +159,7 @@ export default function UsageLogsPage() {
                             {loading && logs.length === 0 ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan={6} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                        <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                     </tr>
                                 ))
                             ) : logs.length === 0 ? (

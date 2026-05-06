@@ -307,14 +307,14 @@ export default function InvoicesPage() {
                         </thead>
                         <tbody className="bg-white dark:bg-transparent divide-y divide-gray-100 dark:divide-slate-800/50">
                             {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
+                                Array.from({ length: 6 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan={7} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
+                                        <td colSpan={8} className="px-6 py-4"><div className="h-4 bg-gray-100 rounded"></div></td>
                                     </tr>
                                 ))
                             ) : invoices.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
+                                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500 dark:text-slate-500">
                                         <FileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                         <p>Không tìm thấy hóa đơn nào</p>
                                     </td>

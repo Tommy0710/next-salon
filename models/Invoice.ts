@@ -96,6 +96,8 @@ if (process.env.NODE_ENV === 'development') {
 // ── Production Indexes ─────────────────────────────────────────────────────
 // Sort mặc định tất cả list queries
 invoiceSchema.index({ createdAt: -1 });
+// Reports dùng field `date` (khác createdAt) — critical cho tất cả dashboard queries
+invoiceSchema.index({ date: -1 });
 // Filter by status + sort
 invoiceSchema.index({ status: 1, createdAt: -1 });
 // Customer invoice history
